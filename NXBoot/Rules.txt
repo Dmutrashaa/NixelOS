@@ -1,0 +1,5 @@
+HOW TO USE THIS BOOTLOADER?
+1.If you use it, always type "NXBoot (version)
+2.Do not modify functions! You can modify only boot, how it works.
+
+RULES WILL BE ADDED SOON!
