@@ -37,7 +37,7 @@ Loads FAT32 Read-only and LFN - You can see filesystem!
 
 | Feature | Status | Description |
 |---|---|---|
-|Full FAT32 | ⛏️ | You can fully read or write disk. |
+|Full FAT32 | ⛏️ | You can fully read or write disk. Write in kernel, and read on bootloader. You must add read in kernel too.|
 | Multiple DE | ⏳ | You can have other desktop environments.|
 | Full open-source | 🚫 | You can freely use ALL code|
 | More languages | ⏳ | More languages inside OS |
@@ -74,4 +74,17 @@ NixelOS like Windows has editions. You can see them there:
 |---|---|---|---|
 | NixelOS PE | Boot your PC from single ISO/IMG. Best for testing | NixelOS Ultra | Haves best programs on start. Almost all settings! Perfect for maximum of functionality without bloatware for you. |
 |NixelOS Home | Basic functionality with basic apps! | NixelOS Max | All apps, and all functions! But for basic users max bloatware🥀 |
-| NixelOS Min | Minimum of functions. Use it if you have bad internet. | NixelOS Server | Only terminal. Only Internet. Perfect for servers! |
+| NixelOS Min | Minimum of functions. Use it if you have bad internet. | NixelOS Ultimate | NixelOS Home with Pro functions.|
+
+****Minimal Requirements****
+-
+*Currently NixelOS in works. We didn't made full kernel yet. But we have minimal requirements.*
+
+| Component | Requirement |
+|---|---|
+|CPU | Any x64 |
+|RAM | 4MB |
+|GPU | Any with text output |
+|Firmware | Only BIOS. |
+
+
