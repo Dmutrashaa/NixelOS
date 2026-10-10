@@ -57,3 +57,8 @@ https://t.me/NixelOS
 ![NixelOS Logo](https://raw.githubusercontent.com/Dmutrashaa/NixelOS/main/NixelOS%20Site/picture-material/1791559441706.png)
 
 ***Yes, that's our logo what I made by myself lol***
+
+****Developing status****
+-
+For today, full ready NixelOS is **not available**. We are working as hard we can. How it long will be use.
+But don't worry, project is not dead!...
