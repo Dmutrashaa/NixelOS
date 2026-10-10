@@ -66,3 +66,9 @@ But don't worry, project is not dead!...
 ****What's that Source Code in Release?****
 -
 That's just files lol. You can't find there any real source code of NixelOS. Only NXBoot 😏
+
+****About Editions****
+NixelOS like Windows has editions. You can see them there:
+
+****|Basic Editions| Description | Big Editions | Description |****
+    |---|---|---|---|
