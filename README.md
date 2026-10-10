@@ -51,3 +51,9 @@ New features will be added soon...
 Currently we have only Telegram.
 
 https://t.me/NixelOS
+
+****Our Logo****
+-
+![NixelOS Logo](https://raw.githubusercontent.com/Dmutrashaa/NixelOS/main/NixelOS%20Site/picture-material/1791559441706.png)
+
+***Yes, that's our logo what I made by myself lol***
