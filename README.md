@@ -70,5 +70,8 @@ That's just files lol. You can't find there any real source code of NixelOS. Onl
 ****About Editions****
 NixelOS like Windows has editions. You can see them there:
 
-****|Basic Editions| Description | Big Editions | Description |****
-    |---|---|---|---|
+|Basic Editions| Description | Big Editions | Description |
+|---|---|---|---|
+| NixelOS PE | Boot your PC from single ISO/IMG. Best for testing | NixelOS Ultra | Haves best programs on start. Almost all settings! Perfect for maximum of functionality without bloatware for you. |
+|NixelOS Home | Basic functionality with basic apps! | NixelOS Max | All apps, and all functions! But for basic users max bloatware🥀 |
+| NixelOS Min | Minimum of functions. Use it if you have bad internet. | NixelOS Server | Only terminal. Only Internet. Perfect for servers! |
