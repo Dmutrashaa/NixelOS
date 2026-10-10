@@ -62,3 +62,7 @@ https://t.me/NixelOS
 -
 For today, full ready NixelOS is **not available**. We are working as hard we can. How it long will be use.
 But don't worry, project is not dead!...
+
+****What's that Source Code in Release?****
+-
+That's just files lol. You can't find there any real source code of NixelOS. Only NXBoot 😏
