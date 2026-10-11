@@ -25,6 +25,10 @@ It has:
 Boot terminal - To check info about device, boot from file (not ready currently)
 Loads FAT32 Read-only and LFN - You can see filesystem!
 
+NXBoot Screenshots
+-
+
+
 ****Features that NixelOS Support****
 -
 ✅ - Supported
@@ -75,7 +79,7 @@ NixelOS like Windows has editions. You can see them there:
 | NixelOS PE | Boot your PC from single ISO/IMG. Best for testing | NixelOS Ultra | Haves best programs on start. Almost all settings! Perfect for maximum of functionality without bloatware for you. |
 |NixelOS Home | Basic functionality with basic apps! | NixelOS Max | All apps, and all functions! But for basic users max bloatware🥀 |
 | NixelOS Min | Minimum of functions. Use it if you have bad internet. | NixelOS Ultimate | NixelOS Home with Pro functions.|
-
+|NixelOS Starter | Hey, try NixelOS? | NixelOS Pro | Best for bigger home work |
 ****Minimal Requirements****
 -
 *Currently NixelOS in works. We didn't made full kernel yet. But we have minimal requirements.*
