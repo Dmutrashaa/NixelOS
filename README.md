@@ -27,6 +27,15 @@ Loads FAT32 Read-only and LFN - You can see filesystem!
 
 NXBoot Screenshots
 -
+Terminal:
+![NXBoot Terminal](https://github.com/Dmutrashaa/NixelOS/blob/main/NXBoot/latest-pics/1791708996515.png)
+
+Terminal loads:
+![NXBoot terminal loading](https://github.com/Dmutrashaa/NixelOS/blob/main/NXBoot/latest-pics/1791708996531.png)
+
+NXBoot boot error:
+![NXBoot Error screen](https://github.com/Dmutrashaa/NixelOS/blob/main/NXBoot/latest-pics/1791708996547.png)
+
 
 
 ****Features that NixelOS Support****
