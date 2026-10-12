@@ -1,4 +1,6 @@
 NixelOS © 2026. All rights reserved!
+-
 This operating system is NOT Open-Source, so you can't yse the code without permissions!
 All you can see in this repository - OS downloads, and Open-Source components.
-(Use Open-source components with the rules in "Rules of file.txt" file.
+
+*Use Open-source components with the rules in "Rules of file.txt" file.*
