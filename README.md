@@ -28,7 +28,7 @@ Loads FAT32 Read-only and LFN - You can see filesystem!
 NXBoot Screenshots
 -
 Terminal:
-![NXBoot Terminal](https://github.com/Dmutrashaa/NixelOS/blob/main/NXBoot/latest-pics/1791708996515.png)
+![NXBoot Terminal](https://github.com/Dmutrashaa/NixelOS/blob/main/NXBoot/latest-pics/1792059227702.png)
 
 Terminal loads:
 ![NXBoot terminal loading](https://github.com/Dmutrashaa/NixelOS/blob/main/NXBoot/latest-pics/1792059144598.png)
@@ -48,9 +48,11 @@ NXBoot boot error:
 
 ⏳ - Will support soon!
 
+░ - Working but not fully
+
 | Feature | Status | Description |
 |---|---|---|
-|Full FAT32 | ⛏️ | You can fully read or write disk. Write in kernel, and read on bootloader. You must add read in kernel too.|
+|Full FAT32 | ░ | You can fully read or write disk. Write in kernel, and read on bootloader. You must add read in kernel too.|
 | Multiple DE | ⏳ | You can have other desktop environments.|
 | Full open-source | 🚫 | You can freely use ALL code|
 | More languages | ⏳ | More languages inside OS |
