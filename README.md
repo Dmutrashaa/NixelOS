@@ -101,4 +101,9 @@ NixelOS like Windows has editions. You can see them there:
 |GPU | Any with text output |
 |Firmware | Only BIOS. |
 
+****Latest NixelOS****
+-
+Latest NixelOS currently is v0.1 Beta Kamaz.
+![NixelOS v0.1 Banner](https://github.com/Dmutrashaa/NixelOS/blob/main/NixelOS%20Site/picture-material/banners/Untitled221_20261015101750.png)
+
 
