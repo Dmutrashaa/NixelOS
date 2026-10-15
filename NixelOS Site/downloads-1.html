@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090a0e">
+<title>NixelOS Downloads</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--background:#090a0e;--panel:rgba(17,18,24,.68);--border:rgba(255,255,255,.09);--text:#f5f5f7;--muted:#b9bbc7}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--background);color:var(--text);font-family:"Comfortaa",system-ui,sans-serif}body{min-height:100vh;overflow-x:hidden;position:relative;padding-top:62px}
+#particles{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.78}.topbar,main{position:relative;z-index:1}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;width:100%;min-height:62px;padding:10px clamp(14px,3.5vw,38px);background:var(--panel);border-bottom:1px solid var(--border);-webkit-backdrop-filter:blur(10px) brightness(.78);backdrop-filter:blur(7.5px) brightness(.78);justify-content:space-between}
+.brand{display:inline-flex;align-items:center;gap:10px;min-width:0;color:inherit;text-decoration:none}.brand img{display:block;width:36px;height:36px;object-fit:contain;flex:0 0 auto}.brand-name{font-size:17px;line-height:1;font-weight:700;letter-spacing:-.035em;white-space:nowrap}
+.menu-toggle,.menu-close{display:grid;place-items:center;width:44px;height:44px;flex:0 0 auto;border:1px solid rgba(255,255,255,.12);border-radius:12px;color:var(--text);background:rgba(255,255,255,.06);-webkit-backdrop-filter:blur(8.5px);backdrop-filter:blur(8.5px);font:700 22px/1 "Comfortaa",sans-serif;cursor:pointer;transition:background 180ms ease,border-color 180ms ease,transform 220ms ease}.menu-toggle:hover,.menu-close:hover{background:rgba(128,112,255,.16);border-color:rgba(150,140,255,.38)}.menu-toggle:focus-visible,.menu-close:focus-visible{outline:2px solid #a8b4ff;outline-offset:3px}.menu-toggle .menu-icon{display:block;transition:transform 260ms cubic-bezier(.2,.7,.2,1)}.menu-toggle[aria-expanded="true"] .menu-icon{transform:rotate(180deg)}
+.menu-scrim{position:fixed;inset:0;z-index:40;background:rgba(3,4,10,.68);opacity:0;visibility:hidden;transition:opacity 280ms ease,visibility 280ms ease}.menu-scrim.is-open{opacity:1;visibility:visible}
+.side-menu{position:fixed;z-index:41;top:0;right:0;width:78vw;height:100dvh;border-left:1px solid rgba(255,255,255,.14);background:rgba(20,22,35,.32);-webkit-backdrop-filter:blur(11px) saturate(160%) brightness(.72);backdrop-filter:blur(11px) saturate(160%) brightness(.72);box-shadow:-24px 0 68px rgba(0,0,0,.42);opacity:0;visibility:hidden;transform:translateX(105%);transition:transform 380ms cubic-bezier(.2,.75,.2,1),opacity 260ms ease,visibility 380ms;pointer-events:none;padding:22px}.side-menu.is-open{opacity:1;visibility:visible;transform:translateX(0);pointer-events:auto}@media(min-width:769px){.side-menu{width:33.333vw}}
+.menu-close{margin-left:auto;font-size:24px}.menu-close:hover{transform:translateX(2px)}.menu-links{display:grid;gap:12px;margin-top:30px}.menu-link{width:100%}.menu-languages{margin-top:34px}.lang-title{margin:0 0 16px;font-size:18px;line-height:1.45}.lang-actions{display:flex;justify-content:flex-start;gap:8px;flex-wrap:wrap}.lang-button{padding:0 12px;min-height:38px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:40px;padding:0 16px;border:1px solid rgba(133,151,255,.32);border-radius:9px;color:#f7f7ff;text-decoration:none;font:700 13px "Comfortaa",sans-serif;background:linear-gradient(135deg,rgba(91,111,255,.17),rgba(142,78,255,.11));box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 8px 24px rgba(44,56,130,.12);-webkit-backdrop-filter:blur(15px) saturate(135%);backdrop-filter:blur(15px) saturate(135%);cursor:pointer;transition:transform 180ms ease,border-color 180ms ease,background 180ms ease}.btn:hover{transform:translateY(-3px);border-color:rgba(151,166,255,.68);background:linear-gradient(135deg,rgba(91,111,255,.34),rgba(142,78,255,.27))}.btn:focus-visible{outline:2px solid #a8b4ff;outline-offset:4px}.btn[aria-pressed="true"]{border-color:#a8b4ff;background:linear-gradient(135deg,rgba(91,111,255,.42),rgba(142,78,255,.3))}
+main{width:min(900px,calc(100% - 36px));margin:0 auto;padding:clamp(36px,7vh,76px) 0 60px;text-align:center}.page-heading{font-size:clamp(32px,6vw,54px);letter-spacing:-.055em;line-height:1.2;margin:0;opacity:0;transform:translateY(18px)}.intro{max-width:690px;margin:18px auto 34px;color:var(--muted);font-size:clamp(14px,2.4vw,17px);line-height:1.8;opacity:0;transform:translateY(18px)}
+.download-card{width:min(100%,690px);margin:0 auto;text-align:left;overflow:hidden;border:1px solid rgba(133,151,255,.26);border-radius:22px;background:linear-gradient(135deg,rgba(91,111,255,.14),rgba(142,78,255,.08));box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 16px 47px rgba(0,0,0,.22);-webkit-backdrop-filter:blur(15px) saturate(135%);backdrop-filter:blur(15px) saturate(135%);opacity:0;transform:translateY(22px)}.build-image{display:block;width:100%;max-height:310px;object-fit:cover;background:#111522}.card-content{padding:clamp(20px,4vw,32px)}h2{font-size:clamp(21px,3.6vw,29px);line-height:1.35;letter-spacing:-.04em;margin:0 0 22px}.change-group{margin:17px 0;color:var(--muted);line-height:1.8;font-size:14px}.change-group strong{display:block;color:var(--text);margin-bottom:3px}.download-action{margin-top:16px;min-width:145px;min-height:46px;font-size:14px}
+.telegram-note{max-width:690px;margin:30px auto 0;color:var(--muted);font-size:14px;line-height:1.8;opacity:0;transform:translateY(22px)}.telegram-note a{color:#b8c2ff;text-decoration:none;font-weight:700}.telegram-note a:hover{text-decoration:underline}
+.reveal.is-visible,.page-heading.is-visible,.intro.is-visible,.download-card.is-visible,.telegram-note.is-visible{animation:rise-in 800ms cubic-bezier(.2,.7,.2,1) forwards}.page-heading.is-visible{animation-delay:160ms}.intro.is-visible{animation-delay:320ms}.download-card.is-visible{animation-delay:420ms}.telegram-note.is-visible{animation-delay:520ms}@keyframes rise-in{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:480px){body{padding-top:54px}.topbar{min-height:54px;padding:8px 14px}.brand img{width:31px;height:31px}.brand-name{font-size:13px}.side-menu{width:86vw}main{padding:36px 0 50px}.build-image{max-height:220px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}.page-heading,.intro,.download-card,.telegram-note{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<canvas id="particles" aria-hidden="true"></canvas>
+<header class="topbar">
+  <a class="brand" href="index.html" style="color:inherit;text-decoration:none" aria-label="NixelOS home">
+    <img src="https://raw.githubusercontent.com/Dmutrashaa/NixelOS/main/NixelOS%20Site/picture-material/1791559522545.png" alt="NixelOS logo">
+    <span class="brand-name">NixelOS / Downloads</span>
+  </a>
+  <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu"><span class="menu-icon" aria-hidden="true">☰</span></button>
+</header>
+<div class="menu-scrim" id="menu-scrim"></div>
+<aside class="side-menu" id="site-menu" aria-hidden="true" inert>
+  <button class="menu-close" id="menu-close" type="button" aria-label="Close menu">→</button>
+  <nav class="menu-links"><a class="btn menu-link" href="index.html" data-i18n="home">Home</a></nav>
+  <div class="menu-languages"><h2 class="lang-title" data-i18n="langTitle">We are on other languages!</h2>
+  <div class="lang-actions" role="group" aria-label="Language">
+    <button class="btn lang-button" type="button" data-lang="en" aria-pressed="true">English</button>
+    <button class="btn lang-button" type="button" data-lang="ru" aria-pressed="false">Русский</button>
+    <button class="btn lang-button" type="button" data-lang="uk" aria-pressed="false">Українська</button>
+  </div></div>
+</aside>
+<main>
+  <h1 class="page-heading" data-i18n="title">NixelOS Downloads</h1>
+  <p class="intro" data-i18n="intro">You can download and test latest NixelOS. Currently it's beta, so please use this info.</p>
+  <article class="download-card">
+    <img class="build-image" src="https://raw.githubusercontent.com/Dmutrashaa/NixelOS/main/NixelOS%20Site/picture-material/banners/Untitled221_20261015101750.png" alt="NixelOS build banner">
+    <div class="card-content">
+      <h2>NixelOS v0.1 Beta - Kamaz Build 013</h2>
+      <div class="change-group"><strong data-i18n="added">Added:</strong><span>—</span></div>
+      <div class="change-group"><strong data-i18n="updated">Updated:</strong><span data-i18n="updateText">Optimized first boot file.</span></div>
+      <div class="change-group"><strong data-i18n="deleted">Deleted:</strong><span>—</span></div>
+      <a class="btn download-action" href="https://github.com/Dmutrashaa/NixelOS/releases/download/v0.1/NixelOS_V01-BD013.img" data-i18n="download">Download</a>
+    </div>
+  </article>
+  <p class="telegram-note"><span data-i18n="otherBuilds">Wanna See other builds? Check out our Telegram with other builds!</span> <a href="https://t.me/NixelOS/" target="_blank" rel="noopener noreferrer">Telegram</a></p>
+</main>
+<script>
+const translations={
+en:{title:"NixelOS Downloads",intro:"You can download and test latest NixelOS. Currently it's beta, so please use this info.",added:"Added:",updated:"Updated:",updateText:"Optimized first boot file.",deleted:"Deleted:",download:"Download",otherBuilds:"Wanna See other builds? Check out our Telegram with other builds!",home:"Home",langTitle:"We are on other languages!",openMenu:"Open menu",closeMenu:"Close menu"},
+ru:{title:"Загрузки NixelOS",intro:"Вы можете скачать и протестировать последнюю версию NixelOS. Сейчас это бета-версия, поэтому, пожалуйста, учитывайте эту информацию.",added:"Добавлено:",updated:"Обновлено:",updateText:"Оптимизирован файл первой загрузки.",deleted:"Удалено:",download:"Скачать",otherBuilds:"Хотите посмотреть другие сборки? Загляните в наш Telegram — там есть другие версии!",home:"Главная",langTitle:"Мы доступны на других языках!",openMenu:"Открыть меню",closeMenu:"Закрыть меню"},
+uk:{title:"Завантаження NixelOS",intro:"Ви можете завантажити й протестувати найновішу NixelOS. Зараз це бета-версія, тому, будь ласка, врахуйте цю інформацію.",added:"Додано:",updated:"Оновлено:",updateText:"Оптимізовано файл першого завантаження.",deleted:"Видалено:",download:"Завантажити",otherBuilds:"Хочеш побачити інші збірки? Завітай до нашого Telegram — там є інші версії!",home:"Головна",langTitle:"Ми доступні іншими мовами!",openMenu:"Відкрити меню",closeMenu:"Закрити меню"}};
+let currentLang='en';
+function t(key){return (translations[currentLang]&&translations[currentLang][key])||translations.en[key]}
+function applyLang(lang){if(!translations[lang])lang='en';currentLang=lang;document.documentElement.lang=lang;document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n)});document.querySelectorAll('.lang-button').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.lang===lang)));menuToggle.setAttribute('aria-label',menuToggle.getAttribute('aria-expanded')==='true'?t('closeMenu'):t('openMenu'));menuClose.setAttribute('aria-label',t('closeMenu'))}
+let langBusy=false,pendingLang=null;
+function setPressed(lang){document.querySelectorAll('.lang-button').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.lang===lang)))}
+function isRevealed(el){const holder=el.closest('.reveal');return !holder||holder.classList.contains('is-visible')}
+async function switchLang(lang){if(!translations[lang])lang='en';if(lang===currentLang)return;if(langBusy){pendingLang=lang;setPressed(lang);return}const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;const items=Array.from(document.querySelectorAll('[data-i18n]')).filter(isRevealed);if(reduceMotion||!items.length||typeof items[0].animate!=='function'){applyLang(lang);return}langBusy=true;setPressed(lang);const hidden={opacity:0,transform:'translateY(-8px)',filter:'blur(5px)'},shown={opacity:1,transform:'translateY(0)',filter:'blur(0px)'};let outs=[];try{outs=items.map(el=>el.animate([shown,hidden],{duration:220,easing:'ease-in',fill:'forwards'}));await Promise.all(outs.map(a=>a.finished));applyLang(lang);const ins=items.map((el,i)=>el.animate([{opacity:0,transform:'translateY(10px)',filter:'blur(5px)'},shown],{duration:460,delay:Math.min(i*28,340),easing:'cubic-bezier(.2,.7,.2,1)',fill:'backwards'}));outs.forEach(a=>a.cancel());await Promise.all(ins.map(a=>a.finished))}catch(e){outs.forEach(a=>a.cancel());applyLang(lang)}finally{langBusy=false;const next=pendingLang;pendingLang=null;if(next&&next!==currentLang)switchLang(next)}}
+const menuToggle=document.getElementById('menu-toggle'),siteMenu=document.getElementById('site-menu'),menuScrim=document.getElementById('menu-scrim'),menuClose=document.getElementById('menu-close');
+function setMenuOpen(open){menuToggle.setAttribute('aria-expanded',String(open));menuToggle.setAttribute('aria-label',open?t('closeMenu'):t('openMenu'));siteMenu.classList.toggle('is-open',open);menuScrim.classList.toggle('is-open',open);siteMenu.setAttribute('aria-hidden',String(!open));siteMenu.toggleAttribute('inert',!open);menuScrim.setAttribute('aria-hidden',String(!open));document.body.style.overflow=open?'hidden':'';if(open)menuClose.focus();else menuToggle.focus()}
+menuToggle.addEventListener('click',()=>setMenuOpen(menuToggle.getAttribute('aria-expanded')!=='true'));menuClose.addEventListener('click',()=>setMenuOpen(false));menuScrim.addEventListener('click',()=>setMenuOpen(false));document.addEventListener('keydown',event=>{if(event.key==='Escape'&&menuToggle.getAttribute('aria-expanded')==='true')setMenuOpen(false)});
+const revealItems=document.querySelectorAll('.page-heading,.intro,.download-card,.telegram-note');if('IntersectionObserver'in window){const revealObserver=new IntersectionObserver((entries,observer)=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');observer.unobserve(entry.target)}})},{threshold:.12});revealItems.forEach(item=>revealObserver.observe(item))}else revealItems.forEach(item=>item.classList.add('is-visible'));
+const canvas=document.getElementById('particles'),ctx=canvas.getContext('2d');let particles=[],width=0,height=0;const colors=['79, 111, 255','147, 91, 255','73, 177, 255'];function resizeParticles(){const dpr=Math.min(window.devicePixelRatio||1,2);width=window.innerWidth;height=window.innerHeight;canvas.width=Math.floor(width*dpr);canvas.height=Math.floor(height*dpr);canvas.style.width=width+'px';canvas.style.height=height+'px';ctx.setTransform(dpr,0,0,dpr,0,0);const count=Math.min(42,Math.max(18,Math.floor(width/27)));particles=Array.from({length:count},()=>({x:Math.random()*width,y:Math.random()*height,r:2+Math.random()*5,vy:.12+Math.random()*.38,vx:(Math.random()-.5)*.22,color:colors[Math.floor(Math.random()*colors.length)],alpha:.12+Math.random()*.28}))}let animationFrame;function drawParticles(){ctx.clearRect(0,0,width,height);particles.forEach(p=>{p.y-=p.vy;p.x+=p.vx;if(p.y< -15){p.y=height+15;p.x=Math.random()*width}if(p.x< -15)p.x=width+15;if(p.x>width+15)p.x=-15;ctx.save();ctx.globalAlpha=p.alpha;ctx.shadowBlur=19;ctx.shadowColor='rgba('+p.color+', 0.9)';ctx.fillStyle='rgba('+p.color+', 0.65)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.restore()});animationFrame=requestAnimationFrame(drawParticles)}resizeParticles();drawParticles();window.addEventListener('resize',resizeParticles,{passive:true});document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelAnimationFrame(animationFrame);else drawParticles()});
+document.querySelectorAll('.lang-button').forEach(btn=>btn.addEventListener('click',()=>{switchLang(btn.dataset.lang);try{localStorage.setItem('nixelos-lang',btn.dataset.lang)}catch(e){}}));let savedLang='en';try{savedLang=localStorage.getItem('nixelos-lang')||'en'}catch(e){}applyLang(savedLang);
+</script>
+</body>
+</html>
