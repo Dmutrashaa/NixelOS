@@ -28,7 +28,7 @@ jobs:
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "NixelOS Site"
+          path: "NixelOS Sie"
 
       - name: Deploy to GitHub Pages
         id: deployment
