@@ -19,6 +19,7 @@ Currently, we support only for Ukrainian, Russian and English.
 
 **About NXBoot bootloader**
 -
+![NXBoot logo](https://github.com/Dmutrashaa/NixelOS/blob/main/NXBoot/latest-pics/logo.jpg)
 NXBoot - It's a Open-Source Bootloader. You can use it freely!
 It has:
 
