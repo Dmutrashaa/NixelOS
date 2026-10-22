@@ -32,7 +32,7 @@ Terminal:
 ![NXBoot Terminal](https://github.com/Dmutrashaa/NixelOS/blob/main/NXBoot/latest-pics/1792059227702.png)
 
 Terminal loads:
-![NXBoot terminal loading](https://github.com/Dmutrashaa/NixelOS/blob/main/NXBoot/latest-pics/1792059144598.png)
+![NXBoot terminal loading](https://github.com/Dmutrashaa/NixelOS/blob/main/NXBoot/latest-pics/screenshot.png)
 
 NXBoot boot error:
 ![NXBoot Error screen](https://github.com/Dmutrashaa/NixelOS/blob/main/NXBoot/latest-pics/1791708996547.png)
