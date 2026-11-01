@@ -53,7 +53,7 @@ NXBoot boot error:
 
 | Feature | Status | Description |
 |---|---|---|
-|Full FAT32 | ░ | You can fully read or write disk. Write in kernel, and read on bootloader. You must add read in kernel too.|
+|Full FAT32 Read, LFN| ✅ | You can fully read disk. Write in kernel, and read on bootloader. You must add read in kernel too.|
 | Multiple DE | ⏳ | You can have other desktop environments.|
 | Full open-source | 🚫 | You can freely use ALL code|
 | More languages | ⏳ | More languages inside OS |
