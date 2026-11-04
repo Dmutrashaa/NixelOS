@@ -64,7 +64,8 @@ New features will be added soon...
 
 ****Our Socials****
 -
-Currently we have only Telegram and Discord.
+Currently we have only Telegram and Discord. Also we have a website
+https://dmutrashaa.github.io/NixelOS/
 
 https://discord.gg/epS2QGkJvP
 https://t.me/NixelOS
