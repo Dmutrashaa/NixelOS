@@ -1,5 +1,5 @@
-****Welcome to NixelOS Project!****
--
+# Welcome to NixelOS Project!
+
 NixelOS - Is an almost free operating system. This operating system wants to add all best from your favourite OSes!
 
 *Windows* - Simple UI and perfect design
@@ -8,13 +8,13 @@ NixelOS - Is an almost free operating system. This operating system wants to add
 
 *MacOS* - Dock, easy to use!
 
-****Is NixelOS Free?****
--
+# Is NixelOS Free?
+
 Yes! NixelOS is almost free.  But on some big editions you need NXSuper Key, which you need to buy...
 
-****Languages Support****
--
-Currently, we support only for Ukrainian, Russian and English.
+# Languages Support
+
+>Currently, we support only for Ukrainian, Russian and English.
 
 
 **About NXBoot bootloader**
@@ -39,8 +39,8 @@ NXBoot boot error:
 
 
 
-****Features that NixelOS Support****
--
+# Features that NixelOS Support
+
 ✅ - Supported
 
 ⛏️ - In works
@@ -100,8 +100,8 @@ NixelOS like Windows has editions. You can see them there:
 | Component | Requirement |
 |---|---|
 |CPU | Any x64 |
-|RAM | 4MB |
-|GPU | Any with text output |
+|RAM | 6MB |
+|GPU | VGA 1024×768 Mode. 32/24 Colors |
 |Firmware | Only BIOS. |
 
 ****Latest NixelOS****
