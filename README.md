@@ -101,13 +101,21 @@ NixelOS like Windows has editions. You can see them there:
 | Component | Requirement |
 |---|---|
 |CPU | Any x64 |
-|RAM | 6MB |
+|RAM | 16MB |
 |GPU | VGA 1024×768 Mode. 32/24 Colors |
-|Firmware | Only BIOS. |
+|Firmware |BIOS/UEFI |
+|Arch | X86-64 Only |
 
 ****Latest NixelOS****
 -
 Latest NixelOS currently is v0.1 Beta Kamaz.
 ![NixelOS v0.1 Banner](https://github.com/Dmutrashaa/NixelOS/blob/main/NixelOS%20Site/picture-material/banners/Untitled221_20261015101750.png)
 
+# Programming Languages
+NixelOS, currently uses this languages to get more functions.
 
+![ASM](https://img.shields.io/badge/ASM-8e44ad?style=flat)
+![C](https://img.shields.io/badge/C-00599C?style=flat)
+![C++](https://img.shields.io/badge/C++-00599C?style=flat)
+![Other](https://img.shields.io/badge/Other-808080?style=flat)
+![Shell](https://img.shields.io/badge/SH-4EAA25?style=flat)
