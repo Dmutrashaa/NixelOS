@@ -1,7 +1,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-export const SUPABASE_URL = "https://YOUR-PROJECT-REF.supabase.co";
-export const SUPABASE_ANON_KEY = "YOUR-ANON-OR-PUBLISHABLE-KEY";
+export const SUPABASE_URL = "https://pmxbgdggupaznjnclpad.supabase.co";
+export const SUPABASE_ANON_KEY = "sb_publishable_-Vmg7JLeeUA5VYnAtf5Y2Q_HllE6Zac";
 
 export const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
