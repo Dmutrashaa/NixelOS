@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090a0e">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>NixelOS — Profile</title>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("nixelos-theme")==="light"?"light":"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--background:#090a0e;--panel:rgba(17,18,24,.68);--border:rgba(255,255,255,.09);--text:#f5f5f7;--muted:#b9bbc7;--field:rgba(255,255,255,.06)}
+:root[data-theme="light"]{color-scheme:light;--background:#f4f5fb;--panel:rgba(255,255,255,.72);--border:rgba(20,24,60,.12);--text:#14162a;--muted:#555a73;--field:rgba(20,24,60,.05)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--background);color:var(--text);font-family:"Comfortaa",system-ui,sans-serif;transition:background-color 300ms ease,color 300ms ease}
+body{min-height:100vh;overflow-x:hidden;position:relative;padding-top:62px}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(520px 520px at 18% 22%,rgba(79,111,255,.2),transparent 70%),radial-gradient(460px 460px at 84% 70%,rgba(147,91,255,.18),transparent 70%),radial-gradient(380px 380px at 60% 10%,rgba(73,177,255,.12),transparent 70%);animation:drift 14s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(0,-18px,0) scale(1.06)}}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;min-height:62px;padding:10px clamp(14px,3.5vw,38px);background:var(--panel);border-bottom:1px solid var(--border);-webkit-backdrop-filter:blur(10px) brightness(.78);backdrop-filter:blur(7.5px) brightness(.78)}
+:root[data-theme="light"] .topbar{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.brand{display:inline-flex;align-items:center;gap:10px;min-width:0;color:inherit;text-decoration:none}
+.brand img{display:block;width:36px;height:36px;object-fit:contain;transition:transform 420ms cubic-bezier(.3,1.5,.5,1)}
+.brand:hover img{transform:rotate(-8deg) scale(1.08)}
+.brand-name{font-size:17px;line-height:1;font-weight:700;letter-spacing:-.035em;white-space:nowrap}
+.toplink{display:inline-flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;font-size:14px;font-weight:700;transition:color 180ms ease,transform 180ms ease}
+.toplink:hover{color:#a8b4ff;transform:translateX(-3px)}
+:root[data-theme="light"] .toplink:hover{color:#4a5bd8}
+.toplink svg{width:20px;height:20px}
+main{position:relative;z-index:1;width:min(520px,calc(100% - 28px));margin:0 auto;padding:clamp(28px,6vh,64px) 0 60px}
+.card{width:100%;padding:clamp(20px,4vw,30px);border:1px solid rgba(133,151,255,.26);border-radius:22px;background:linear-gradient(135deg,rgba(91,111,255,.14),rgba(142,78,255,.08));box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 16px 47px rgba(0,0,0,.22);-webkit-backdrop-filter:blur(15px) saturate(135%);backdrop-filter:blur(15px) saturate(135%);animation:rise-in 800ms cubic-bezier(.2,.7,.2,1) both}
+:root[data-theme="light"] .card{border-color:rgba(91,111,255,.32);background:linear-gradient(135deg,rgba(255,255,255,.78),rgba(236,240,255,.7));box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 16px 47px rgba(20,24,60,.12)}
+.card+.card{margin-top:18px;animation-delay:120ms}
+@keyframes rise-in{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+h1{margin:0 0 8px;font-size:clamp(24px,4vw,30px);line-height:1.3;letter-spacing:-.04em}
+h2{margin:0 0 4px;font-size:18px;letter-spacing:-.02em}
+.sub{margin:0;color:var(--muted);font-size:15px;line-height:1.7}
+.field{display:grid;gap:6px;margin-top:16px}
+.field label{font-size:13px;font-weight:700;color:var(--muted)}
+.field input,.field textarea{width:100%;min-height:46px;padding:0 14px;border:1px solid var(--border);border-radius:12px;color:var(--text);background:var(--field);font:400 15px "Comfortaa",sans-serif;transition:border-color 180ms ease,box-shadow 180ms ease}
+.field textarea{padding:12px 14px;min-height:92px;resize:vertical;line-height:1.6}
+.field input:focus,.field textarea:focus{outline:none;border-color:rgba(151,166,255,.8);box-shadow:0 0 0 3px rgba(133,151,255,.22)}
+.field input[readonly]{opacity:.7;cursor:not-allowed}
+.hint{font-size:12px;color:var(--muted)}
+.btn{position:relative;overflow:hidden;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:46px;padding:0 22px;border:1px solid rgba(133,151,255,.32);border-radius:9px;color:#f7f7ff;text-decoration:none;font:700 14px "Comfortaa",sans-serif;background:linear-gradient(135deg,rgba(91,111,255,.17),rgba(142,78,255,.11));box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 8px 24px rgba(44,56,130,.12);-webkit-backdrop-filter:blur(15px) saturate(135%);backdrop-filter:blur(15px) saturate(135%);cursor:pointer;transition:transform 180ms ease,border-color 180ms ease,background 180ms ease,opacity 180ms ease}
+:root[data-theme="light"] .btn{color:var(--text);border-color:rgba(91,111,255,.4);background:linear-gradient(135deg,rgba(91,111,255,.12),rgba(142,78,255,.08))}
+.btn:hover{transform:translateY(-3px);border-color:rgba(151,166,255,.68);background:linear-gradient(135deg,rgba(91,111,255,.34),rgba(142,78,255,.27))}
+.btn::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.2) 50%,transparent 70%);transform:translateX(-130%);transition:transform 650ms cubic-bezier(.2,.7,.2,1)}
+.btn:hover::after{transform:translateX(130%)}
+.btn:active{transform:translateY(-1px) scale(.97)}
+.btn:focus-visible{outline:2px solid #a8b4ff;outline-offset:4px}
+.btn:disabled{opacity:.55;cursor:wait;transform:none}
+.btn.block{width:100%;margin-top:22px}
+.btn.ghost{background:var(--field);border-color:var(--border)}
+.btn.danger:hover{border-color:rgba(255,120,120,.7);background:linear-gradient(135deg,rgba(255,90,90,.25),rgba(255,90,140,.18))}
+.msg{margin:14px 0 0;padding:0 12px;max-height:0;overflow:hidden;border-radius:10px;font-size:13px;line-height:1.6;opacity:0;transition:max-height 300ms ease,opacity 300ms ease,padding 300ms ease}
+.msg.on{max-height:90px;padding:10px 12px;opacity:1}
+.msg.err{color:#ff9c9c;background:rgba(255,90,90,.12);border:1px solid rgba(255,120,120,.3)}
+.msg.ok{color:#8ee6b0;background:rgba(60,200,120,.12);border:1px solid rgba(90,220,150,.3)}
+:root[data-theme="light"] .msg.err{color:#b3261e}
+:root[data-theme="light"] .msg.ok{color:#146c3a}
+.alt{margin:20px 0 0;text-align:center;color:var(--muted);font-size:14px}
+.alt a{color:#b8c2ff;font-weight:700;text-decoration:none;padding-bottom:2px;background:linear-gradient(currentColor,currentColor) 0 100%/0 2px no-repeat;transition:background-size 320ms cubic-bezier(.2,.7,.2,1)}
+.alt a:hover{background-size:100% 2px}
+:root[data-theme="light"] .alt a{color:#4a5bd8}
+.av-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:18px}
+.av-lg{width:96px;height:96px;border-radius:50%;object-fit:cover;flex:none;display:grid;place-items:center;font-size:38px;font-weight:700;color:#fff;background:linear-gradient(135deg,#8f9bff,#a46bff);box-shadow:0 8px 28px rgba(120,110,255,.35);border:2px solid rgba(255,255,255,.18);transition:transform 320ms cubic-bezier(.3,1.5,.5,1)}
+.av-lg:hover{transform:scale(1.05)}
+.av-actions{display:flex;gap:10px;flex-wrap:wrap}
+.who{display:flex;align-items:center;gap:8px;margin-top:2px;color:var(--muted);font-size:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.sep{height:1px;margin:24px 0;background:var(--border)}
+@media(max-width:480px){body{padding-top:54px}.topbar{min-height:54px;padding:8px 14px}.brand img{width:31px;height:31px}.brand-name{font-size:16px}.btn.block{min-height:48px}}
+@media(prefers-reduced-motion:reduce){.card,body::before{animation:none}.btn::after{display:none}}
+</style>
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="index.html" aria-label="NixelOS home"><img src="https://raw.githubusercontent.com/Dmutrashaa/NixelOS/main/NixelOS%20Site/picture-material/1791559522545.png" alt="NixelOS logo"><span class="brand-name">NixelOS / Profile</span></a>
+<a class="toplink" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg><span data-sk="back">Back to site</span></a>
+</header>
+<main>
+<section class="card">
+<h1 data-sk="pTitle">Your profile</h1>
+<div class="who"><span id="uname"></span><span id="vb"></span></div>
+<div class="av-row">
+<div id="avslot"></div>
+<div class="av-actions">
+<button class="btn" id="chg" type="button" data-sk="pChange">Change avatar</button>
+<button class="btn ghost" id="rem" type="button" data-sk="pRemove">Remove avatar</button>
+</div>
+<input id="file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+</div>
+<form id="pf" novalidate>
+<div class="field"><label for="un" data-sk="fUser">Username</label><input id="un" type="text" readonly><span class="hint" data-sk="pUserHint">Username can't be changed</span></div>
+<div class="field"><label for="dn" data-sk="fDisp">Display name</label><input id="dn" type="text" maxlength="32" autocomplete="nickname"></div>
+<div class="field"><label for="bio" data-sk="pBio">About you</label><textarea id="bio" maxlength="160"></textarea></div>
+<p class="msg" id="msg" role="status"></p>
+<div class="row"><button class="btn" id="save" type="submit" data-sk="pSave">Save</button><button class="btn ghost danger" id="out" type="button" data-sk="pLogout">Log out</button></div>
+</form>
+</section>
+<section class="card">
+<h2 data-sk="pSecurity">Security</h2>
+<form id="pw" novalidate>
+<div class="field"><label for="np" data-sk="pNewPass">New password</label><input id="np" type="password" autocomplete="new-password" maxlength="72"></div>
+<div class="field"><label for="np2" data-sk="fPass2">Repeat password</label><input id="np2" type="password" autocomplete="new-password" maxlength="72"></div>
+<p class="msg" id="pmsg" role="status"></p>
+<div class="row"><button class="btn" id="pbtn" type="submit" data-sk="pChangePass">Change password</button></div>
+</form>
+</section>
+</main>
+<script type="module">
+import { sb, t, initLang, makeAvatar, badge, getSessionUser, getMyProfile } from "./Auth/supabase.js";
+
+initLang();
+
+const $ = id => document.getElementById(id);
+const user = await getSessionUser();
+if (!user) location.replace("Auth/login.html");
+
+let profile = await getMyProfile(user.id);
+if (!profile) { await sb.auth.signOut(); location.replace("Auth/login.html"); }
+
+const ALLOWED = ["image/jpeg", "image/png", "image/webp"];
+const MAX_BYTES = 2 * 1024 * 1024;
+
+function flash(el, text, ok) {
+  el.textContent = text;
+  el.className = "msg " + (ok ? "ok" : "err") + (text ? " on" : "");
+  if (text) setTimeout(() => { if (el.textContent === text) el.classList.remove("on"); }, 4500);
+}
+
+function render() {
+  $("uname").textContent = "@" + profile.username;
+  $("vb").replaceChildren();
+  if (profile.is_verified) $("vb").append(badge());
+  $("un").value = profile.username;
+  $("dn").value = profile.display_name;
+  $("bio").value = profile.bio || "";
+  $("avslot").replaceChildren(makeAvatar(profile, "av-lg"));
+  $("rem").hidden = !profile.avatar_path;
+}
+
+async function squareJpeg(file) {
+  if (!ALLOWED.includes(file.type) || file.size > MAX_BYTES) throw new Error("eAvatar");
+  let bmp;
+  try { bmp = await createImageBitmap(file); } catch (e) { throw new Error("eAvatar"); }
+  const side = Math.min(bmp.width, bmp.height);
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 256;
+  canvas.getContext("2d").drawImage(bmp, (bmp.width - side) / 2, (bmp.height - side) / 2, side, side, 0, 0, 256, 256);
+  bmp.close();
+  return new Promise((res, rej) => canvas.toBlob(b => b ? res(b) : rej(new Error("eAvatar")), "image/jpeg", 0.9));
+}
+
+async function dropOld(path) {
+  if (path && path.startsWith(user.id + "/")) await sb.storage.from("avatars").remove([path]);
+}
+
+$("chg").addEventListener("click", () => $("file").click());
+
+$("file").addEventListener("change", async () => {
+  const file = $("file").files[0];
+  $("file").value = "";
+  if (!file) return;
+  $("chg").disabled = true;
+  flash($("msg"), t("pWait"), true);
+  try {
+    const blob = await squareJpeg(file);
+    const path = user.id + "/" + Date.now() + ".jpg";
+    const up = await sb.storage.from("avatars").upload(path, blob, { contentType: "image/jpeg", upsert: false });
+    if (up.error) throw new Error("eNet");
+    const old = profile.avatar_path;
+    const upd = await sb.from("profiles").update({ avatar_path: path }).eq("id", user.id).select("id,username,display_name,bio,avatar_path,is_verified,created_at").single();
+    if (upd.error) { await dropOld(path); throw new Error("eNet"); }
+    profile = upd.data;
+    await dropOld(old);
+    render();
+    flash($("msg"), t("pSaved"), true);
+  } catch (e) {
+    flash($("msg"), t(e.message === "eAvatar" ? "eAvatar" : "eNet"), false);
+  }
+  $("chg").disabled = false;
+});
+
+$("rem").addEventListener("click", async () => {
+  const old = profile.avatar_path;
+  if (!old) return;
+  $("rem").disabled = true;
+  const upd = await sb.from("profiles").update({ avatar_path: null }).eq("id", user.id).select("id,username,display_name,bio,avatar_path,is_verified,created_at").single();
+  $("rem").disabled = false;
+  if (upd.error) return flash($("msg"), t("eNet"), false);
+  profile = upd.data;
+  await dropOld(old);
+  render();
+  flash($("msg"), t("pSaved"), true);
+});
+
+$("pf").addEventListener("submit", async event => {
+  event.preventDefault();
+  const dn = $("dn").value.trim();
+  const bio = $("bio").value.trim();
+  if (dn.length < 2 || dn.length > 32 || /[\u0000-\u001f\u007f]/.test(dn)) return flash($("msg"), t("eDisp"), false);
+  $("save").disabled = true;
+  const upd = await sb.from("profiles").update({ display_name: dn, bio }).eq("id", user.id).select("id,username,display_name,bio,avatar_path,is_verified,created_at").single();
+  $("save").disabled = false;
+  if (upd.error) return flash($("msg"), t("eNet"), false);
+  profile = upd.data;
+  render();
+  flash($("msg"), t("pSaved"), true);
+});
+
+$("pw").addEventListener("submit", async event => {
+  event.preventDefault();
+  const a = $("np").value;
+  if (a.length < 8) return flash($("pmsg"), t("ePassLen"), false);
+  if (a !== $("np2").value) return flash($("pmsg"), t("ePassMatch"), false);
+  $("pbtn").disabled = true;
+  const { error } = await sb.auth.updateUser({ password: a });
+  $("pbtn").disabled = false;
+  if (error) return flash($("pmsg"), t("eNet"), false);
+  $("np").value = "";
+  $("np2").value = "";
+  flash($("pmsg"), t("pPassDone"), true);
+});
+
+$("out").addEventListener("click", async () => {
+  $("out").disabled = true;
+  await sb.auth.signOut();
+  location.replace("Auth/login.html");
+});
+
+sb.auth.onAuthStateChange(event => { if (event === "SIGNED_OUT") location.replace("Auth/login.html"); });
+
+render();
+</script>
+</body></html>
