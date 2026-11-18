@@ -1,0 +1,1587 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090a0e">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>NixelOS — Profile</title>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("nixelos-theme")==="light"?"light":"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--background:#090a0e;--panel:rgba(17,18,24,.68);--border:rgba(255,255,255,.09);--text:#f5f5f7;--muted:#b9bbc7;--field:rgba(255,255,255,.06);--option-bg:#14162a}
+:root[data-theme="light"]{color-scheme:light;--background:#f4f5fb;--panel:rgba(255,255,255,.72);--border:rgba(20,24,60,.12);--text:#14162a;--muted:#555a73;--field:rgba(20,24,60,.05);--option-bg:#ffffff}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--background);color:var(--text);font-family:"Comfortaa",system-ui,sans-serif;transition:background-color 300ms ease,color 300ms ease}
+body{min-height:100vh;overflow-x:hidden;position:relative;padding-top:62px}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(520px 520px at 18% 22%,rgba(79,111,255,.2),transparent 70%),radial-gradient(460px 460px at 84% 70%,rgba(147,91,255,.18),transparent 70%),radial-gradient(380px 380px at 60% 10%,rgba(73,177,255,.12),transparent 70%);animation:drift 14s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(0,-18px,0) scale(1.06)}}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;min-height:62px;padding:10px clamp(14px,3.5vw,38px);background:var(--panel);border-bottom:1px solid var(--border);-webkit-backdrop-filter:blur(10px) brightness(.78);backdrop-filter:blur(7.5px) brightness(.78)}
+:root[data-theme="light"] .topbar{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.brand{display:inline-flex;align-items:center;gap:10px;min-width:0;color:inherit;text-decoration:none}
+.brand img{display:block;width:36px;height:36px;object-fit:contain;transition:transform 420ms cubic-bezier(.3,1.5,.5,1)}
+.brand-name{font-size:17px;line-height:1;font-weight:700;letter-spacing:-.035em;white-space:nowrap}
+.top-actions{display:flex;align-items:center;gap:14px}
+.toplink{display:inline-flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;font-size:14px;font-weight:700;transition:color 180ms ease,transform 180ms ease}
+.toplink:hover{color:#a8b4ff;transform:translateX(-3px)}
+:root[data-theme="light"] .toplink:hover{color:#4a5bd8}
+.toplink svg{width:20px;height:20px}
+
+/* Side menu */
+.menu-toggle,.menu-close{display:grid;place-items:center;width:44px;height:44px;flex:0 0 auto;border:1px solid rgba(255,255,255,.12);border-radius:12px;color:var(--text);background:rgba(255,255,255,.06);-webkit-backdrop-filter:blur(8.5px);backdrop-filter:blur(8.5px);font:700 22px/1 "Comfortaa",sans-serif;cursor:pointer;transition:background 180ms ease,border-color 180ms ease,transform 220ms ease}
+.menu-toggle:hover,.menu-close:hover{background:rgba(128,112,255,.16);border-color:rgba(150,140,255,.38)}
+.menu-toggle:focus-visible,.menu-close:focus-visible{outline:2px solid #a8b4ff;outline-offset:3px}
+.menu-toggle svg,.menu-close svg{width:22px;height:22px}
+.menu-toggle .menu-icon{display:block;transition:transform 260ms cubic-bezier(.2,.7,.2,1)}
+.menu-toggle[aria-expanded="true"] .menu-icon{transform:rotate(180deg)}
+.menu-scrim{position:fixed;inset:0;z-index:40;background:rgba(3,4,10,.68);opacity:0;visibility:hidden;transition:opacity 280ms ease,visibility 280ms ease}
+.menu-scrim.is-open{opacity:1;visibility:visible}
+.side-menu{position:fixed;z-index:41;top:0;right:0;width:78vw;height:100dvh;overflow-y:auto;border-left:1px solid rgba(255,255,255,.14);background:rgba(20,22,35,.32);-webkit-backdrop-filter:blur(11px) saturate(160%) brightness(.72);backdrop-filter:blur(11px) saturate(160%) brightness(.72);box-shadow:-24px 0 68px rgba(0,0,0,.42);opacity:0;visibility:hidden;transform:translateX(105%);transition:transform 380ms cubic-bezier(.2,.75,.2,1),opacity 260ms ease,visibility 380ms;pointer-events:none;padding:22px}
+.side-menu.is-open{opacity:1;visibility:visible;transform:translateX(0);pointer-events:auto}
+@media(min-width:769px){.side-menu{width:33.333vw}}
+.menu-head{display:flex;align-items:center;gap:12px}
+.menu-head .menu-close{flex:none;margin-left:0}
+.menu-account{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:8px 14px 8px 8px;border:1px solid rgba(255,255,255,.15);border-radius:16px;color:var(--text,#f5f5f7);background:rgba(255,255,255,.08);text-decoration:none;transition:border-color 180ms ease,background 180ms ease,transform 180ms ease}
+.menu-account:hover{border-color:rgba(151,166,255,.6);background:rgba(128,112,255,.16);transform:translateX(2px)}
+.menu-av{flex:none;width:44px;height:44px;border-radius:50%;object-fit:cover;display:grid;place-items:center;font-size:18px;font-weight:700;color:#fff;background:linear-gradient(135deg,#8f9bff,#a46bff);border:1px solid rgba(255,255,255,.18)}
+.menu-av svg{width:22px;height:22px}
+.menu-acc-text{min-width:0;display:grid;gap:2px}
+.menu-acc-name{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:16px;font-weight:700;line-height:1.3}
+.menu-acc-name>span{margin-left:6px;vertical-align:-3px}
+.menu-acc-sub{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:12px;color:var(--muted,#b9bbc7)}
+.menu-acc-sub:empty{display:none}
+.menu-links{display:grid;gap:2px;margin-top:30px}
+.menu-link{display:flex;align-items:center;gap:14px;width:100%;padding:12px 6px;border-radius:10px;color:var(--text);text-decoration:none;font-size:18px;font-weight:700;transition:color 180ms ease,transform 180ms ease}
+.menu-link svg{width:24px;height:24px;flex:0 0 auto;transition:transform 280ms cubic-bezier(.3,1.5,.5,1)}
+.menu-link:hover,.menu-link[aria-current="page"]{color:#a8b4ff}
+.menu-link:hover{transform:translateX(4px)}
+:root[data-theme="light"] .menu-toggle,:root[data-theme="light"] .menu-close,:root[data-theme="light"] .menu-account{border-color:rgba(20,24,60,.16);background:rgba(20,24,60,.06)}
+:root[data-theme="light"] .side-menu{border-left-color:rgba(20,24,60,.14);background:rgba(250,251,255,.8);box-shadow:-24px 0 68px rgba(20,24,60,.2)}
+:root[data-theme="light"] .menu-link:hover,:root[data-theme="light"] .menu-link[aria-current="page"]{color:#4a5bd8}
+
+main{position:relative;z-index:1;width:min(620px,calc(100% - 28px));margin:0 auto;padding:clamp(28px,6vh,64px) 0 60px}
+.card{width:100%;padding:clamp(20px,4vw,30px);border:1px solid rgba(133,151,255,.26);border-radius:22px;background:linear-gradient(135deg,rgba(91,111,255,.14),rgba(142,78,255,.08));box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 16px 47px rgba(0,0,0,.22);-webkit-backdrop-filter:blur(15px) saturate(135%);backdrop-filter:blur(15px) saturate(135%);animation:rise-in 800ms cubic-bezier(.2,.7,.2,1) both}
+.card.profile-card{padding:0;overflow:hidden}
+.card-body{padding:0 clamp(20px,4vw,30px) clamp(20px,4vw,30px)}
+:root[data-theme="light"] .card{border-color:rgba(91,111,255,.32);background:linear-gradient(135deg,rgba(255,255,255,.78),rgba(236,240,255,.7));box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 16px 47px rgba(20,24,60,.12)}
+.card+.card{margin-top:18px;animation-delay:120ms}
+@keyframes rise-in{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+
+/* Banner + Avatar Header */
+.profile-banner{position:relative;width:100%;height:170px;background:linear-gradient(135deg,#2a3578 0%,#52328c 52%,#1c254a 100%);border-bottom:1px solid var(--border);overflow:hidden;transition:filter 300ms ease}
+.profile-banner::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 25% 30%,rgba(143,155,255,.28),transparent 55%),radial-gradient(circle at 80% 70%,rgba(164,107,255,.25),transparent 55%);pointer-events:none}
+.profile-banner.has-banner::after{display:none}
+.banner-overlay-actions{position:absolute;top:12px;right:12px;z-index:2;display:flex;gap:8px;flex-wrap:wrap}
+.banner-chip{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 12px;border:1px solid rgba(255,255,255,.24);border-radius:999px;color:#fff;background:rgba(12,14,24,.62);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font:700 12px "Comfortaa",sans-serif;cursor:pointer;text-decoration:none;transition:transform 180ms ease,background 180ms ease,border-color 180ms ease}
+.banner-chip:hover{transform:translateY(-2px);background:rgba(91,111,255,.55);border-color:rgba(168,180,255,.8)}
+.banner-chip svg{width:15px;height:15px}
+
+.profile-hero-row{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:-48px;margin-bottom:16px;position:relative;z-index:2}
+.av-lg{width:96px;height:96px;border-radius:50%;object-fit:cover;flex:none;display:grid;place-items:center;font-size:38px;font-weight:700;color:#fff;background:linear-gradient(135deg,#8f9bff,#a46bff);box-shadow:0 8px 28px rgba(0,0,0,.45);border:4px solid var(--background);transition:transform 320ms cubic-bezier(.3,1.5,.5,1)}
+.av-lg:hover{transform:scale(1.05)}
+.av-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+h1{margin:0 0 6px;font-size:clamp(22px,4vw,28px);line-height:1.3;letter-spacing:-.04em}
+h2{margin:0 0 4px;font-size:18px;letter-spacing:-.02em}
+.sub{margin:0;color:var(--muted);font-size:14px;line-height:1.7}
+.who{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:2px;color:var(--muted);font-size:14px}
+.field{display:grid;gap:6px;margin-top:16px}
+.field label{font-size:13px;font-weight:700;color:var(--muted)}
+.field input,.field textarea{width:100%;min-height:46px;padding:0 14px;border:1px solid var(--border);border-radius:12px;color:var(--text);background:var(--field);font:400 15px "Comfortaa",sans-serif;transition:border-color 180ms ease,box-shadow 180ms ease}
+.field textarea{padding:12px 14px;min-height:92px;resize:vertical;line-height:1.6}
+.field input:focus,.field textarea:focus{outline:none;border-color:rgba(151,166,255,.8);box-shadow:0 0 0 3px rgba(133,151,255,.22)}
+.field input[readonly]{opacity:.7;cursor:not-allowed}
+.hint{font-size:12px;color:var(--muted)}
+.btn{position:relative;overflow:hidden;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 18px;border:1px solid rgba(133,151,255,.32);border-radius:9px;color:#f7f7ff;text-decoration:none;font:700 13px "Comfortaa",sans-serif;background:linear-gradient(135deg,rgba(91,111,255,.17),rgba(142,78,255,.11));box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 8px 24px rgba(44,56,130,.12);-webkit-backdrop-filter:blur(15px) saturate(135%);backdrop-filter:blur(15px) saturate(135%);cursor:pointer;transition:transform 180ms ease,border-color 180ms ease,background 180ms ease,opacity 180ms ease}
+:root[data-theme="light"] .btn{color:var(--text);border-color:rgba(91,111,255,.4);background:linear-gradient(135deg,rgba(91,111,255,.12),rgba(142,78,255,.08))}
+.btn:hover{transform:translateY(-3px);border-color:rgba(151,166,255,.68);background:linear-gradient(135deg,rgba(91,111,255,.34),rgba(142,78,255,.27))}
+.btn::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.2) 50%,transparent 70%);transform:translateX(-130%);transition:transform 650ms cubic-bezier(.2,.7,.2,1)}
+.btn:hover::after{transform:translateX(130%)}
+.btn:active{transform:translateY(-1px) scale(.97)}
+.btn:focus-visible{outline:2px solid #a8b4ff;outline-offset:4px}
+.btn:disabled{opacity:.55;cursor:wait;transform:none}
+.btn.ghost{background:var(--field);border-color:var(--border)}
+.btn.danger:hover{border-color:rgba(255,120,120,.7);background:linear-gradient(135deg,rgba(255,90,90,.25),rgba(255,90,140,.18))}
+.btn.sm{min-height:36px;padding:0 13px;font-size:12px}
+.msg{margin:14px 0 0;padding:0 12px;max-height:0;overflow:hidden;border-radius:10px;font-size:13px;line-height:1.6;opacity:0;transition:max-height 300ms ease,opacity 300ms ease,padding 300ms ease}
+.msg.on{max-height:90px;padding:10px 12px;opacity:1}
+.msg.err{color:#ff9c9c;background:rgba(255,90,90,.12);border:1px solid rgba(255,120,120,.3)}
+.msg.ok{color:#8ee6b0;background:rgba(60,200,120,.12);border:1px solid rgba(90,220,150,.3)}
+:root[data-theme="light"] .msg.err{color:#b3261e}
+:root[data-theme="light"] .msg.ok{color:#146c3a}
+.error-panel{display:none;margin-top:16px;padding:16px;border:1px solid rgba(255,120,120,.34);border-radius:14px;background:linear-gradient(135deg,rgba(255,75,95,.12),rgba(150,60,110,.08));animation:rise-in 350ms ease both}
+.error-panel.on{display:block}
+.error-title{margin:0 0 8px;font-size:16px;font-weight:700;color:#ff999f}
+:root[data-theme="light"] .error-title{color:#b3261e}
+.error-intro{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.6}
+.error-caption{font-size:12px;font-weight:700;color:var(--muted)}
+.error-details{margin:8px 0 0;padding:10px;border:1px solid var(--border);border-radius:9px;background:rgba(0,0,0,.12);font:12px/1.6 monospace;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--text);max-height:190px;overflow:auto}
+:root[data-theme="light"] .error-details{background:rgba(20,24,60,.04)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.sep{height:1px;margin:20px 0;background:var(--border)}
+
+/* Friends list inside profile */
+.fr-subhead{margin:16px 0 10px;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.fr-grid{display:grid;gap:10px}
+.fr-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid var(--border);border-radius:14px;background:var(--field)}
+.fr-user{display:flex;align-items:center;gap:10px;min-width:0;color:inherit;text-decoration:none}
+.fr-av{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none;display:grid;place-items:center;font-size:16px;font-weight:700;color:#fff;background:linear-gradient(135deg,#8f9bff,#a46bff)}
+.fr-meta{min-width:0}
+.fr-name{display:flex;align-items:center;gap:5px;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fr-handle{font-size:12px;color:var(--muted)}
+.fr-btns{display:flex;gap:6px;flex:none}
+.fr-empty{margin:8px 0;font-size:13px;color:var(--muted)}
+
+@media(max-width:480px){body{padding-top:54px}.topbar{min-height:54px;padding:8px 14px}.brand img{width:31px;height:31px}.brand-name{font-size:16px}.profile-banner{height:140px}}
+@media(prefers-reduced-motion:reduce){.card,body::before{animation:none}.btn::after{display:none}}
+
+.menu-theme{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:26px;padding:0 6px}
+.menu-theme-label{font-size:16px;font-weight:700}
+.theme-switch{position:relative;display:flex;align-items:center;justify-content:space-between;flex:0 0 auto;width:62px;height:34px;padding:0 8px;border:1px solid rgba(255,255,255,.18);border-radius:999px;color:var(--muted);background:rgba(255,255,255,.08);cursor:pointer}
+.theme-switch svg{width:16px;height:16px}
+.theme-knob{position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#8f9bff,#a46bff);box-shadow:0 2px 8px rgba(0,0,0,.35);transition:transform 280ms cubic-bezier(.2,.7,.2,1)}
+.theme-switch[aria-checked="true"] .theme-knob{transform:translateX(28px)}
+.menu-languages{margin-top:34px}
+.lang-title{margin:0 0 16px;font-size:18px;line-height:1.45}
+.lang-switch{position:relative;display:flex;align-items:center;width:100%;padding:3px;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.06);container-type:inline-size}
+.lang-thumb{position:absolute;top:3px;bottom:3px;left:0;width:0;border-radius:999px;background:linear-gradient(135deg,#8f9bff,#a46bff);box-shadow:0 2px 12px rgba(120,110,255,.45)}
+.lang-button{position:relative;z-index:1;flex:1 1 auto;min-width:0;min-height:36px;padding:0 6px;border:0;border-radius:999px;color:var(--muted);background:none;font:700 12px "Comfortaa",sans-serif;cursor:pointer}
+.lang-button[aria-pressed="true"]{color:#fff}
+:root[data-theme="light"] .lang-switch,:root[data-theme="light"] .theme-switch{border-color:rgba(20,24,60,.18);background:rgba(20,24,60,.07)}
+
+
+.nx-rules-btn{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 13px;border:1px solid rgba(151,166,255,.38);border-radius:999px;color:var(--text,#f5f5f7);background:rgba(133,151,255,.12);font:700 12px "Comfortaa",sans-serif;cursor:pointer;transition:transform 180ms ease,border-color 180ms ease,background 180ms ease}
+.nx-rules-btn:hover{transform:translateY(-2px);border-color:rgba(151,166,255,.75);background:rgba(133,151,255,.22)}
+.nx-rules-btn svg{width:15px;height:15px;color:#a8b4ff;flex:none}
+:root[data-theme="light"] .nx-rules-btn{border-color:rgba(91,111,255,.4);background:rgba(91,111,255,.1)}
+:root[data-theme="light"] .nx-rules-btn svg{color:#4a5bd8}
+.nx-rules-overlay{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:rgba(5,6,12,.68);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);opacity:0;visibility:hidden;transition:opacity 220ms ease,visibility 220ms ease}
+.nx-rules-overlay.on{opacity:1;visibility:visible}
+.nx-rules-box{width:min(520px,100%);max-height:88vh;overflow-y:auto;padding:clamp(20px,4vw,28px);text-align:left;border:1px solid rgba(151,166,255,.36);border-radius:22px;background:linear-gradient(135deg,rgba(28,31,56,.97),rgba(16,18,30,.98));box-shadow:0 24px 70px rgba(0,0,0,.5);transform:translateY(16px) scale(.97);transition:transform 260ms cubic-bezier(.2,.7,.2,1)}
+.nx-rules-overlay.on .nx-rules-box{transform:none}
+:root[data-theme="light"] .nx-rules-box{background:linear-gradient(135deg,rgba(255,255,255,.98),rgba(238,242,255,.98));box-shadow:0 24px 70px rgba(20,24,60,.24)}
+.nx-rules-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.nx-rules-top h3{margin:0;font-size:clamp(19px,3.2vw,23px);line-height:1.3;letter-spacing:-.03em}
+.nx-rules-sub{margin:0 0 16px;color:var(--muted,#b9bbc7);font-size:13.5px;line-height:1.65}
+.nx-rules-list{display:grid;gap:10px;margin:0 0 16px;padding:0;list-style:none}
+.nx-rules-item{padding:12px 14px;border:1px solid rgba(151,166,255,.22);border-left:3px solid #8f9bff;border-radius:6px 14px 14px 6px;background:rgba(255,255,255,.04)}
+.nx-rules-item:nth-child(4){border-left-color:#ff7a8a;background:rgba(255,100,120,.07)}
+:root[data-theme="light"] .nx-rules-item{background:rgba(91,111,255,.06);border-color:rgba(91,111,255,.22)}
+:root[data-theme="light"] .nx-rules-item:nth-child(4){background:rgba(255,90,110,.09)}
+.nx-rules-item strong{display:block;margin-bottom:4px;font-size:14.5px;color:var(--text,#f5f5f7)}
+.nx-rules-item p{margin:0;font-size:13px;line-height:1.6;color:var(--muted,#b9bbc7)}
+.nx-rules-foot{margin:0 0 16px;padding:10px 12px;border-radius:12px;background:rgba(133,151,255,.1);font-size:13px;font-weight:700;line-height:1.55;text-align:center;color:var(--text,#f5f5f7)}
+.nx-rules-ok{width:100%}
+
+</style>
+  <style>
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: none; }
+}
+
+.reveal.is-visible,
+.hero-logo.is-visible,
+h1.is-visible,
+.tagline.is-visible {
+  animation: rise-in 800ms cubic-bezier(.2,.7,.2,1) forwards;
+}
+
+h1.is-visible { animation-delay: 160ms; }
+.tagline.is-visible { animation-delay: 320ms; }
+
+.os-card:nth-child(1).is-visible { animation-delay: 80ms; }
+.os-card:nth-child(2).is-visible { animation-delay: 220ms; }
+.os-card:nth-child(3).is-visible { animation-delay: 360ms; }
+.social-section .social-intro.is-visible { animation-delay: 120ms; }
+.social-section .social-actions.is-visible { animation-delay: 240ms; }
+
+.reveal.reveal-auto { opacity: 0; transform: translateY(22px); animation: none; }
+.reveal.reveal-auto.is-visible { animation: rise-in 800ms cubic-bezier(.2,.7,.2,1) forwards; animation-delay: var(--reveal-delay, 0ms); }
+
+.os-card,.status-card,.download-card,.news-card,.card,.req-card,.faq-panel{transition:translate 360ms cubic-bezier(.2,.7,.2,1),border-color 300ms ease,box-shadow 360ms ease}
+.os-card:hover,.status-card:hover,.download-card:hover,.news-card:hover,.card:hover,.req-card:hover,.faq-panel:hover{translate:0 -5px;border-color:rgba(151,166,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 24px 60px rgba(44,56,130,.3)}
+:root[data-theme="light"] .os-card:hover,:root[data-theme="light"] .status-card:hover,:root[data-theme="light"] .download-card:hover,:root[data-theme="light"] .news-card:hover,:root[data-theme="light"] .card:hover,:root[data-theme="light"] .req-card:hover,:root[data-theme="light"] .faq-panel:hover{border-color:rgba(91,111,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 24px 60px rgba(44,56,130,.2)}
+.btn,.social-button{position:relative;overflow:hidden;isolation:isolate}
+.btn::after,.social-button::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.2) 50%,transparent 70%);transform:translateX(-130%);transition:transform 650ms cubic-bezier(.2,.7,.2,1)}
+.btn:hover::after,.social-button:hover::after{transform:translateX(130%)}
+.btn:active,.social-button:active{transform:translateY(-1px) scale(.97)}
+.telegram-note a,.news-note a{padding-bottom:2px;background:linear-gradient(currentColor,currentColor) 0 100%/0 2px no-repeat;transition:background-size 320ms cubic-bezier(.2,.7,.2,1),color 200ms ease}
+.telegram-note a:hover,.news-note a:hover{background-size:100% 2px;text-decoration:none}
+.build-image,.news-image{transition:filter 500ms ease}
+.download-card:hover .build-image,.news-card:hover .news-image{filter:saturate(1.15) brightness(1.06)}
+.brand img{transition:transform 420ms cubic-bezier(.3,1.5,.5,1)}
+.brand:hover img{transform:rotate(-8deg) scale(1.08)}
+.menu-link svg{transition:transform 280ms cubic-bezier(.3,1.5,.5,1)}
+.menu-link:hover svg{transform:scale(1.14) rotate(-4deg)}
+.theme-switch{transition:border-color 200ms ease,background 200ms ease}
+.theme-switch:hover{border-color:rgba(151,166,255,.6);background:rgba(133,151,255,.14)}
+:root[data-theme="light"] .theme-switch:hover{border-color:rgba(91,111,255,.6);background:rgba(91,111,255,.14)}
+.lang-switch.is-ready .lang-thumb{transition:transform 440ms cubic-bezier(.2,.8,.2,1.1),width 440ms cubic-bezier(.2,.8,.2,1.1)}
+@media(prefers-reduced-motion:reduce){.os-card:hover,.status-card:hover,.download-card:hover,.news-card:hover,.card:hover,.req-card:hover,.faq-panel:hover{translate:none}.btn::after,.social-button::after{display:none}.lang-switch.is-ready .lang-thumb{transition:none}}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-logo, h1, .tagline, .reveal, .os-card, .status-card {
+    opacity: 1;
+    transform: none;
+    animation: none !important;
+  }
+}
+
+.menu-toggle:active,.menu-close:active,.lang-button:active{transform:scale(.94)}
+.fr-item,.friend-mini,.req-item,.faq-post,.chat-msg,.nx-c,.u-tab,.faq-tab{transition:translate 300ms cubic-bezier(.2,.7,.2,1),border-color 240ms ease,box-shadow 300ms ease,background 240ms ease,color 200ms ease}
+.fr-item:hover,.friend-mini:hover,.req-item:hover,.faq-post:hover,.nx-c:hover{translate:0 -3px;border-color:rgba(151,166,255,.55);box-shadow:0 14px 34px rgba(44,56,130,.22)}
+.chat-msg:hover{translate:3px 0;border-color:rgba(151,166,255,.5)}
+.uc-av,.chat-av,.av-lg,.pv-av,.fr-av,.friend-mini-av,.nx-av,.menu-av{transition:scale 360ms cubic-bezier(.3,1.5,.5,1),box-shadow 300ms ease}
+.user-card:hover .uc-av,.chat-msg:hover .chat-av,.fr-item:hover .fr-av,.friend-mini:hover .friend-mini-av,.nx-c:hover .nx-av,.av-lg:hover,.pv-av:hover,.menu-account:hover .menu-av{scale:1.1;box-shadow:0 0 0 3px rgba(151,166,255,.4),0 8px 22px rgba(44,56,130,.35)}
+.nx-rules-btn,.nx-chip,.faq-open,.news-button,.req-cta,.download-action{position:relative;overflow:hidden;isolation:isolate}
+.nx-rules-btn::after,.nx-chip::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.2) 50%,transparent 70%);transform:translateX(-130%);transition:transform 650ms cubic-bezier(.2,.7,.2,1)}
+.nx-rules-btn:hover::after,.nx-chip:hover::after{transform:translateX(130%)}
+.nx-rules-btn:active,.nx-chip:active,.u-tab:active,.faq-tab:active,.faq-open:active,.news-button:active,.req-cta:active,.download-action:active{scale:.96}
+.users-grid>*,.friends-grid>*,.fr-grid>*,.req-grid>*,.faq-list>*{animation:rise-in 560ms cubic-bezier(.2,.7,.2,1) both}
+.users-grid>*:nth-child(2),.friends-grid>*:nth-child(2),.fr-grid>*:nth-child(2),.req-grid>*:nth-child(2),.faq-list>*:nth-child(2){animation-delay:70ms}
+.users-grid>*:nth-child(3),.friends-grid>*:nth-child(3),.fr-grid>*:nth-child(3),.req-grid>*:nth-child(3),.faq-list>*:nth-child(3){animation-delay:140ms}
+.users-grid>*:nth-child(4),.friends-grid>*:nth-child(4),.fr-grid>*:nth-child(4),.req-grid>*:nth-child(4),.faq-list>*:nth-child(4){animation-delay:210ms}
+.users-grid>*:nth-child(n+5),.friends-grid>*:nth-child(n+5),.fr-grid>*:nth-child(n+5),.req-grid>*:nth-child(n+5),.faq-list>*:nth-child(n+5){animation-delay:280ms}
+.faq-hero,.back-bar{animation:rise-in 700ms cubic-bezier(.2,.7,.2,1) both}
+.live-dot{animation:nx-pulse 1.8s ease-in-out infinite}
+@keyframes nx-pulse{0%,100%{box-shadow:0 0 0 0 rgba(120,255,170,.5)}50%{box-shadow:0 0 0 7px rgba(120,255,170,0)}}
+@media(prefers-reduced-motion:reduce){.users-grid>*,.friends-grid>*,.fr-grid>*,.req-grid>*,.faq-list>*,.faq-hero,.back-bar,.live-dot{animation:none}.nx-rules-btn::after,.nx-chip::after{display:none}.fr-item:hover,.friend-mini:hover,.req-item:hover,.faq-post:hover,.nx-c:hover,.chat-msg:hover{translate:none}}
+.menu-toggle:focus-visible,.menu-close:focus-visible,.menu-link:focus-visible,.lang-button:focus-visible,.theme-switch:focus-visible,.btn:focus-visible,.toplink:focus-visible{outline:2px solid rgba(151,166,255,.85);outline-offset:2px}
+</style>
+  <script>
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function ready(fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+
+  function initReveal() {
+    if (document.querySelector('.reveal') || reduce) return;
+    var main = document.querySelector('main');
+    if (!main) return;
+    var items = [];
+    Array.prototype.forEach.call(main.children, function (el) {
+      var cs = getComputedStyle(el);
+      if (cs.animationName !== 'none' || cs.position === 'fixed' || cs.display === 'none' || el.hidden || /^(SCRIPT|STYLE|TEMPLATE)$/.test(el.tagName)) return;
+      items.push(el);
+    });
+    items.forEach(function (el, i) {
+      el.classList.add('reveal', 'reveal-auto');
+      el.style.setProperty('--reveal-delay', Math.min(i, 4) * 140 + 'ms');
+    });
+    if ('IntersectionObserver' in window) {
+      var revealObserver = new IntersectionObserver(function (entries, observer) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      items.forEach(function (item) { revealObserver.observe(item); });
+    } else {
+      items.forEach(function (item) { item.classList.add('is-visible'); });
+    }
+  }
+
+  function initParticles() {
+    if (document.getElementById('particles')) return;
+    var canvas = document.createElement('canvas');
+    canvas.id = 'particles';
+    canvas.setAttribute('aria-hidden', 'true');
+    canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.78';
+    document.body.insertBefore(canvas, document.body.firstChild);
+    ['.topbar', 'main'].forEach(function (sel) {
+      var n = document.querySelector(sel);
+      if (n && getComputedStyle(n).position === 'static') { n.style.position = 'relative'; n.style.zIndex = '1'; }
+    });
+    var ctx = canvas.getContext('2d');
+    var particles = [], width = 0, height = 0, animationFrame;
+    var colors = ['79, 111, 255', '147, 91, 255', '73, 177, 255'];
+    function resizeParticles() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth; height = window.innerHeight;
+      canvas.width = Math.floor(width * dpr); canvas.height = Math.floor(height * dpr);
+      canvas.style.width = width + 'px'; canvas.style.height = height + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var count = Math.min(42, Math.max(18, Math.floor(width / 27)));
+      particles = Array.from({ length: count }, function () {
+        return {
+          x: Math.random() * width, y: Math.random() * height, r: 2 + Math.random() * 5,
+          vy: 0.12 + Math.random() * 0.38, vx: (Math.random() - 0.5) * 0.22,
+          color: colors[Math.floor(Math.random() * colors.length)], alpha: 0.12 + Math.random() * 0.28
+        };
+      });
+    }
+    function drawParticles() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(function (p) {
+        p.y -= p.vy; p.x += p.vx;
+        if (p.y < -15) { p.y = height + 15; p.x = Math.random() * width; }
+        if (p.x < -15) p.x = width + 15;
+        if (p.x > width + 15) p.x = -15;
+        ctx.save();
+        ctx.globalAlpha = p.alpha; ctx.shadowBlur = 19;
+        ctx.shadowColor = 'rgba(' + p.color + ', 0.9)'; ctx.fillStyle = 'rgba(' + p.color + ', 0.65)';
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      });
+      animationFrame = requestAnimationFrame(drawParticles);
+    }
+    resizeParticles(); drawParticles();
+    window.addEventListener('resize', resizeParticles, { passive: true });
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) cancelAnimationFrame(animationFrame);
+      else drawParticles();
+    });
+  }
+
+  ready(function () { initReveal(); initParticles(); });
+})();
+(function () {
+  var busy = false, pending = null;
+  function setPressed(lang) {
+    document.querySelectorAll('.lang-button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.lang === lang)); });
+  }
+  function visible(el) {
+    var r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < window.innerHeight;
+  }
+  window.nxLangSwap = async function (lang, apply) {
+    if (lang === document.documentElement.lang) { apply(); return; }
+    if (busy) { pending = [lang, apply]; setPressed(lang); return; }
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var items = Array.prototype.filter.call(document.querySelectorAll('[data-i18n],[data-sk]'), visible);
+    if (reduce || !items.length || typeof items[0].animate !== 'function') { apply(); return; }
+    busy = true;
+    setPressed(lang);
+    var shown = { opacity: 1, transform: 'translateY(0)', filter: 'blur(0px)' };
+    var hidden = { opacity: 0, transform: 'translateY(-8px)', filter: 'blur(5px)' };
+    var outs = [], applied = false;
+    try {
+      outs = items.map(function (el) { return el.animate([shown, hidden], { duration: 220, easing: 'ease-in', fill: 'forwards' }); });
+      await Promise.race([Promise.all(outs.map(function (a) { return a.finished; })), new Promise(function (r) { setTimeout(r, 600); })]);
+      apply();
+      applied = true;
+      var ins = items.map(function (el, i) {
+        return el.animate([{ opacity: 0, transform: 'translateY(10px)', filter: 'blur(5px)' }, shown], { duration: 460, delay: Math.min(i * 28, 340), easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' });
+      });
+      outs.forEach(function (a) { a.cancel(); });
+      await Promise.race([Promise.all(ins.map(function (a) { return a.finished; })), new Promise(function (r) { setTimeout(r, 1400); })]);
+    } catch (e) {
+      outs.forEach(function (a) { a.cancel(); });
+      if (!applied) apply();
+    } finally {
+      busy = false;
+      var next = pending;
+      pending = null;
+      if (next) window.nxLangSwap(next[0], next[1]);
+    }
+  };
+})();
+</script>
+  <script>
+(function(){
+if(window.__nxChrome)return;window.__nxChrome=1;
+var page=(location.pathname.split('/').pop()||'index.html').replace(/\.html$/i,'').toLowerCase()||'index';
+var UI={
+en:{home:'NixelOS home',logo:'NixelOS logo',open:'Open menu',close:'Close menu',nav:'Site navigation',lang:'Language',theme:'Light theme'},
+ru:{home:'NixelOS — на главную',logo:'Логотип NixelOS',open:'Открыть меню',close:'Закрыть меню',nav:'Навигация по сайту',lang:'Язык',theme:'Светлая тема'},
+uk:{home:'NixelOS — на головну',logo:'Логотип NixelOS',open:'Відкрити меню',close:'Закрити меню',nav:'Навігація сайтом',lang:'Мова',theme:'Світла тема'}
+};
+var PG={
+index:{en:['NixelOS',''],ru:['NixelOS',''],uk:['NixelOS','']},
+downloads:{en:['NixelOS Downloads','Downloads'],ru:['NixelOS — Загрузки','Загрузки'],uk:['NixelOS — Завантаження','Завантаження']},
+news:{en:['NixelOS News','News'],ru:['NixelOS — Новости','Новости'],uk:['NixelOS — Новини','Новини']},
+'min-req':{en:['NixelOS Minimal Requirements','Requirements'],ru:['NixelOS — Минимальные требования','Требования'],uk:['NixelOS — Мінімальні вимоги','Вимоги']},
+faq:{en:['NixelOS FAQ','FAQ'],ru:['NixelOS — FAQ','FAQ'],uk:['NixelOS — FAQ','FAQ']},
+users:{en:['NixelOS — Users','Users'],ru:['NixelOS — Пользователи','Пользователи'],uk:['NixelOS — Користувачі','Користувачі']},
+chat:{en:['NixelOS — Community Chat','Chat'],ru:['NixelOS — Чат сообщества','Чат'],uk:['NixelOS — Чат спільноти','Чат']},
+profile:{en:['NixelOS — Profile','Profile'],ru:['NixelOS — Профиль','Профиль'],uk:['NixelOS — Профіль','Профіль']},
+'profile-view':{en:['NixelOS — User Profile','Profile View'],ru:['NixelOS — Профиль пользователя','Профиль'],uk:['NixelOS — Профіль користувача','Профіль']},
+login:{en:['NixelOS — Log in','Login'],ru:['NixelOS — Вход','Вход'],uk:['NixelOS — Вхід','Вхід']},
+register:{en:['NixelOS — Sign up','Sign up'],ru:['NixelOS — Регистрация','Регистрация'],uk:['NixelOS — Реєстрація','Реєстрація']},
+verification:{en:['NixelOS — Email verification','Verification'],ru:['NixelOS — Подтверждение почты','Подтверждение'],uk:['NixelOS — Підтвердження пошти','Підтвердження']}
+};
+function lang(){var l=document.documentElement.lang;if(!UI[l]){try{l=localStorage.getItem('nixelos-lang')}catch(e){}}return UI[l]?l:'en'}
+function set(el,a,v){if(el&&el.getAttribute(a)!==v)el.setAttribute(a,v)}
+function chrome(){
+var l=lang(),u=UI[l],p=PG[page];
+set(document.querySelector('.brand'),'aria-label',u.home);
+document.querySelectorAll('.brand img,.menu-head img,.hero-logo').forEach(function(i){set(i,'alt',u.logo)});
+var tg=document.getElementById('menu-toggle');
+if(tg)set(tg,'aria-label',tg.getAttribute('aria-expanded')==='true'?u.close:u.open);
+set(document.getElementById('menu-close'),'aria-label',u.close);
+set(document.querySelector('.menu-links'),'aria-label',u.nav);
+set(document.querySelector('.lang-switch'),'aria-label',u.lang);
+set(document.getElementById('theme-switch'),'aria-label',u.theme);
+if(p){
+var known=[p.en[0],p.ru[0],p.uk[0]];
+if(known.indexOf(document.title)>-1&&document.title!==p[l][0])document.title=p[l][0];
+var bn=document.querySelector('.brand-name');
+if(bn&&p.en[1]&&/^NixelOS\s*\/\s*/.test(bn.textContent)){var want='NixelOS / '+p[l][1];if(bn.textContent!==want)bn.textContent=want}
+}
+}
+var last=lang();
+function onLang(){last=lang();chrome()}
+new MutationObserver(onLang).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+new MutationObserver(function(){chrome()}).observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['aria-expanded']});
+document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.lang-button'))setTimeout(onLang,0)});
+function init(){
+chrome();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+window.addEventListener('load',chrome);
+})();
+</script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="index.html" aria-label="NixelOS home">
+    <img src="https://raw.githubusercontent.com/Dmutrashaa/NixelOS/main/NixelOS%20Site/picture-material/1791559522545.png" alt="NixelOS logo">
+    <span class="brand-name">NixelOS / Profile</span>
+  </a>
+  <div class="top-actions">
+    <a class="toplink" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+      <span data-sk="back">Back to site</span>
+    </a>
+    <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu">
+      <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+    </button>
+  </div>
+</header>
+<div class="menu-scrim" id="menu-scrim" aria-hidden="true"></div>
+<aside class="side-menu" id="site-menu" aria-hidden="true" inert="">
+  <div class="menu-head">
+    <a class="menu-account" id="account-link" href="profile.html">
+      <span class="menu-av" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.6"></circle><path d="M5 20c.8-3.6 3.7-5.4 7-5.4s6.2 1.8 7 5.4"></path></svg></span>
+      <span class="menu-acc-text"><span class="menu-acc-name" data-i18n="navAccount">Log in / Sign up</span><span class="menu-acc-sub"></span></span>
+    </a>
+    <button class="menu-close" id="menu-close" type="button" aria-label="Close menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+  </div>
+  <nav class="menu-links" aria-label="Site navigation">
+    <a class="menu-link" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10v9.5h13V10"></path><path d="M10 19.5v-5h4v5"></path></svg><span data-i18n="navHome">Home</span></a>
+    <a class="menu-link" href="downloads.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"></path><path d="m7.5 11 4.5 4.5 4.5-4.5"></path><path d="M5 19.5h14"></path></svg><span data-i18n="navDownloads">Downloads</span></a>
+    <a class="menu-link" href="news.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="M8 9h8M8 12.5h8M8 16h5"></path></svg><span data-i18n="navNews">News</span></a>
+    <a class="menu-link" href="min-req.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"></rect><rect x="9.5" y="9.5" width="5" height="5" rx=".8"></rect><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"></path></svg><span data-i18n="navMinReq">Min. Requirements</span></a>
+    <a class="menu-link" href="faq.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9.6 9.4a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2 1-1.2 1.8"></path><path d="M12 17h.01"></path></svg><span data-i18n="navFaq">FAQ</span></a>
+    <a class="menu-link" href="Users.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2"></circle><path d="M3.5 19.5c.7-3.1 3-4.7 5.5-4.7s4.8 1.6 5.5 4.7"></path><circle cx="17" cy="9.5" r="2.5"></circle><path d="M15.5 19.5c.5-2.3 2.1-3.6 4.2-3.6.7 0 1.3.15 1.8.45"></path></svg><span data-i18n="navUsers">Users</span></a>
+    <a class="menu-link" href="chat.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"></path></svg><span data-i18n="navChat">OS Chat</span></a>
+  </nav>
+  <div class="menu-theme">
+    <span class="menu-theme-label" data-i18n="themeLabel">Light theme</span>
+    <button class="theme-switch" id="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Light theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"></path></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"></path></svg><span class="theme-knob"></span></button>
+  </div>
+  <div class="menu-languages">
+    <h2 class="lang-title" data-i18n="langTitle">We are on other languages!</h2>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <span class="lang-thumb" aria-hidden="true"></span>
+      <button class="lang-button" type="button" data-lang="en" aria-pressed="true">English</button>
+      <button class="lang-button" type="button" data-lang="ru" aria-pressed="false">Русский</button>
+      <button class="lang-button" type="button" data-lang="uk" aria-pressed="false">Українська</button>
+    </div>
+  </div>
+</aside>
+
+<main>
+  <section class="card profile-card">
+    <div class="profile-banner" id="banner-box">
+      <div class="banner-overlay-actions">
+        <button class="banner-chip" id="chg-banner" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg>
+          <span data-sk="pBannerChange">Change banner</span>
+        </button>
+        <button class="banner-chip" id="rem-banner" type="button" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+          <span data-sk="pBannerRemove">Remove banner</span>
+        </button>
+        <a class="banner-chip" id="view-pub" href="Users.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          <span data-sk="pViewPublic">View public profile</span>
+        </a>
+      </div>
+      <input id="banner-file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+    </div>
+
+    <div class="card-body">
+      <div class="profile-hero-row">
+        <div id="avslot"><div class="av-lg">U</div></div>
+        <div class="av-actions">
+          <button class="btn sm" id="chg" type="button" data-sk="pChange">Change avatar</button>
+          <button class="btn ghost sm" id="rem" type="button" data-sk="pRemove">Remove avatar</button>
+        </div>
+        <input id="file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+      </div>
+
+      <h1 data-sk="pTitle">Your profile</h1>
+      <div class="who"><span id="uname"></span><span id="vb"></span></div>
+      <p class="hint" style="margin:6px 0 0" data-sk="pBannerHint">JPG, PNG or WebP up to 4 MB (recommended 3:1 ratio)</p>
+
+      <div class="error-panel" id="avatar-error" role="alert" aria-live="assertive">
+        <h3 class="error-title" id="avatar-error-title"></h3>
+        <p class="error-intro" id="avatar-error-intro"></p>
+        <div class="error-caption" id="avatar-error-caption"></div>
+        <pre class="error-details" id="avatar-error-details"></pre>
+      </div>
+
+      <form id="pf" novalidate>
+        <div class="field"><label for="un" data-sk="fUser">Username</label><input id="un" type="text" readonly><span class="hint" data-sk="pUserHint">Username can't be changed</span></div>
+        <div class="field"><label for="dn" data-sk="fDisp">Display name</label><input id="dn" type="text" maxlength="32" autocomplete="nickname"></div>
+        <div class="field"><label for="bio" data-sk="pBio">About you</label><textarea id="bio" maxlength="160"></textarea></div>
+        <p class="msg" id="msg" role="status"></p>
+        <div class="row">
+          <button class="btn" id="save" type="submit" data-sk="pSave">Save</button>
+          <button class="btn ghost danger" id="out" type="button" data-sk="pLogout">Log out</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 data-sk="fSectionTitle">Friends & Requests</h2>
+    <div class="fr-subhead" data-sk="fIncoming">Incoming friend requests</div>
+    <div class="fr-grid" id="req-list"></div>
+    <div class="sep"></div>
+    <div class="fr-subhead" data-sk="fMyFriends">Friends</div>
+    <div class="fr-grid" id="friends-list"></div>
+  </section>
+
+  <section class="card">
+    <h2 data-sk="pSecurity">Security</h2>
+    <form id="pw" novalidate>
+      <div class="field"><label for="np" data-sk="pNewPass">New password</label><input id="np" type="password" autocomplete="new-password" maxlength="72"></div>
+      <div class="field"><label for="np2" data-sk="fPass2">Repeat password</label><input id="np2" type="password" autocomplete="new-password" maxlength="72"></div>
+      <p class="msg" id="pmsg" role="status"></p>
+      <div class="row"><button class="btn" id="pbtn" type="submit" data-sk="pChangePass">Change password</button></div>
+    </form>
+  </section>
+</main>
+
+<script>
+(function(){
+  const NAV_I18N = {
+    en: {
+      navHome:"Home", navDownloads:"Downloads", navNews:"News", navMinReq:"Min. Requirements", navFaq:"FAQ",
+      navUsers:"Users", navChat:"OS Chat", navAccount:"Log in / Sign up", themeLabel:"Light theme",
+      langTitle:"We are on other languages!", openMenu:"Open menu", closeMenu:"Close menu", back:"Back to site"
+    },
+    ru: {
+      navHome:"Главная", navDownloads:"Загрузки", navNews:"Новости", navMinReq:"Мин. требования", navFaq:"FAQ",
+      navUsers:"Пользователи", navChat:"Чат ОС", navAccount:"Войти / Регистрация", themeLabel:"Светлая тема",
+      langTitle:"Мы доступны на других языках!", openMenu:"Открыть меню", closeMenu:"Закрыть меню", back:"Назад на сайт"
+    },
+    uk: {
+      navHome:"Головна", navDownloads:"Завантаження", navNews:"Новини", navMinReq:"Мін. вимоги", navFaq:"FAQ",
+      navUsers:"Користувачі", navChat:"Чат ОС", navAccount:"Увійти / Реєстрація", themeLabel:"Світла тема",
+      langTitle:"Ми доступні іншими мовами!", openMenu:"Відкрити меню", closeMenu:"Закрити меню", back:"Назад на сайт"
+    }
+  };
+
+
+  const SK_I18N = {
+    en: {
+      back:"Back to site", pTitle:"Your profile", pChange:"Change avatar", pRemove:"Remove avatar",
+      pBannerChange:"Change banner", pBannerRemove:"Remove banner", pBannerHint:"JPG, PNG or WebP up to 4 MB (recommended 3:1 ratio)",
+      pViewPublic:"View public profile", fUser:"Username", pUserHint:"Username can't be changed", fDisp:"Display name",
+      pBio:"About you", pSave:"Save", pLogout:"Log out", fSectionTitle:"Friends & Requests", fIncoming:"Incoming friend requests",
+      fMyFriends:"Friends", pSecurity:"Security", pNewPass:"New password", fPass2:"Repeat password", pChangePass:"Change password",
+      uTitle:"NixelOS Users", uIntro:"Meet the NixelOS community, view profiles, and add friends!",
+      uSearch:"Search by name or @username…", uTabAll:"All Users", uTabFriends:"My Friends", uTabRequests:"Requests",
+      pvBackUsers:"All Users", pvReadOnlyBadge:"Viewing public profile (read-only)", pvJoined:"Joined:", pvBioLabel:"About user",
+      cTitle:"NixelOS Community Chat", cIntro:"Live discussion about NixelOS builds, bootloader features, ideas, and feedback!",
+      cRefresh:"Refresh", sRules:"Rules"
+    },
+    ru: {
+      back:"Назад на сайт", pTitle:"Ваш профиль", pChange:"Сменить аватарку", pRemove:"Убрать аватарку",
+      pBannerChange:"Сменить баннер", pBannerRemove:"Убрать баннер", pBannerHint:"JPG, PNG или WebP до 4 МБ (рекомендуется формат 3:1)",
+      pViewPublic:"Как видят другие", fUser:"Имя пользователя", pUserHint:"Имя пользователя изменить нельзя", fDisp:"Отображаемое имя",
+      pBio:"О себе", pSave:"Сохранить", pLogout:"Выйти", fSectionTitle:"Друзья и запросы", fIncoming:"Входящие запросы в друзья",
+      fMyFriends:"Друзья", pSecurity:"Безопасность", pNewPass:"Новый пароль", fPass2:"Повторите пароль", pChangePass:"Сменить пароль",
+      uTitle:"Пользователи NixelOS", uIntro:"Знакомьтесь с участниками сообщества NixelOS, смотрите профили и добавляйте друзей!",
+      uSearch:"Поиск по имени или @username…", uTabAll:"Все пользователи", uTabFriends:"Мои друзья", uTabRequests:"Запросы",
+      pvBackUsers:"Все пользователи", pvReadOnlyBadge:"Просмотр чужого профиля (только чтение)", pvJoined:"На сайте с:", pvBioLabel:"О пользователе",
+      cTitle:"Чат сообщества NixelOS", cIntro:"Живое обсуждение NixelOS, новых сборок, загрузчика NXBoot и ваших идей!",
+      cRefresh:"Обновить", sRules:"Правила"
+    },
+    uk: {
+      back:"Назад на сайт", pTitle:"Ваш профіль", pChange:"Змінити аватарку", pRemove:"Прибрати аватарку",
+      pBannerChange:"Змінити банер", pBannerRemove:"Прибрати банер", pBannerHint:"JPG, PNG або WebP до 4 МБ (рекомендовано пропорції 3:1)",
+      pViewPublic:"Як бачать інші", fUser:"Ім'я користувача", pUserHint:"Ім'я користувача змінити не можна", fDisp:"Відображуване ім'я",
+      pBio:"Про себе", pSave:"Зберегти", pLogout:"Вийти", fSectionTitle:"Друзі та запити", fIncoming:"Вхідні запити в друзі",
+      fMyFriends:"Друзі", pSecurity:"Безпека", pNewPass:"Новий пароль", fPass2:"Повторіть пароль", pChangePass:"Змінити пароль",
+      uTitle:"Користувачі NixelOS", uIntro:"Знайомтеся зі спільнотою NixelOS, переглядайте профілі та додавайте друзів!",
+      uSearch:"Пошук за ім'ям або @username…", uTabAll:"Усі користувачі", uTabFriends:"Мої друзі", uTabRequests:"Запити",
+      pvBackUsers:"Усі користувачі", pvReadOnlyBadge:"Перегляд чужого профілю (лише читання)", pvJoined:"На сайті з:", pvBioLabel:"Про користувача",
+      cTitle:"Чат спільноти NixelOS", cIntro:"Живе обговорення NixelOS, нових збірок, завантажувача NXBoot та ваших ідей!",
+      cRefresh:"Оновити", sRules:"Правила"
+    }
+  };
+
+  let currentLang = "en";
+  try { currentLang = localStorage.getItem("nixelos-lang") || "en"; } catch(e) {}
+  if (!NAV_I18N[currentLang]) currentLang = "en";
+
+  function tNav(k) {
+    return (NAV_I18N[currentLang] && NAV_I18N[currentLang][k]) || NAV_I18N.en[k] || k;
+  }
+
+  const menuToggle = document.getElementById("menu-toggle");
+  const siteMenu = document.getElementById("site-menu");
+  const menuScrim = document.getElementById("menu-scrim");
+  const menuClose = document.getElementById("menu-close");
+
+  function setMenuOpen(open) {
+    if (!menuToggle || !siteMenu || !menuScrim) return;
+    menuToggle.setAttribute("aria-expanded", String(open));
+    menuToggle.setAttribute("aria-label", open ? tNav("closeMenu") : tNav("openMenu"));
+    siteMenu.classList.toggle("is-open", open);
+    menuScrim.classList.toggle("is-open", open);
+    siteMenu.setAttribute("aria-hidden", String(!open));
+    siteMenu.toggleAttribute("inert", !open);
+    menuScrim.setAttribute("aria-hidden", String(!open));
+    document.body.style.overflow = open ? "hidden" : "";
+    if (open && menuClose) menuClose.focus();
+    else menuToggle.focus();
+  }
+
+  if (menuToggle) menuToggle.addEventListener("click", () => setMenuOpen(menuToggle.getAttribute("aria-expanded") !== "true"));
+  if (menuClose) menuClose.addEventListener("click", () => setMenuOpen(false));
+  if (menuScrim) menuScrim.addEventListener("click", () => setMenuOpen(false));
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && menuToggle && menuToggle.getAttribute("aria-expanded") === "true") setMenuOpen(false);
+  });
+
+  function applyBaseLang(lang) {
+    if (!NAV_I18N[lang]) lang = "en";
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const k = el.dataset.i18n;
+      if (NAV_I18N[lang][k]) el.textContent = NAV_I18N[lang][k];
+    });
+    document.querySelectorAll("[data-sk]").forEach(el => {
+      const k = el.dataset.sk;
+      if (SK_I18N[lang] && SK_I18N[lang][k]) el.textContent = SK_I18N[lang][k];
+    });
+    document.querySelectorAll("[data-sp]").forEach(el => {
+      const k = el.dataset.sp;
+      if (SK_I18N[lang] && SK_I18N[lang][k]) el.placeholder = SK_I18N[lang][k];
+    });
+    document.querySelectorAll(".lang-button").forEach(btn => {
+      btn.setAttribute("aria-pressed", String(btn.dataset.lang === lang));
+    });
+    if (menuToggle) {
+      menuToggle.setAttribute("aria-label", menuToggle.getAttribute("aria-expanded") === "true" ? tNav("closeMenu") : tNav("openMenu"));
+    }
+    window.dispatchEvent(new CustomEvent("nixelos-langchange", { detail: { lang } }));
+  }
+
+  const themeSwitch = document.getElementById("theme-switch");
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    if (themeSwitch) themeSwitch.setAttribute("aria-checked", String(theme === "light"));
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", theme === "light" ? "#f4f5fb" : "#090a0e");
+  }
+  applyTheme(document.documentElement.dataset.theme === "light" ? "light" : "dark");
+  if (themeSwitch) {
+    themeSwitch.addEventListener("click", () => {
+      const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+      applyTheme(next);
+      try { localStorage.setItem("nixelos-theme", next); } catch(e) {}
+    });
+  }
+
+  const langSwitch = document.querySelector(".lang-switch");
+  const langThumb = document.querySelector(".lang-thumb");
+  function moveThumb() {
+    if (!langSwitch || !langThumb) return;
+    const a = langSwitch.querySelector('.lang-button[aria-pressed="true"]');
+    if (!a) return;
+    langThumb.style.width = a.offsetWidth + "px";
+    langThumb.style.transform = "translateX(" + a.offsetLeft + "px)";
+  }
+  if (langSwitch) {
+    new MutationObserver(moveThumb).observe(langSwitch, { subtree: true, attributes: true, attributeFilter: ["aria-pressed"] });
+    if ("ResizeObserver" in window) new ResizeObserver(moveThumb).observe(langSwitch);
+    window.addEventListener("resize", moveThumb);
+    document.querySelectorAll(".lang-button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        try { localStorage.setItem("nixelos-lang", btn.dataset.lang); } catch(e) {}
+        nxLangSwap(btn.dataset.lang, function () { applyBaseLang(btn.dataset.lang); });
+      });
+    });
+    applyBaseLang(currentLang);
+    moveThumb();
+    requestAnimationFrame(() => requestAnimationFrame(() => langSwitch.classList.add("is-ready")));
+  } else {
+    applyBaseLang(currentLang);
+  }
+
+  const canvas = document.getElementById("particles");
+  if (canvas) {
+    const ctx = canvas.getContext("2d");
+    let particles = [], width = 0, height = 0, animationFrame;
+    const colors = ["79, 111, 255", "147, 91, 255", "73, 177, 255"];
+    function resizeParticles() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth; height = window.innerHeight;
+      canvas.width = Math.floor(width * dpr); canvas.height = Math.floor(height * dpr);
+      canvas.style.width = width + "px"; canvas.style.height = height + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const count = Math.min(42, Math.max(18, Math.floor(width / 27)));
+      particles = Array.from({ length: count }, () => ({
+        x: Math.random() * width, y: Math.random() * height, r: 2 + Math.random() * 5,
+        vy: 0.12 + Math.random() * 0.38, vx: (Math.random() - 0.5) * 0.22,
+        color: colors[Math.floor(Math.random() * colors.length)], alpha: 0.12 + Math.random() * 0.28
+      }));
+    }
+    function drawParticles() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(p => {
+        p.y -= p.vy; p.x += p.vx;
+        if (p.y < -15) { p.y = height + 15; p.x = Math.random() * width; }
+        if (p.x < -15) p.x = width + 15;
+        if (p.x > width + 15) p.x = -15;
+        ctx.save(); ctx.globalAlpha = p.alpha; ctx.shadowBlur = 19;
+        ctx.shadowColor = "rgba(" + p.color + ", 0.9)"; ctx.fillStyle = "rgba(" + p.color + ", 0.65)";
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+      });
+      animationFrame = requestAnimationFrame(drawParticles);
+    }
+    resizeParticles(); drawParticles();
+    window.addEventListener("resize", resizeParticles, { passive: true });
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) cancelAnimationFrame(animationFrame);
+      else drawParticles();
+    });
+  }
+})();
+</script>
+<script type="module">
+let Supa = {};
+try {
+  Supa = await import("./Auth/supabase.js?v=4");
+} catch (e) {
+  try {
+    const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+    const SUPABASE_URL = "https://pmxbgdggupaznjnclpad.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_-Vmg7JLeeUA5VYnAtf5Y2Q_HllE6Zac";
+    const sbClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
+    });
+    Supa = {
+      sb: sbClient,
+      getSessionUser: async () => {
+        const { data } = await sbClient.auth.getSession();
+        return data && data.session ? data.session.user : null;
+      },
+      makeAvatar: (profile, className) => {
+        const p = profile || {};
+        const url = p.avatar_path ? sbClient.storage.from("avatars").getPublicUrl(p.avatar_path).data.publicUrl : null;
+        let el;
+        if (url) {
+          el = document.createElement("img");
+          el.src = url; el.alt = ""; el.loading = "lazy"; el.referrerPolicy = "no-referrer";
+        } else {
+          el = document.createElement("div");
+          el.textContent = ((p.display_name || p.username || "?").trim()[0] || "?").toUpperCase();
+        }
+        el.className = className;
+        return el;
+      },
+      badge: () => {
+        const s = document.createElement("span");
+        s.style.cssText = "display:inline-flex;flex:none;width:16px;height:16px;color:#5b8cff;vertical-align:middle";
+        s.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 1.8l2.6 1.9 3.2-.1 1 3 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3-3.2-.1L12 22.2l-2.6-1.9-3.2.1-1-3-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3 3.2.1z"/><path fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M8 12.3l2.8 2.8L16.2 9.6"/></svg>';
+        return s;
+      },
+      initMenuAccount: async (base) => {
+        const a = document.getElementById("account-link");
+        if (!a) return;
+        a.href = base + "Auth/login.html";
+        try {
+          const { data } = await sbClient.auth.getSession();
+          const u = data && data.session ? data.session.user : null;
+          if (!u) return;
+          a.href = base + "profile.html";
+          const { data: p } = await sbClient.from("profiles").select("*").eq("id", u.id).maybeSingle();
+          if (!p) return;
+          const av = a.querySelector(".menu-av");
+          if (av) av.replaceWith(Supa.makeAvatar(p, "menu-av"));
+          const name = a.querySelector(".menu-acc-name");
+          if (name) {
+            name.removeAttribute("data-i18n");
+            name.removeAttribute("data-sk");
+            name.textContent = p.display_name;
+            if (p.is_verified) name.append(Supa.badge());
+          }
+          const sub = a.querySelector(".menu-acc-sub");
+          if (sub) sub.textContent = "@" + p.username;
+        } catch (err) {}
+      }
+    };
+  } catch (e2) {
+    Supa = {
+      sb: null,
+      getSessionUser: async () => null,
+      makeAvatar: (profile, className) => {
+        const p = profile || {};
+        const el = document.createElement("div");
+        el.textContent = ((p.display_name || p.username || "?").trim()[0] || "?").toUpperCase();
+        el.className = className;
+        return el;
+      },
+      badge: () => {
+        const s = document.createElement("span");
+        s.style.cssText = "display:inline-flex;flex:none;width:16px;height:16px;color:#5b8cff;vertical-align:middle";
+        s.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 1.8l2.6 1.9 3.2-.1 1 3 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3-3.2-.1L12 22.2l-2.6-1.9-3.2.1-1-3-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3 3.2.1z"/><path fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M8 12.3l2.8 2.8L16.2 9.6"/></svg>';
+        return s;
+      },
+      initMenuAccount: async () => {}
+    };
+  }
+}
+const { sb, getSessionUser } = Supa;
+const _memStore = {};
+const sGet = k => { try { return localStorage.getItem(k); } catch (e) { return _memStore[k] || null; } };
+const sSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { _memStore[k] = String(v); } };
+const sDel = k => { try { localStorage.removeItem(k); } catch (e) { delete _memStore[k]; } };
+
+
+const EXTRA_I18N = {
+  en: {
+    sComments: "Comments", sWrite: "Write a comment…", sPost: "Post", sLoginC: "Log in to comment", sLoginR: "Log in to react", sDel: "Delete", sNone: "No comments yet. Be the first!", sEmpty: "Comment can't be empty", eLoad: "Failed to load comments", sClose: "Close", sVerified: "Verified", pWait: "Please wait…", eNet: "Something went wrong. Try again later", eRate: "Too many attempts. Wait a little", pBannerLabel: "Profile banner", pBannerChange: "Change banner", pBannerRemove: "Remove banner",
+    pBannerHint: "JPG, PNG or WebP up to 4 MB (recommended 3:1 ratio)", eBanner: "Only JPG, PNG or WebP up to 4 MB",
+    pViewPublic: "View public profile", sMod: "Admin / Mod", navUsers: "Users", navChat: "OS Chat",
+    sRules: "Rules", rulesTitle: "NixelOS Community Rules 🚀",
+    rulesSub: "We're not the police here, but to keep the vibe friendly and fun for everyone, stick to these simple rules:",
+    rule1T: "1. Don't spam or flood 🛑", rule1D: "No need to flood comments or chat with identical messages. One thoughtful message beats ten noisy ones!",
+    rule2T: "2. Be cool — no insults 🤝", rule2D: "Respect other members! We're all here testing the OS of the future together, so keep it chill and toxicity-free.",
+    rule3T: "3. No bad words or swearing 🧼", rule3D: "Keep the chat as clean as fresh NXBoot code. Bad language and profanity are strictly off-limits.",
+    rule4T: "5. Insulting admins = Instant Ban ⚡", rule4D: "Yes, we skipped #4 because rule #5 is serious: our admins & devs code NixelOS late into the night. Insulting the team gets you a one-way ticket to Ban-land!",
+    rulesFoot: "Follow the rules, enjoy smooth booting, and may your FPS always be high! 😎", rulesOk: "Got it, I'll be cool!",
+    fAddFriend: "Add to friends", fReqSent: "Request sent (Cancel)", fAccept: "Accept friend", fDecline: "Decline",
+    fFriends: "In friends ✓", fRemoveFriend: "Remove friend", fLoginFriend: "Log in to add friends",
+    fSectionTitle: "Friends & Requests", fIncoming: "Incoming friend requests", fMyFriends: "Friends",
+    fNoFriends: "No friends added yet. Find cool people in Users!", fNoRequests: "No pending friend requests",
+    uTitle: "NixelOS Users", uIntro: "Meet the NixelOS community, view profiles, and add friends!",
+    uSearch: "Search by name or @username…", uTabAll: "All Users", uTabFriends: "My Friends", uTabRequests: "Requests",
+    uEmpty: "No users found.", uViewProfile: "View profile", pvTitle: "User Profile", pvJoined: "Joined:",
+    pvBioLabel: "About user", pvBioEmpty: "This user hasn't written a bio yet.", pvEditOwn: "Edit my profile",
+    pvNotFound: "User not found", pvNotFoundSub: "This account doesn't exist or the link is incorrect.",
+    pvBackUsers: "All Users", pvReadOnlyBadge: "Viewing public profile (read-only)",
+    cTitle: "NixelOS Community Chat", cIntro: "Live discussion about NixelOS builds, bootloader features, ideas, and feedback!",
+    cWrite: "Write a message about NixelOS…", cSend: "Send", cEmpty: "No messages yet. Start the NixelOS discussion!",
+    cLogin: "Log in to join the NixelOS chat", cRefresh: "Refresh"
+  },
+  ru: {
+    sComments: "Комментарии", sWrite: "Напишите комментарий…", sPost: "Отправить", sLoginC: "Войдите, чтобы комментировать", sLoginR: "Войдите, чтобы ставить реакции", sDel: "Удалить", sNone: "Комментариев пока нет. Будьте первым!", sEmpty: "Комментарий не может быть пустым", eLoad: "Не удалось загрузить комментарии", sClose: "Закрыть", sVerified: "Подтверждён", pWait: "Подождите…", eNet: "Что-то пошло не так. Попробуйте позже", eRate: "Слишком много попыток. Подождите немного", pBannerLabel: "Баннер профиля", pBannerChange: "Сменить баннер", pBannerRemove: "Убрать баннер",
+    pBannerHint: "JPG, PNG или WebP до 4 МБ (рекомендуется формат 3:1)", eBanner: "Только JPG, PNG или WebP до 4 МБ",
+    pViewPublic: "Как видят другие", sMod: "Админ / Мод", navUsers: "Пользователи", navChat: "Чат ОС",
+    sRules: "Правила", rulesTitle: "Правила сообщества NixelOS 🚀",
+    rulesSub: "Мы тут не полиция, но чтобы всем было кайфово общаться, держи несколько простых правил:",
+    rule1T: "1. Не спамить и не флудить 🛑", rule1D: "Не засыпай чат и комменты одинаковыми сообщениями. Лучше написать одну крутую мысль, чем десять пустых!",
+    rule2T: "2. Не оскорблять участников 🤝", rule2D: "Уважай других! Мы тут все свои и тестируем ОС будущего, так что давай без токсичности и ссор.",
+    rule3T: "3. Плохие слова запрещены 🧼", rule3D: "Держим общение чистым, как свежий код загрузчика NXBoot. Мат и ругательства оставь за пределами сайта.",
+    rule4T: "5. Оскорбление админов — Бан ⚡", rule4D: "Да, пункт 4 мы перепрыгнули, потому что правило №5 железное: админы ночами пилят NixelOS, поэтому за наезды на команду — мгновенный билет в бан!",
+    rulesFoot: "Соблюдай правила — и будет тебе счастье, быстрый бут и стабильный FPS! 😎", rulesOk: "Понял, буду котиком!",
+    fAddFriend: "Добавить в друзья", fReqSent: "Запрос отправлен (Отменить)", fAccept: "Принять в друзья", fDecline: "Отклонить",
+    fFriends: "В друзьях ✓", fRemoveFriend: "Удалить из друзей", fLoginFriend: "Войдите, чтобы добавить в друзья",
+    fSectionTitle: "Друзья и запросы", fIncoming: "Входящие запросы в друзья", fMyFriends: "Друзья",
+    fNoFriends: "Пока нет друзей. Найдите единомышленников во вкладке «Пользователи»!", fNoRequests: "Нет новых запросов в друзья",
+    uTitle: "Пользователи NixelOS", uIntro: "Знакомьтесь с участниками сообщества NixelOS, смотрите профили и добавляйте друзей!",
+    uSearch: "Поиск по имени или @username…", uTabAll: "Все пользователи", uTabFriends: "Мои друзья", uTabRequests: "Запросы",
+    uEmpty: "Пользователи не найдены.", uViewProfile: "Профиль", pvTitle: "Профиль пользователя", pvJoined: "На сайте с:",
+    pvBioLabel: "О пользователе", pvBioEmpty: "Пользователь ещё ничего о себе не рассказал.", pvEditOwn: "Редактировать мой профиль",
+    pvNotFound: "Пользователь не найден", pvNotFoundSub: "Такого аккаунта не существует или ссылка неверна.",
+    pvBackUsers: "Все пользователи", pvReadOnlyBadge: "Просмотр чужого профиля (только чтение)",
+    cTitle: "Чат сообщества NixelOS", cIntro: "Живое обсуждение NixelOS, новых сборок, загрузчика NXBoot и ваших идей!",
+    cWrite: "Напишите сообщение об ОС…", cSend: "Отправить", cEmpty: "Сообщений пока нет. Начните обсуждение NixelOS первым!",
+    cLogin: "Войдите в аккаунт, чтобы общаться в чате NixelOS", cRefresh: "Обновить"
+  },
+  uk: {
+    sComments: "Коментарі", sWrite: "Напишіть коментар…", sPost: "Надіслати", sLoginC: "Увійдіть, щоб коментувати", sLoginR: "Увійдіть, щоб ставити реакції", sDel: "Видалити", sNone: "Коментарів поки немає. Будьте першим!", sEmpty: "Коментар не може бути порожнім", eLoad: "Не вдалося завантажити коментарі", sClose: "Закрити", sVerified: "Підтверджений", pWait: "Зачекайте…", eNet: "Щось пішло не так. Спробуйте пізніше", eRate: "Забагато спроб. Зачекайте трохи", pBannerLabel: "Банер профілю", pBannerChange: "Змінити банер", pBannerRemove: "Прибрати банер",
+    pBannerHint: "JPG, PNG або WebP до 4 МБ (рекомендовано пропорції 3:1)", eBanner: "Лише JPG, PNG або WebP до 4 МБ",
+    pViewPublic: "Як бачать інші", sMod: "Адмін / Мод", navUsers: "Користувачі", navChat: "Чат ОС",
+    sRules: "Правила", rulesTitle: "Правила спільноти NixelOS 🚀",
+    rulesSub: "Ми тут не поліція, але щоб усім було кайфово спілкуватися, тримай кілька простих правил:",
+    rule1T: "1. Не спамити та не флудити 🛑", rule1D: "Не засипай коментарі чи чат однаковими повідомленнями. Краще написати одну круту думку, ніж десять порожніх!",
+    rule2T: "2. Не ображати учасників 🤝", rule2D: "Поважай інших! Ми тут усі свої й разом тестуємо ОС майбутнього, тож давай без токсичності та сварок.",
+    rule3T: "3. Погані слова заборонені 🧼", rule3D: "Тримаймо спілкування чистим, як свіженький код завантажувача NXBoot. Матюки та лайку залиш поза сайтом.",
+    rule4T: "5. Образа адмінів — Бан ⚡", rule4D: "Так, пункт 4 ми перестрибнули, бо правило №5 залізне: адміни ночами пиляють NixelOS, тому за наїзди чи образу команди — миттєвий квиток у бан!",
+    rulesFoot: "Дотримуйся правил — і буде тобі щастя, швидкий бут та стабільний FPS! 😎", rulesOk: "Зрозумів, буду котиком!",
+    fAddFriend: "Додати в друзі", fReqSent: "Запит надіслано (Скасувати)", fAccept: "Прийняти в друзі", fDecline: "Відхилити",
+    fFriends: "У друзях ✓", fRemoveFriend: "Видалити з друзів", fLoginFriend: "Увійдіть, щоб додати в друзі",
+    fSectionTitle: "Друзі та запити", fIncoming: "Вхідні запити в друзі", fMyFriends: "Друзі",
+    fNoFriends: "Поки немає друзів. Знайдіть однодумців у вкладці «Користувачі»!", fNoRequests: "Немає нових запитів у друзі",
+    uTitle: "Користувачі NixelOS", uIntro: "Знайомтеся зі спільнотою NixelOS, переглядайте профілі та додавайте друзів!",
+    uSearch: "Пошук за ім'ям або @username…", uTabAll: "Усі користувачі", uTabFriends: "Мої друзі", uTabRequests: "Запити",
+    uEmpty: "Користувачів не знайдено.", uViewProfile: "Профіль", pvTitle: "Профіль користувача", pvJoined: "На сайті з:",
+    pvBioLabel: "Про користувача", pvBioEmpty: "Користувач ще нічого про себе не розповів.", pvEditOwn: "Редагувати мій профіль",
+    pvNotFound: "Користувача не знайдено", pvNotFoundSub: "Такого акаунта не існує або посилання неправильне.",
+    pvBackUsers: "Усі користувачі", pvReadOnlyBadge: "Перегляд чужого профілю (лише читання)",
+    cTitle: "Чат спільноти NixelOS", cIntro: "Живе обговорення NixelOS, нових збірок, завантажувача NXBoot та ваших ідей!",
+    cWrite: "Напишіть повідомлення про ОС…", cSend: "Надіслати", cEmpty: "Повідомлень поки немає. Почніть обговорення NixelOS першим!",
+    cLogin: "Увійдіть в акаунт, щоб спілкуватися в чаті NixelOS", cRefresh: "Оновити"
+  }
+};
+
+const getLang = Supa.getLang || (() => {
+  try { const l = sGet("nixelos-lang") || "en"; return ["en","ru","uk"].includes(l) ? l : "en"; } catch { return "en"; }
+});
+
+const t = key => {
+  const l = getLang();
+  if (EXTRA_I18N[l] && EXTRA_I18N[l][key]) return EXTRA_I18N[l][key];
+  if (Supa.t) {
+    const v = Supa.t(key);
+    if (v && v !== key) return v;
+  }
+  return (EXTRA_I18N.en && EXTRA_I18N.en[key]) || key;
+};
+
+const applyLabels = (root = document) => {
+  root.querySelectorAll("[data-sk]").forEach(el => {
+    const v = t(el.dataset.sk);
+    if (v && v !== el.dataset.sk) el.textContent = v;
+  });
+  root.querySelectorAll("[data-sp]").forEach(el => {
+    const v = t(el.dataset.sp);
+    if (v && v !== el.dataset.sp) el.placeholder = v;
+  });
+};
+
+const initLang = () => {
+  document.documentElement.lang = getLang();
+  applyLabels();
+};
+
+const makeAvatar = Supa.makeAvatar;
+const badge = Supa.badge;
+const initMenuAccount = Supa.initMenuAccount;
+
+const getMyProfile = async (uid) => {
+  const read = () => sb.from("profiles").select("*").eq("id", uid).maybeSingle();
+  let { data } = await read();
+  if (!data) {
+    const r = await sb.rpc("ensure_my_profile");
+    if (!r.error) ({ data } = await read());
+  }
+  return data;
+};
+
+const bannerUrl = Supa.bannerUrl || (path => {
+  if (!path) return null;
+  if (/^https?:\/\//i.test(path)) return path;
+  return sb.storage.from("avatars").getPublicUrl(path).data.publicUrl;
+});
+
+const applyBannerStyle = Supa.applyBannerStyle || ((el, profile) => {
+  if (!el) return;
+  let bPath = profile && profile.banner_path;
+  if (!bPath && profile && profile.id) { try { bPath = sGet("nixelos-banner-" + profile.id) || null; } catch (e) {} }
+  const url = bannerUrl(bPath);
+  if (url) {
+    el.style.backgroundImage = `linear-gradient(180deg, rgba(9,10,14,.15) 0%, rgba(9,10,14,.55) 100%), url("${url.replace(/"/g, "%22")}")`;
+    el.style.backgroundSize = "cover";
+    el.style.backgroundPosition = "center";
+    el.classList.add("has-banner");
+  } else {
+    el.style.backgroundImage = "";
+    el.style.backgroundSize = "";
+    el.style.backgroundPosition = "";
+    el.classList.remove("has-banner");
+  }
+});
+
+const modBadge = Supa.modBadge || (() => {
+  const s = document.createElement("span");
+  s.textContent = "MOD";
+  s.title = t("sMod");
+  s.style.cssText = "display:inline-flex;align-items:center;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.04em;color:#fff;background:linear-gradient(135deg,#ff6b8b,#a46bff);vertical-align:middle";
+  return s;
+});
+
+let _localRulesOv = null;
+const ensureRulesModal = Supa.ensureRulesModal || (() => {
+  if (_localRulesOv) { applyLabels(_localRulesOv); return _localRulesOv; }
+  if (!document.getElementById("nx-rules-style")) {
+    const st = document.createElement("style");
+    st.id = "nx-rules-style";
+    st.textContent = `.nx-rules-btn{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 13px;border:1px solid rgba(151,166,255,.38);border-radius:999px;color:var(--text,#f5f5f7);background:rgba(133,151,255,.12);font:700 12px "Comfortaa",sans-serif;cursor:pointer;transition:transform 180ms ease,border-color 180ms ease,background 180ms ease}.nx-rules-btn:hover{transform:translateY(-2px);border-color:rgba(151,166,255,.75);background:rgba(133,151,255,.22)}.nx-rules-btn svg{width:15px;height:15px;color:#a8b4ff;flex:none}.nx-rules-overlay{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:rgba(5,6,12,.68);backdrop-filter:blur(7px);opacity:0;visibility:hidden;transition:opacity 220ms ease,visibility 220ms ease}.nx-rules-overlay.on{opacity:1;visibility:visible}.nx-rules-box{width:min(520px,100%);max-height:88vh;overflow-y:auto;padding:clamp(20px,4vw,28px);text-align:left;border:1px solid rgba(151,166,255,.36);border-radius:22px;background:linear-gradient(135deg,rgba(28,31,56,.97),rgba(16,18,30,.98));box-shadow:0 24px 70px rgba(0,0,0,.5)}.nx-rules-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}.nx-rules-top h3{margin:0;font-size:21px}.nx-rules-sub{margin:0 0 16px;color:var(--muted,#b9bbc7);font-size:13.5px;line-height:1.65}.nx-rules-list{display:grid;gap:10px;margin:0 0 16px;padding:0;list-style:none}.nx-rules-item{padding:12px 14px;border:1px solid rgba(151,166,255,.22);border-left:3px solid #8f9bff;border-radius:6px 14px 14px 6px;background:rgba(255,255,255,.04)}.nx-rules-item:nth-child(4){border-left-color:#ff7a8a;background:rgba(255,100,120,.07)}.nx-rules-item strong{display:block;margin-bottom:4px;font-size:14.5px}.nx-rules-item p{margin:0;font-size:13px;line-height:1.6;color:var(--muted,#b9bbc7)}.nx-rules-foot{margin:0 0 16px;padding:10px 12px;border-radius:12px;background:rgba(133,151,255,.1);font-size:13px;font-weight:700;text-align:center}.nx-rules-ok{width:100%}`;
+    document.head.append(st);
+  }
+  _localRulesOv = document.createElement("div");
+  _localRulesOv.className = "nx-rules-overlay";
+  _localRulesOv.innerHTML = `<div class="nx-rules-box" role="dialog" aria-modal="true"><div class="nx-rules-top"><h3 data-sk="rulesTitle"></h3><button type="button" class="nx-x nx-rules-close" style="width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:none;color:var(--text);cursor:pointer">✕</button></div><p class="nx-rules-sub" data-sk="rulesSub"></p><ul class="nx-rules-list"><li class="nx-rules-item"><strong data-sk="rule1T"></strong><p data-sk="rule1D"></p></li><li class="nx-rules-item"><strong data-sk="rule2T"></strong><p data-sk="rule2D"></p></li><li class="nx-rules-item"><strong data-sk="rule3T"></strong><p data-sk="rule3D"></p></li><li class="nx-rules-item"><strong data-sk="rule4T"></strong><p data-sk="rule4D"></p></li></ul><p class="nx-rules-foot" data-sk="rulesFoot"></p><button type="button" class="btn nx-rules-ok" data-sk="rulesOk"></button></div>`;
+  document.body.append(_localRulesOv);
+  const close = () => _localRulesOv.classList.remove("on");
+  _localRulesOv.querySelector(".nx-rules-close").addEventListener("click", close);
+  _localRulesOv.querySelector(".nx-rules-ok").addEventListener("click", close);
+  _localRulesOv.addEventListener("mousedown", e => { if (e.target === _localRulesOv) close(); });
+  applyLabels(_localRulesOv);
+  return _localRulesOv;
+});
+
+const openRulesModal = Supa.openRulesModal || (() => {
+  const ov = ensureRulesModal();
+  applyLabels(ov);
+  ov.classList.add("on");
+});
+
+const makeRulesButton = Supa.makeRulesButton || (() => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "nx-rules-btn";
+  b.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4.5 6.5v5.8c0 4.6 3.2 8.4 7.5 10.2 4.3-1.8 7.5-5.6 7.5-10.2V6.5L12 3Z"></path><path d="M12 8v4.5"></path><path d="M12 16h.01"></path></svg><span data-sk="sRules">${t("sRules")}</span>`;
+  b.addEventListener("click", openRulesModal);
+  return b;
+});
+
+
+initLang();
+window.addEventListener("nixelos-langchange", () => { initLang(); loadFriendsSection(); });
+initMenuAccount("./");
+
+const $ = id => document.getElementById(id);
+
+
+
+const lang = () => {
+  try {
+    const value = sGet("nixelos-lang") || "en";
+    return ["uk", "ru", "en"].includes(value) ? value : "en";
+  } catch {
+    return "en";
+  }
+};
+
+const ERROR_TEXT = {
+  en: {
+    title: "Oops! An error occurred!",
+    intro: "Send it to our social media pages and we'll look into it!",
+    caption: "Error details:",
+    stage: "Stage",
+    message: "Message",
+    code: "Code",
+    status: "HTTP status",
+    details: "Additional details",
+    hint: "Hint",
+    image: "Image processing",
+    upload: "Image upload",
+    update: "Profile update",
+    cleanup: "Old image cleanup",
+    remove: "Image removal",
+    unknown: "Unknown error"
+  },
+  ru: {
+    title: "Упс! Произошла ошибка!",
+    intro: "Отправьте её в наши соцсети, мы разберёмся!",
+    caption: "Подробности ошибки:",
+    stage: "Этап",
+    message: "Сообщение",
+    code: "Код",
+    status: "HTTP-статус",
+    details: "Дополнительные сведения",
+    hint: "Подсказка",
+    image: "Обработка изображения",
+    upload: "Загрузка изображения",
+    update: "Обновление профиля",
+    cleanup: "Удаление старого изображения",
+    remove: "Удаление изображения",
+    unknown: "Неизвестная ошибка"
+  },
+  uk: {
+    title: "Упс! Виникла помилка!",
+    intro: "Відправ її на наші соцмережі, ми розберемося!",
+    caption: "Деталі помилки:",
+    stage: "Етап",
+    message: "Повідомлення",
+    code: "Код",
+    status: "HTTP-статус",
+    details: "Додаткова інформація",
+    hint: "Підказка",
+    image: "Обробка зображення",
+    upload: "Завантаження зображення",
+    update: "Оновлення профілю",
+    cleanup: "Видалення старого зображення",
+    remove: "Видалення зображення",
+    unknown: "Невідома помилка"
+  }
+};
+
+const user = (await getSessionUser().catch(() => null)) || { id: "local-user" };
+if (user.id === "local-user" && sb) location.replace("Auth/login.html");
+
+let profile = (user.id !== "local-user" && sb) ? await getMyProfile(user.id).catch(() => null) : { id: "local-user", username: "nixel_user", display_name: "NixelOS User", bio: "" };
+if (!profile && sb) {
+  await sb.auth.signOut();
+  location.replace("Auth/login.html");
+}
+if (!profile) profile = { id: "local-user", username: "nixel_user", display_name: "NixelOS User", bio: "" };
+
+const ALLOWED = ["image/jpeg", "image/png", "image/webp"];
+const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
+const MAX_BANNER_BYTES = 4 * 1024 * 1024;
+
+function flash(el, text, ok) {
+  el.textContent = text;
+  el.className = "msg " + (ok ? "ok" : "err") + (text ? " on" : "");
+  if (text) setTimeout(() => {
+    if (el.textContent === text) el.classList.remove("on");
+  }, 4500);
+}
+
+function showAvatarError(error, stage) {
+  const words = ERROR_TEXT[lang()];
+  const panel = $("avatar-error");
+
+  const value = (v, fallback = "—") => {
+    if (v === undefined || v === null || v === "") return fallback;
+    if (typeof v === "string") return v;
+    try { return JSON.stringify(v); } catch { return String(v); }
+  };
+
+  const lines = [
+    `${words.stage}: ${words[stage] || stage}`,
+    `${words.message}: ${value(error?.message, words.unknown)}`,
+    `${words.code}: ${value(error?.code)}`,
+    `${words.status}: ${value(error?.status || error?.statusCode)}`,
+    `${words.details}: ${value(error?.details)}`,
+    `${words.hint}: ${value(error?.hint)}`
+  ];
+
+  $("avatar-error-title").textContent = words.title;
+  $("avatar-error-intro").textContent = words.intro;
+  $("avatar-error-caption").textContent = words.caption;
+  $("avatar-error-details").textContent = lines.join("\n");
+  panel.classList.add("on");
+  panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function hideAvatarError() {
+  $("avatar-error").classList.remove("on");
+}
+
+function render() {
+  $("uname").textContent = "@" + profile.username;
+  $("vb").replaceChildren();
+  if (profile.is_verified) $("vb").append(badge());
+  if (profile.is_moderator) $("vb").append(modBadge());
+  $("un").value = profile.username;
+  $("dn").value = profile.display_name;
+  $("bio").value = profile.bio || "";
+  $("avslot").replaceChildren(makeAvatar(profile, "av-lg"));
+  $("rem").hidden = !profile.avatar_path;
+  applyBannerStyle($("banner-box"), profile);
+  $("rem-banner").hidden = !(profile.banner_path || sGet("nixelos-banner-" + user.id));
+  $("view-pub").href = "profile-view.html?u=" + encodeURIComponent(profile.username);
+  initMenuAccount("./");
+}
+
+async function squareJpeg(file) {
+  if (!ALLOWED.includes(file.type) || file.size > MAX_AVATAR_BYTES) {
+    throw new Error("eAvatar");
+  }
+  let bmp;
+  try { bmp = await createImageBitmap(file); } catch (error) {
+    throw new Error("eAvatar: " + (error?.message || "Cannot read image"));
+  }
+  try {
+    const side = Math.min(bmp.width, bmp.height);
+    if (!side) throw new Error("Invalid image dimensions");
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 256;
+    const context = canvas.getContext("2d");
+    context.drawImage(bmp, (bmp.width - side) / 2, (bmp.height - side) / 2, side, side, 0, 0, 256, 256);
+    return await new Promise((resolve, reject) => {
+      canvas.toBlob(r => r ? resolve(r) : reject(new Error("Image conversion failed")), "image/jpeg", 0.9);
+    });
+  } finally {
+    bmp.close();
+  }
+}
+
+async function bannerJpeg(file) {
+  if (!ALLOWED.includes(file.type) || file.size > MAX_BANNER_BYTES) {
+    throw new Error("eBanner");
+  }
+  let bmp;
+  try { bmp = await createImageBitmap(file); } catch (error) {
+    throw new Error("eBanner: " + (error?.message || "Cannot read image"));
+  }
+  try {
+    const targetRatio = 3; // 960x320
+    let sw = bmp.width, sh = bmp.height;
+    if (sw / sh > targetRatio) {
+      sw = Math.round(sh * targetRatio);
+    } else {
+      sh = Math.round(sw / targetRatio);
+    }
+    const sx = Math.floor((bmp.width - sw) / 2);
+    const sy = Math.floor((bmp.height - sh) / 2);
+    const canvas = document.createElement("canvas");
+    canvas.width = 960;
+    canvas.height = 320;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(bmp, sx, sy, sw, sh, 0, 0, 960, 320);
+    return await new Promise((resolve, reject) => {
+      canvas.toBlob(r => r ? resolve(r) : reject(new Error("Banner conversion failed")), "image/jpeg", 0.9);
+    });
+  } finally {
+    bmp.close();
+  }
+}
+
+async function dropOld(path) {
+  if (!path || !path.startsWith(user.id + "/")) return;
+  const result = await sb.storage.from("avatars").remove([path]);
+  if (result.error) throw result.error;
+}
+
+/* Avatar upload & remove */
+$("chg").addEventListener("click", () => $("file").click());
+$("file").addEventListener("change", async () => {
+  const file = $("file").files[0];
+  $("file").value = "";
+  if (!file) return;
+
+  hideAvatarError();
+  $("chg").disabled = true;
+  flash($("msg"), t("pWait"), true);
+  let stage = "image";
+
+  try {
+    const blob = await squareJpeg(file);
+    stage = "upload";
+    const path = user.id + "/" + Date.now() + ".jpg";
+    const up = await sb.storage.from("avatars").upload(path, blob, { contentType: "image/jpeg", upsert: false });
+    if (up.error) throw up.error;
+
+    stage = "update";
+    const old = profile.avatar_path;
+    const upd = await sb.from("profiles")
+      .update({ avatar_path: path })
+      .eq("id", user.id)
+      .select("*")
+      .single();
+
+    if (upd.error) {
+      try { await dropOld(path); } catch (e) {}
+      throw upd.error;
+    }
+
+    profile = upd.data;
+    render();
+    flash($("msg"), t("pSaved"), true);
+    if (old) { try { await dropOld(old); } catch (e) {} }
+  } catch (error) {
+    $("msg").classList.remove("on");
+    if (String(error?.message).startsWith("eAvatar")) flash($("msg"), t("eAvatar"), false);
+    else showAvatarError(error, stage);
+  } finally {
+    $("chg").disabled = false;
+  }
+});
+
+$("rem").addEventListener("click", async () => {
+  const old = profile.avatar_path;
+  if (!old) return;
+  hideAvatarError();
+  $("rem").disabled = true;
+  try {
+    const upd = await sb.from("profiles")
+      .update({ avatar_path: null })
+      .eq("id", user.id)
+      .select("*")
+      .single();
+    if (upd.error) throw upd.error;
+    profile = upd.data;
+    render();
+    flash($("msg"), t("pSaved"), true);
+    try { await dropOld(old); } catch (error) { showAvatarError(error, "cleanup"); }
+  } catch (error) {
+    showAvatarError(error, "remove");
+  } finally {
+    $("rem").disabled = false;
+  }
+});
+
+/* Banner upload & remove */
+$("chg-banner").addEventListener("click", () => $("banner-file").click());
+$("banner-file").addEventListener("change", async () => {
+  const file = $("banner-file").files[0];
+  $("banner-file").value = "";
+  if (!file) return;
+
+  hideAvatarError();
+  $("chg-banner").disabled = true;
+  flash($("msg"), t("pWait"), true);
+  let stage = "image";
+
+  try {
+    const blob = await bannerJpeg(file);
+    stage = "upload";
+    const path = user.id + "/" + Date.now() + ".jpg";
+    const up = await sb.storage.from("avatars").upload(path, blob, { contentType: "image/jpeg", upsert: false });
+    if (up.error) throw up.error;
+
+    stage = "update";
+    const old = profile.banner_path || sGet("nixelos-banner-" + user.id);
+    try { sSet("nixelos-banner-" + user.id, path); } catch (e) {}
+    const upd = await sb.from("profiles")
+      .update({ banner_path: path })
+      .eq("id", user.id)
+      .select("*")
+      .single();
+
+    if (upd.error) {
+      const em = String(upd.error.message || "") + " " + String(upd.error.details || "");
+      if (em.includes("banner_path") || upd.error.code === "42703" || upd.error.code === "PGRST204") {
+        profile.banner_path = path;
+      } else {
+        try { await dropOld(path); } catch (e) {}
+        throw upd.error;
+      }
+    } else {
+      profile = upd.data;
+    }
+    render();
+    flash($("msg"), t("pSaved"), true);
+    if (old) { try { await dropOld(old); } catch (e) {} }
+  } catch (error) {
+    $("msg").classList.remove("on");
+    if (String(error?.message).startsWith("eBanner")) flash($("msg"), t("eBanner"), false);
+    else showAvatarError(error, stage);
+  } finally {
+    $("chg-banner").disabled = false;
+  }
+});
+
+$("rem-banner").addEventListener("click", async () => {
+  const old = profile.banner_path || sGet("nixelos-banner-" + user.id);
+  if (!old) return;
+  hideAvatarError();
+  $("rem-banner").disabled = true;
+  try {
+    try { sDel("nixelos-banner-" + user.id); } catch (e) {}
+    const upd = await sb.from("profiles")
+      .update({ banner_path: null })
+      .eq("id", user.id)
+      .select("*")
+      .single();
+    if (upd.error) {
+      const em = String(upd.error.message || "");
+      if (!em.includes("banner_path") && upd.error.code !== "42703" && upd.error.code !== "PGRST204") throw upd.error;
+      profile.banner_path = null;
+    } else {
+      profile = upd.data;
+    }
+    render();
+    flash($("msg"), t("pSaved"), true);
+    try { await dropOld(old); } catch (error) {}
+  } catch (error) {
+    showAvatarError(error, "remove");
+  } finally {
+    $("rem-banner").disabled = false;
+  }
+});
+
+/* Save display name & bio */
+$("pf").addEventListener("submit", async event => {
+  event.preventDefault();
+  const dn = $("dn").value.trim();
+  const bio = $("bio").value.trim();
+  if (dn.length < 2 || dn.length > 32 || /[\u0000-\u001f\u007f]/.test(dn)) {
+    return flash($("msg"), t("eDisp"), false);
+  }
+  $("save").disabled = true;
+  try {
+    const upd = await sb.from("profiles")
+      .update({ display_name: dn, bio })
+      .eq("id", user.id)
+      .select("*")
+      .single();
+    if (upd.error) throw upd.error;
+    profile = upd.data;
+    render();
+    flash($("msg"), t("pSaved"), true);
+  } catch (error) {
+    flash($("msg"), t("eNet"), false);
+  } finally {
+    $("save").disabled = false;
+  }
+});
+
+/* Friends & Requests loader */
+async function loadFriendsSection() {
+  const reqBox = $("req-list");
+  const frBox = $("friends-list");
+  try {
+    const { data: rows, error } = await sb.from("friendships")
+      .select("id,requester_id,addressee_id,status")
+      .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
+    if (error || !rows) {
+      reqBox.innerHTML = `<p class="fr-empty">${t("fNoRequests")}</p>`;
+      frBox.innerHTML = `<p class="fr-empty">${t("fNoFriends")}</p>`;
+      return;
+    }
+
+    const incoming = rows.filter(r => r.status === "pending" && r.addressee_id === user.id);
+    const accepted = rows.filter(r => r.status === "accepted");
+    const otherIds = [...new Set([
+      ...incoming.map(r => r.requester_id),
+      ...accepted.map(r => r.requester_id === user.id ? r.addressee_id : r.requester_id)
+    ])];
+
+    const profMap = {};
+    if (otherIds.length) {
+      const { data: profs } = await sb.from("profiles")
+        .select("id,username,display_name,avatar_path,is_verified,is_moderator")
+        .in("id", otherIds);
+      (profs || []).forEach(p => { profMap[p.id] = p; });
+    }
+
+    reqBox.replaceChildren();
+    if (!incoming.length) {
+      const p = document.createElement("p");
+      p.className = "fr-empty";
+      p.textContent = t("fNoRequests");
+      reqBox.append(p);
+    } else {
+      incoming.forEach(r => {
+        const p = profMap[r.requester_id] || { username: "user", display_name: "User" };
+        const item = document.createElement("div");
+        item.className = "fr-item";
+        const link = document.createElement("a");
+        link.className = "fr-user";
+        link.href = "profile-view.html?u=" + encodeURIComponent(p.username);
+        link.append(makeAvatar(p, "fr-av"));
+        const meta = document.createElement("div");
+        meta.className = "fr-meta";
+        const nm = document.createElement("div");
+        nm.className = "fr-name";
+        nm.textContent = p.display_name || p.username;
+        if (p.is_verified) nm.append(badge());
+        const hd = document.createElement("div");
+        hd.className = "fr-handle";
+        hd.textContent = "@" + p.username;
+        meta.append(nm, hd);
+        link.append(meta);
+
+        const btns = document.createElement("div");
+        btns.className = "fr-btns";
+        const acc = document.createElement("button");
+        acc.type = "button";
+        acc.className = "btn sm";
+        acc.textContent = t("fAccept");
+        acc.addEventListener("click", async () => {
+          acc.disabled = true;
+          await sb.from("friendships").update({ status: "accepted" }).eq("id", r.id);
+          loadFriendsSection();
+        });
+        const dec = document.createElement("button");
+        dec.type = "button";
+        dec.className = "btn ghost danger sm";
+        dec.textContent = t("fDecline");
+        dec.addEventListener("click", async () => {
+          dec.disabled = true;
+          await sb.from("friendships").delete().eq("id", r.id);
+          loadFriendsSection();
+        });
+        btns.append(acc, dec);
+        item.append(link, btns);
+        reqBox.append(item);
+      });
+    }
+
+    frBox.replaceChildren();
+    if (!accepted.length) {
+      const p = document.createElement("p");
+      p.className = "fr-empty";
+      p.textContent = t("fNoFriends");
+      frBox.append(p);
+    } else {
+      accepted.forEach(r => {
+        const oid = r.requester_id === user.id ? r.addressee_id : r.requester_id;
+        const p = profMap[oid] || { username: "user", display_name: "User" };
+        const item = document.createElement("div");
+        item.className = "fr-item";
+        const link = document.createElement("a");
+        link.className = "fr-user";
+        link.href = "profile-view.html?u=" + encodeURIComponent(p.username);
+        link.append(makeAvatar(p, "fr-av"));
+        const meta = document.createElement("div");
+        meta.className = "fr-meta";
+        const nm = document.createElement("div");
+        nm.className = "fr-name";
+        nm.textContent = p.display_name || p.username;
+        if (p.is_verified) nm.append(badge());
+        const hd = document.createElement("div");
+        hd.className = "fr-handle";
+        hd.textContent = "@" + p.username;
+        meta.append(nm, hd);
+        link.append(meta);
+
+        const btns = document.createElement("div");
+        btns.className = "fr-btns";
+        const rem = document.createElement("button");
+        rem.type = "button";
+        rem.className = "btn ghost danger sm";
+        rem.textContent = t("fRemoveFriend");
+        rem.addEventListener("click", async () => {
+          rem.disabled = true;
+          await sb.from("friendships").delete().eq("id", r.id);
+          loadFriendsSection();
+        });
+        btns.append(rem);
+        item.append(link, btns);
+        frBox.append(item);
+      });
+    }
+  } catch (e) {}
+}
+
+$("pw").addEventListener("submit", async event => {
+  event.preventDefault();
+  const a = $("np").value;
+  if (a.length < 8) return flash($("pmsg"), t("ePassLen"), false);
+  if (a !== $("np2").value) return flash($("pmsg"), t("ePassMatch"), false);
+  $("pbtn").disabled = true;
+  try {
+    const { error } = await sb.auth.updateUser({ password: a });
+    if (error) throw error;
+    $("np").value = "";
+    $("np2").value = "";
+    flash($("pmsg"), t("pPassDone"), true);
+  } catch (error) {
+    flash($("pmsg"), t("eNet"), false);
+  } finally {
+    $("pbtn").disabled = false;
+  }
+});
+
+$("out").addEventListener("click", async () => {
+  $("out").disabled = true;
+  await sb.auth.signOut();
+  location.replace("Auth/login.html");
+});
+
+if (sb && sb.auth) sb.auth.onAuthStateChange(event => {
+  if (event === "SIGNED_OUT") location.replace("Auth/login.html");
+});
+
+render();
+loadFriendsSection();
+</script>
+
+
+</body>
+</html>
