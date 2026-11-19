@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090a0e">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>NixelOS — Email verification</title>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("nixelos-theme")==="light"?"light":"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--background:#090a0e;--panel:rgba(17,18,24,.68);--border:rgba(255,255,255,.09);--text:#f5f5f7;--muted:#b9bbc7;--field:rgba(255,255,255,.06)}
+:root[data-theme="light"]{color-scheme:light;--background:#f4f5fb;--panel:rgba(255,255,255,.72);--border:rgba(20,24,60,.12);--text:#14162a;--muted:#555a73;--field:rgba(20,24,60,.05)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--background);color:var(--text);font-family:"Comfortaa",system-ui,sans-serif;transition:background-color 300ms ease,color 300ms ease}
+body{min-height:100vh;overflow-x:hidden;position:relative;padding-top:62px}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(520px 520px at 18% 22%,rgba(79,111,255,.2),transparent 70%),radial-gradient(460px 460px at 84% 70%,rgba(147,91,255,.18),transparent 70%),radial-gradient(380px 380px at 60% 10%,rgba(73,177,255,.12),transparent 70%);animation:drift 14s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(0,-18px,0) scale(1.06)}}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;min-height:62px;padding:10px clamp(14px,3.5vw,38px);background:var(--panel);border-bottom:1px solid var(--border);-webkit-backdrop-filter:blur(10px) brightness(.78);backdrop-filter:blur(7.5px) brightness(.78)}
+:root[data-theme="light"] .topbar{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.brand{display:inline-flex;align-items:center;gap:10px;min-width:0;color:inherit;text-decoration:none}
+.brand img{display:block;width:36px;height:36px;object-fit:contain;transition:transform 420ms cubic-bezier(.3,1.5,.5,1)}
+.brand-name{font-size:17px;line-height:1;font-weight:700;letter-spacing:-.035em;white-space:nowrap}
+.toplink{display:inline-flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;font-size:14px;font-weight:700;transition:color 180ms ease,transform 180ms ease}
+.toplink:hover{color:#a8b4ff;transform:translateX(-3px)}
+:root[data-theme="light"] .toplink:hover{color:#4a5bd8}
+.toplink svg{width:20px;height:20px}
+main{position:relative;z-index:1;width:min(520px,calc(100% - 28px));margin:0 auto;padding:clamp(28px,6vh,64px) 0 60px}
+.card{width:100%;padding:clamp(20px,4vw,30px);border:1px solid rgba(133,151,255,.26);border-radius:22px;background:linear-gradient(135deg,rgba(91,111,255,.14),rgba(142,78,255,.08));box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 16px 47px rgba(0,0,0,.22);-webkit-backdrop-filter:blur(15px) saturate(135%);backdrop-filter:blur(15px) saturate(135%);animation:rise-in 800ms cubic-bezier(.2,.7,.2,1) both}
+:root[data-theme="light"] .card{border-color:rgba(91,111,255,.32);background:linear-gradient(135deg,rgba(255,255,255,.78),rgba(236,240,255,.7));box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 16px 47px rgba(20,24,60,.12)}
+.card+.card{margin-top:18px;animation-delay:120ms}
+@keyframes rise-in{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+h1{margin:0 0 8px;font-size:clamp(24px,4vw,30px);line-height:1.3;letter-spacing:-.04em}
+h2{margin:0 0 4px;font-size:18px;letter-spacing:-.02em}
+.sub{margin:0;color:var(--muted);font-size:15px;line-height:1.7}
+.field{display:grid;gap:6px;margin-top:16px}
+.field label{font-size:13px;font-weight:700;color:var(--muted)}
+.field input,.field textarea{width:100%;min-height:46px;padding:0 14px;border:1px solid var(--border);border-radius:12px;color:var(--text);background:var(--field);font:400 15px "Comfortaa",sans-serif;transition:border-color 180ms ease,box-shadow 180ms ease}
+.field textarea{padding:12px 14px;min-height:92px;resize:vertical;line-height:1.6}
+.field input:focus,.field textarea:focus{outline:none;border-color:rgba(151,166,255,.8);box-shadow:0 0 0 3px rgba(133,151,255,.22)}
+.field input[readonly]{opacity:.7;cursor:not-allowed}
+.hint{font-size:12px;color:var(--muted)}
+.btn{position:relative;overflow:hidden;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:46px;padding:0 22px;border:1px solid rgba(133,151,255,.32);border-radius:9px;color:#f7f7ff;text-decoration:none;font:700 14px "Comfortaa",sans-serif;background:linear-gradient(135deg,rgba(91,111,255,.17),rgba(142,78,255,.11));box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 8px 24px rgba(44,56,130,.12);-webkit-backdrop-filter:blur(15px) saturate(135%);backdrop-filter:blur(15px) saturate(135%);cursor:pointer;transition:transform 180ms ease,border-color 180ms ease,background 180ms ease,opacity 180ms ease}
+:root[data-theme="light"] .btn{color:var(--text);border-color:rgba(91,111,255,.4);background:linear-gradient(135deg,rgba(91,111,255,.12),rgba(142,78,255,.08))}
+.btn:hover{transform:translateY(-3px);border-color:rgba(151,166,255,.68);background:linear-gradient(135deg,rgba(91,111,255,.34),rgba(142,78,255,.27))}
+.btn::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.2) 50%,transparent 70%);transform:translateX(-130%);transition:transform 650ms cubic-bezier(.2,.7,.2,1)}
+.btn:hover::after{transform:translateX(130%)}
+.btn:active{transform:translateY(-1px) scale(.97)}
+.btn:focus-visible{outline:2px solid #a8b4ff;outline-offset:4px}
+.btn:disabled{opacity:.55;cursor:wait;transform:none}
+.btn.block{width:100%;margin-top:22px}
+.btn.ghost{background:var(--field);border-color:var(--border)}
+.btn.danger:hover{border-color:rgba(255,120,120,.7);background:linear-gradient(135deg,rgba(255,90,90,.25),rgba(255,90,140,.18))}
+.msg{margin:14px 0 0;padding:0 12px;max-height:0;overflow:hidden;border-radius:10px;font-size:13px;line-height:1.6;opacity:0;transition:max-height 300ms ease,opacity 300ms ease,padding 300ms ease}
+.msg.on{max-height:90px;padding:10px 12px;opacity:1}
+.msg.err{color:#ff9c9c;background:rgba(255,90,90,.12);border:1px solid rgba(255,120,120,.3)}
+.msg.ok{color:#8ee6b0;background:rgba(60,200,120,.12);border:1px solid rgba(90,220,150,.3)}
+:root[data-theme="light"] .msg.err{color:#b3261e}
+:root[data-theme="light"] .msg.ok{color:#146c3a}
+.alt{margin:20px 0 0;text-align:center;color:var(--muted);font-size:14px}
+.alt a{color:#b8c2ff;font-weight:700;text-decoration:none;padding-bottom:2px;background:linear-gradient(currentColor,currentColor) 0 100%/0 2px no-repeat;transition:background-size 320ms cubic-bezier(.2,.7,.2,1)}
+.alt a:hover{background-size:100% 2px}
+:root[data-theme="light"] .alt a{color:#4a5bd8}
+.av-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:18px}
+.av-lg{width:96px;height:96px;border-radius:50%;object-fit:cover;flex:none;display:grid;place-items:center;font-size:38px;font-weight:700;color:#fff;background:linear-gradient(135deg,#8f9bff,#a46bff);box-shadow:0 8px 28px rgba(120,110,255,.35);border:2px solid rgba(255,255,255,.18);transition:transform 320ms cubic-bezier(.3,1.5,.5,1)}
+.av-lg:hover{transform:scale(1.05)}
+.av-actions{display:flex;gap:10px;flex-wrap:wrap}
+.who{display:flex;align-items:center;gap:8px;margin-top:2px;color:var(--muted);font-size:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.sep{height:1px;margin:24px 0;background:var(--border)}
+@media(max-width:480px){body{padding-top:54px}.topbar{min-height:54px;padding:8px 14px}.brand img{width:31px;height:31px}.brand-name{font-size:16px}.btn.block{min-height:48px}}
+@media(prefers-reduced-motion:reduce){.card,body::before{animation:none}.btn::after{display:none}}
+.center{text-align:center}
+.state{display:grid;justify-items:center;gap:0}
+.state[hidden]{display:none}
+.ico{display:grid;place-items:center;width:72px;height:72px;margin:0 auto 16px;border-radius:50%;border:1px solid var(--border)}
+.ico svg{width:34px;height:34px}
+.ico.ok{color:#8ee6b0;background:rgba(60,200,120,.14);border-color:rgba(90,220,150,.35)}
+.ico.warn{color:#ffd37a;background:rgba(255,190,70,.14);border-color:rgba(255,200,100,.35)}
+.ico.bad{color:#ff9c9c;background:rgba(255,90,90,.12);border-color:rgba(255,120,120,.35)}
+.ico.info{color:#a8b4ff;background:rgba(133,151,255,.14);border-color:rgba(133,151,255,.32)}
+:root[data-theme="light"] .ico.ok{color:#146c3a}
+:root[data-theme="light"] .ico.warn{color:#8a5a00}
+:root[data-theme="light"] .ico.bad{color:#b3261e}
+:root[data-theme="light"] .ico.info{color:#4a5bd8}
+.spin{width:34px;height:34px;border:3px solid rgba(133,151,255,.25);border-top-color:#a8b4ff;border-radius:50%;animation:spin 900ms linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pop{animation:pop 520ms cubic-bezier(.3,1.5,.5,1) both}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.acts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:22px;width:100%}
+.acts .btn{flex:1 1 150px}
+@media(prefers-reduced-motion:reduce){.spin{animation-duration:2.4s}.pop{animation:none}}
+
+.top-actions{display:flex;align-items:center;gap:14px}
+.menu-toggle,.menu-close{display:grid;place-items:center;width:44px;height:44px;flex:0 0 auto;border:1px solid rgba(255,255,255,.12);border-radius:12px;color:var(--text);background:rgba(255,255,255,.06);-webkit-backdrop-filter:blur(8.5px);backdrop-filter:blur(8.5px);font:700 22px/1 "Comfortaa",sans-serif;cursor:pointer;transition:background 180ms ease,border-color 180ms ease,transform 220ms ease}
+.menu-toggle:hover,.menu-close:hover{background:rgba(128,112,255,.16);border-color:rgba(150,140,255,.38)}
+.menu-toggle:focus-visible,.menu-close:focus-visible{outline:2px solid #a8b4ff;outline-offset:3px}
+.menu-toggle svg,.menu-close svg{width:22px;height:22px}
+.menu-toggle .menu-icon{display:block;transition:transform 260ms cubic-bezier(.2,.7,.2,1)}
+.menu-toggle[aria-expanded="true"] .menu-icon{transform:rotate(180deg)}
+.menu-scrim{position:fixed;inset:0;z-index:40;background:rgba(3,4,10,.68);opacity:0;visibility:hidden;transition:opacity 280ms ease,visibility 280ms ease}
+.menu-scrim.is-open{opacity:1;visibility:visible}
+.side-menu{position:fixed;z-index:41;top:0;right:0;width:78vw;height:100dvh;overflow-y:auto;border-left:1px solid rgba(255,255,255,.14);background:rgba(20,22,35,.32);-webkit-backdrop-filter:blur(11px) saturate(160%) brightness(.72);backdrop-filter:blur(11px) saturate(160%) brightness(.72);box-shadow:-24px 0 68px rgba(0,0,0,.42);opacity:0;visibility:hidden;transform:translateX(105%);transition:transform 380ms cubic-bezier(.2,.75,.2,1),opacity 260ms ease,visibility 380ms;pointer-events:none;padding:22px}
+.side-menu.is-open{opacity:1;visibility:visible;transform:translateX(0);pointer-events:auto}
+@media(min-width:769px){.side-menu{width:33.333vw}}
+.menu-head{display:flex;align-items:center;gap:12px}
+.menu-head .menu-close{flex:none;margin-left:0}
+.menu-account{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:8px 14px 8px 8px;border:1px solid rgba(255,255,255,.15);border-radius:16px;color:var(--text,#f5f5f7);background:rgba(255,255,255,.08);text-decoration:none;transition:border-color 180ms ease,background 180ms ease,transform 180ms ease}
+.menu-account:hover{border-color:rgba(151,166,255,.6);background:rgba(128,112,255,.16);transform:translateX(2px)}
+.menu-av{flex:none;width:44px;height:44px;border-radius:50%;object-fit:cover;display:grid;place-items:center;font-size:18px;font-weight:700;color:#fff;background:linear-gradient(135deg,#8f9bff,#a46bff);border:1px solid rgba(255,255,255,.18)}
+.menu-av svg{width:22px;height:22px}
+.menu-acc-text{min-width:0;display:grid;gap:2px}
+.menu-acc-name{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:16px;font-weight:700;line-height:1.3}
+.menu-acc-sub{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:12px;color:var(--muted,#b9bbc7)}
+.menu-acc-sub:empty{display:none}
+.menu-links{display:grid;gap:2px;margin-top:30px}
+.menu-link{display:flex;align-items:center;gap:14px;width:100%;padding:12px 6px;border-radius:10px;color:var(--text);text-decoration:none;font-size:18px;font-weight:700;transition:color 180ms ease,transform 180ms ease}
+.menu-link svg{width:24px;height:24px;flex:0 0 auto;transition:transform 280ms cubic-bezier(.3,1.5,.5,1)}
+.menu-link:hover,.menu-link[aria-current="page"]{color:#a8b4ff}
+.menu-link:hover{transform:translateX(4px)}
+.menu-theme{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:26px;padding:0 6px}
+.menu-theme-label{font-size:16px;font-weight:700}
+.theme-switch{position:relative;display:flex;align-items:center;justify-content:space-between;flex:0 0 auto;width:62px;height:34px;padding:0 8px;border:1px solid rgba(255,255,255,.18);border-radius:999px;color:var(--muted);background:rgba(255,255,255,.08);cursor:pointer}
+.theme-switch svg{width:16px;height:16px}
+.theme-knob{position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#8f9bff,#a46bff);box-shadow:0 2px 8px rgba(0,0,0,.35);transition:transform 280ms cubic-bezier(.2,.7,.2,1)}
+.theme-switch[aria-checked="true"] .theme-knob{transform:translateX(28px)}
+.menu-languages{margin-top:34px}
+.lang-title{margin:0 0 16px;font-size:18px;line-height:1.45}
+.lang-switch{position:relative;display:flex;align-items:center;width:100%;padding:3px;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.06);container-type:inline-size}
+.lang-thumb{position:absolute;top:3px;bottom:3px;left:0;width:0;border-radius:999px;background:linear-gradient(135deg,#8f9bff,#a46bff);box-shadow:0 2px 12px rgba(120,110,255,.45)}
+.lang-button{position:relative;z-index:1;flex:1 1 auto;min-width:0;min-height:36px;padding:0 6px;border:0;border-radius:999px;color:var(--muted);background:none;font:700 12px "Comfortaa",sans-serif;cursor:pointer}
+.lang-button[aria-pressed="true"]{color:#fff}
+:root[data-theme="light"] .menu-toggle,:root[data-theme="light"] .menu-close,:root[data-theme="light"] .menu-account,:root[data-theme="light"] .lang-switch,:root[data-theme="light"] .theme-switch{border-color:rgba(20,24,60,.16);background:rgba(20,24,60,.06)}
+:root[data-theme="light"] .side-menu{border-left-color:rgba(20,24,60,.14);background:rgba(250,251,255,.8);box-shadow:-24px 0 68px rgba(20,24,60,.2)}
+:root[data-theme="light"] .menu-link:hover,:root[data-theme="light"] .menu-link[aria-current="page"]{color:#4a5bd8}
+
+</style>
+  <style>
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: none; }
+}
+
+.reveal.is-visible,
+.hero-logo.is-visible,
+h1.is-visible,
+.tagline.is-visible {
+  animation: rise-in 800ms cubic-bezier(.2,.7,.2,1) forwards;
+}
+
+h1.is-visible { animation-delay: 160ms; }
+.tagline.is-visible { animation-delay: 320ms; }
+
+.os-card:nth-child(1).is-visible { animation-delay: 80ms; }
+.os-card:nth-child(2).is-visible { animation-delay: 220ms; }
+.os-card:nth-child(3).is-visible { animation-delay: 360ms; }
+.social-section .social-intro.is-visible { animation-delay: 120ms; }
+.social-section .social-actions.is-visible { animation-delay: 240ms; }
+
+.reveal.reveal-auto { opacity: 0; transform: translateY(22px); animation: none; }
+.reveal.reveal-auto.is-visible { animation: rise-in 800ms cubic-bezier(.2,.7,.2,1) forwards; animation-delay: var(--reveal-delay, 0ms); }
+
+.os-card,.status-card,.download-card,.news-card,.card,.req-card,.faq-panel{transition:translate 360ms cubic-bezier(.2,.7,.2,1),border-color 300ms ease,box-shadow 360ms ease}
+.os-card:hover,.status-card:hover,.download-card:hover,.news-card:hover,.card:hover,.req-card:hover,.faq-panel:hover{translate:0 -5px;border-color:rgba(151,166,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 24px 60px rgba(44,56,130,.3)}
+:root[data-theme="light"] .os-card:hover,:root[data-theme="light"] .status-card:hover,:root[data-theme="light"] .download-card:hover,:root[data-theme="light"] .news-card:hover,:root[data-theme="light"] .card:hover,:root[data-theme="light"] .req-card:hover,:root[data-theme="light"] .faq-panel:hover{border-color:rgba(91,111,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 24px 60px rgba(44,56,130,.2)}
+.btn,.social-button{position:relative;overflow:hidden;isolation:isolate}
+.btn::after,.social-button::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.2) 50%,transparent 70%);transform:translateX(-130%);transition:transform 650ms cubic-bezier(.2,.7,.2,1)}
+.btn:hover::after,.social-button:hover::after{transform:translateX(130%)}
+.btn:active,.social-button:active{transform:translateY(-1px) scale(.97)}
+.telegram-note a,.news-note a{padding-bottom:2px;background:linear-gradient(currentColor,currentColor) 0 100%/0 2px no-repeat;transition:background-size 320ms cubic-bezier(.2,.7,.2,1),color 200ms ease}
+.telegram-note a:hover,.news-note a:hover{background-size:100% 2px;text-decoration:none}
+.build-image,.news-image{transition:filter 500ms ease}
+.download-card:hover .build-image,.news-card:hover .news-image{filter:saturate(1.15) brightness(1.06)}
+.brand img{transition:transform 420ms cubic-bezier(.3,1.5,.5,1)}
+.brand:hover img{transform:rotate(-8deg) scale(1.08)}
+.menu-link svg{transition:transform 280ms cubic-bezier(.3,1.5,.5,1)}
+.menu-link:hover svg{transform:scale(1.14) rotate(-4deg)}
+.theme-switch{transition:border-color 200ms ease,background 200ms ease}
+.theme-switch:hover{border-color:rgba(151,166,255,.6);background:rgba(133,151,255,.14)}
+:root[data-theme="light"] .theme-switch:hover{border-color:rgba(91,111,255,.6);background:rgba(91,111,255,.14)}
+.lang-switch.is-ready .lang-thumb{transition:transform 440ms cubic-bezier(.2,.8,.2,1.1),width 440ms cubic-bezier(.2,.8,.2,1.1)}
+@media(prefers-reduced-motion:reduce){.os-card:hover,.status-card:hover,.download-card:hover,.news-card:hover,.card:hover,.req-card:hover,.faq-panel:hover{translate:none}.btn::after,.social-button::after{display:none}.lang-switch.is-ready .lang-thumb{transition:none}}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-logo, h1, .tagline, .reveal, .os-card, .status-card {
+    opacity: 1;
+    transform: none;
+    animation: none !important;
+  }
+}
+
+.menu-toggle:active,.menu-close:active,.lang-button:active{transform:scale(.94)}
+.fr-item,.friend-mini,.req-item,.faq-post,.chat-msg,.nx-c,.u-tab,.faq-tab{transition:translate 300ms cubic-bezier(.2,.7,.2,1),border-color 240ms ease,box-shadow 300ms ease,background 240ms ease,color 200ms ease}
+.fr-item:hover,.friend-mini:hover,.req-item:hover,.faq-post:hover,.nx-c:hover{translate:0 -3px;border-color:rgba(151,166,255,.55);box-shadow:0 14px 34px rgba(44,56,130,.22)}
+.chat-msg:hover{translate:3px 0;border-color:rgba(151,166,255,.5)}
+.uc-av,.chat-av,.av-lg,.pv-av,.fr-av,.friend-mini-av,.nx-av,.menu-av{transition:scale 360ms cubic-bezier(.3,1.5,.5,1),box-shadow 300ms ease}
+.user-card:hover .uc-av,.chat-msg:hover .chat-av,.fr-item:hover .fr-av,.friend-mini:hover .friend-mini-av,.nx-c:hover .nx-av,.av-lg:hover,.pv-av:hover,.menu-account:hover .menu-av{scale:1.1;box-shadow:0 0 0 3px rgba(151,166,255,.4),0 8px 22px rgba(44,56,130,.35)}
+.nx-rules-btn,.nx-chip,.faq-open,.news-button,.req-cta,.download-action{position:relative;overflow:hidden;isolation:isolate}
+.nx-rules-btn::after,.nx-chip::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.2) 50%,transparent 70%);transform:translateX(-130%);transition:transform 650ms cubic-bezier(.2,.7,.2,1)}
+.nx-rules-btn:hover::after,.nx-chip:hover::after{transform:translateX(130%)}
+.nx-rules-btn:active,.nx-chip:active,.u-tab:active,.faq-tab:active,.faq-open:active,.news-button:active,.req-cta:active,.download-action:active{scale:.96}
+.users-grid>*,.friends-grid>*,.fr-grid>*,.req-grid>*,.faq-list>*{animation:rise-in 560ms cubic-bezier(.2,.7,.2,1) both}
+.users-grid>*:nth-child(2),.friends-grid>*:nth-child(2),.fr-grid>*:nth-child(2),.req-grid>*:nth-child(2),.faq-list>*:nth-child(2){animation-delay:70ms}
+.users-grid>*:nth-child(3),.friends-grid>*:nth-child(3),.fr-grid>*:nth-child(3),.req-grid>*:nth-child(3),.faq-list>*:nth-child(3){animation-delay:140ms}
+.users-grid>*:nth-child(4),.friends-grid>*:nth-child(4),.fr-grid>*:nth-child(4),.req-grid>*:nth-child(4),.faq-list>*:nth-child(4){animation-delay:210ms}
+.users-grid>*:nth-child(n+5),.friends-grid>*:nth-child(n+5),.fr-grid>*:nth-child(n+5),.req-grid>*:nth-child(n+5),.faq-list>*:nth-child(n+5){animation-delay:280ms}
+.faq-hero,.back-bar{animation:rise-in 700ms cubic-bezier(.2,.7,.2,1) both}
+.live-dot{animation:nx-pulse 1.8s ease-in-out infinite}
+@keyframes nx-pulse{0%,100%{box-shadow:0 0 0 0 rgba(120,255,170,.5)}50%{box-shadow:0 0 0 7px rgba(120,255,170,0)}}
+@media(prefers-reduced-motion:reduce){.users-grid>*,.friends-grid>*,.fr-grid>*,.req-grid>*,.faq-list>*,.faq-hero,.back-bar,.live-dot{animation:none}.nx-rules-btn::after,.nx-chip::after{display:none}.fr-item:hover,.friend-mini:hover,.req-item:hover,.faq-post:hover,.nx-c:hover,.chat-msg:hover{translate:none}}
+.menu-toggle:focus-visible,.menu-close:focus-visible,.menu-link:focus-visible,.lang-button:focus-visible,.theme-switch:focus-visible,.btn:focus-visible,.toplink:focus-visible{outline:2px solid rgba(151,166,255,.85);outline-offset:2px}
+</style>
+  <script>
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function ready(fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+
+  function initReveal() {
+    if (document.querySelector('.reveal') || reduce) return;
+    var main = document.querySelector('main');
+    if (!main) return;
+    var items = [];
+    Array.prototype.forEach.call(main.children, function (el) {
+      var cs = getComputedStyle(el);
+      if (cs.animationName !== 'none' || cs.position === 'fixed' || cs.display === 'none' || el.hidden || /^(SCRIPT|STYLE|TEMPLATE)$/.test(el.tagName)) return;
+      items.push(el);
+    });
+    items.forEach(function (el, i) {
+      el.classList.add('reveal', 'reveal-auto');
+      el.style.setProperty('--reveal-delay', Math.min(i, 4) * 140 + 'ms');
+    });
+    if ('IntersectionObserver' in window) {
+      var revealObserver = new IntersectionObserver(function (entries, observer) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      items.forEach(function (item) { revealObserver.observe(item); });
+    } else {
+      items.forEach(function (item) { item.classList.add('is-visible'); });
+    }
+  }
+
+  function initParticles() {
+    if (document.getElementById('particles')) return;
+    var canvas = document.createElement('canvas');
+    canvas.id = 'particles';
+    canvas.setAttribute('aria-hidden', 'true');
+    canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.78';
+    document.body.insertBefore(canvas, document.body.firstChild);
+    ['.topbar', 'main'].forEach(function (sel) {
+      var n = document.querySelector(sel);
+      if (n && getComputedStyle(n).position === 'static') { n.style.position = 'relative'; n.style.zIndex = '1'; }
+    });
+    var ctx = canvas.getContext('2d');
+    var particles = [], width = 0, height = 0, animationFrame;
+    var colors = ['79, 111, 255', '147, 91, 255', '73, 177, 255'];
+    function resizeParticles() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth; height = window.innerHeight;
+      canvas.width = Math.floor(width * dpr); canvas.height = Math.floor(height * dpr);
+      canvas.style.width = width + 'px'; canvas.style.height = height + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var count = Math.min(42, Math.max(18, Math.floor(width / 27)));
+      particles = Array.from({ length: count }, function () {
+        return {
+          x: Math.random() * width, y: Math.random() * height, r: 2 + Math.random() * 5,
+          vy: 0.12 + Math.random() * 0.38, vx: (Math.random() - 0.5) * 0.22,
+          color: colors[Math.floor(Math.random() * colors.length)], alpha: 0.12 + Math.random() * 0.28
+        };
+      });
+    }
+    function drawParticles() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(function (p) {
+        p.y -= p.vy; p.x += p.vx;
+        if (p.y < -15) { p.y = height + 15; p.x = Math.random() * width; }
+        if (p.x < -15) p.x = width + 15;
+        if (p.x > width + 15) p.x = -15;
+        window.nxGlow(ctx,p);
+      });
+      animationFrame = requestAnimationFrame(drawParticles);
+    }
+    resizeParticles(); drawParticles();
+    window.addEventListener('resize', resizeParticles, { passive: true });
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) cancelAnimationFrame(animationFrame);
+      else drawParticles();
+    });
+  }
+
+  ready(function () { initReveal(); initParticles(); });
+})();
+(function () {
+  var busy = false, pending = null;
+  function setPressed(lang) {
+    document.querySelectorAll('.lang-button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.lang === lang)); });
+  }
+  function visible(el) {
+    var r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < window.innerHeight;
+  }
+  window.nxLangSwap = async function (lang, apply) {
+    if (lang === document.documentElement.lang) { apply(); return; }
+    if (busy) { pending = [lang, apply]; setPressed(lang); return; }
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var items = Array.prototype.filter.call(document.querySelectorAll('[data-i18n],[data-sk]'), visible);
+    if (reduce || !items.length || typeof items[0].animate !== 'function') { apply(); return; }
+    busy = true;
+    setPressed(lang);
+    var shown = { opacity: 1, transform: 'translateY(0)', filter: 'blur(0px)' };
+    var hidden = { opacity: 0, transform: 'translateY(-8px)', filter: 'blur(5px)' };
+    var outs = [], applied = false;
+    try {
+      outs = items.map(function (el) { return el.animate([shown, hidden], { duration: 220, easing: 'ease-in', fill: 'forwards' }); });
+      await Promise.race([Promise.all(outs.map(function (a) { return a.finished; })), new Promise(function (r) { setTimeout(r, 600); })]);
+      apply();
+      applied = true;
+      var ins = items.map(function (el, i) {
+        return el.animate([{ opacity: 0, transform: 'translateY(10px)', filter: 'blur(5px)' }, shown], { duration: 460, delay: Math.min(i * 28, 340), easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' });
+      });
+      outs.forEach(function (a) { a.cancel(); });
+      await Promise.race([Promise.all(ins.map(function (a) { return a.finished; })), new Promise(function (r) { setTimeout(r, 1400); })]);
+    } catch (e) {
+      outs.forEach(function (a) { a.cancel(); });
+      if (!applied) apply();
+    } finally {
+      busy = false;
+      var next = pending;
+      pending = null;
+      if (next) window.nxLangSwap(next[0], next[1]);
+    }
+  };
+})();
+</script>
+  <script>
+(function(){
+if(window.__nxChrome)return;window.__nxChrome=1;
+var page=(location.pathname.split('/').pop()||'index.html').replace(/\.html$/i,'').toLowerCase()||'index';
+var UI={
+en:{home:'NixelOS home',logo:'NixelOS logo',open:'Open menu',close:'Close menu',nav:'Site navigation',lang:'Language',theme:'Light theme'},
+ru:{home:'NixelOS — на главную',logo:'Логотип NixelOS',open:'Открыть меню',close:'Закрыть меню',nav:'Навигация по сайту',lang:'Язык',theme:'Светлая тема'},
+uk:{home:'NixelOS — на головну',logo:'Логотип NixelOS',open:'Відкрити меню',close:'Закрити меню',nav:'Навігація сайтом',lang:'Мова',theme:'Світла тема'}
+};
+var PG={
+index:{en:['NixelOS',''],ru:['NixelOS',''],uk:['NixelOS','']},
+downloads:{en:['NixelOS Downloads','Downloads'],ru:['NixelOS — Загрузки','Загрузки'],uk:['NixelOS — Завантаження','Завантаження']},
+news:{en:['NixelOS News','News'],ru:['NixelOS — Новости','Новости'],uk:['NixelOS — Новини','Новини']},
+'min-req':{en:['NixelOS Minimal Requirements','Requirements'],ru:['NixelOS — Минимальные требования','Требования'],uk:['NixelOS — Мінімальні вимоги','Вимоги']},
+faq:{en:['NixelOS FAQ','FAQ'],ru:['NixelOS — FAQ','FAQ'],uk:['NixelOS — FAQ','FAQ']},
+users:{en:['NixelOS — Users','Users'],ru:['NixelOS — Пользователи','Пользователи'],uk:['NixelOS — Користувачі','Користувачі']},
+chat:{en:['NixelOS — Community Chat','Chat'],ru:['NixelOS — Чат сообщества','Чат'],uk:['NixelOS — Чат спільноти','Чат']},
+profile:{en:['NixelOS — Profile','Profile'],ru:['NixelOS — Профиль','Профиль'],uk:['NixelOS — Профіль','Профіль']},
+'profile-view':{en:['NixelOS — User Profile','Profile View'],ru:['NixelOS — Профиль пользователя','Профиль'],uk:['NixelOS — Профіль користувача','Профіль']},
+login:{en:['NixelOS — Log in','Login'],ru:['NixelOS — Вход','Вход'],uk:['NixelOS — Вхід','Вхід']},
+register:{en:['NixelOS — Sign up','Sign up'],ru:['NixelOS — Регистрация','Регистрация'],uk:['NixelOS — Реєстрація','Реєстрація']},
+verification:{en:['NixelOS — Email verification','Verification'],ru:['NixelOS — Подтверждение почты','Подтверждение'],uk:['NixelOS — Підтвердження пошти','Підтвердження']}
+};
+function lang(){var l=document.documentElement.lang;if(!UI[l]){try{l=localStorage.getItem('nixelos-lang')}catch(e){}}return UI[l]?l:'en'}
+function set(el,a,v){if(el&&el.getAttribute(a)!==v)el.setAttribute(a,v)}
+function chrome(){
+var l=lang(),u=UI[l],p=PG[page];
+set(document.querySelector('.brand'),'aria-label',u.home);
+document.querySelectorAll('.brand img,.menu-head img,.hero-logo').forEach(function(i){set(i,'alt',u.logo)});
+var tg=document.getElementById('menu-toggle');
+if(tg)set(tg,'aria-label',tg.getAttribute('aria-expanded')==='true'?u.close:u.open);
+set(document.getElementById('menu-close'),'aria-label',u.close);
+set(document.querySelector('.menu-links'),'aria-label',u.nav);
+set(document.querySelector('.lang-switch'),'aria-label',u.lang);
+set(document.getElementById('theme-switch'),'aria-label',u.theme);
+if(p){
+var known=[p.en[0],p.ru[0],p.uk[0]];
+if(known.indexOf(document.title)>-1&&document.title!==p[l][0])document.title=p[l][0];
+var bn=document.querySelector('.brand-name');
+if(bn&&p.en[1]&&/^NixelOS\s*\/\s*/.test(bn.textContent)){var want='NixelOS / '+p[l][1];if(bn.textContent!==want)bn.textContent=want}
+}
+}
+var last=lang();
+function onLang(){last=lang();chrome()}
+new MutationObserver(onLang).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+new MutationObserver(function(){chrome()}).observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['aria-expanded']});
+document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.lang-button'))setTimeout(onLang,0)});
+function init(){
+chrome();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+window.addEventListener('load',chrome);
+})();
+</script>
+<script id="nx-gpu">(function () {
+  'use strict';
+  /* ---------- 1. Fast glow for particles (same look, no shadowBlur per frame) ---------- */
+  var sprites = {};
+  function sprite(color, r) {
+    var rr = Math.max(1, Math.round(r));
+    var key = color + '|' + rr;
+    if (sprites[key]) return sprites[key];
+    var S = 2, half = rr + 32, size = half * 2 * S;
+    var c = document.createElement('canvas');
+    c.width = c.height = size;
+    var g = c.getContext('2d');
+    g.scale(S, S);
+    g.shadowBlur = 19;
+    g.shadowColor = 'rgba(' + color + ', 0.9)';
+    g.fillStyle = 'rgba(' + color + ', 0.65)';
+    g.beginPath(); g.arc(half, half, rr, 0, Math.PI * 2); g.fill();
+    return (sprites[key] = { c: c, half: half });
+  }
+
+  /* ---------- 1b. GPU (WebGL) rendering for #particles ---------- */
+  var origGetContext = HTMLCanvasElement.prototype.getContext;
+  var VS = 'attribute vec2 aC;attribute vec2 aP;attribute vec4 aD;attribute vec3 aK;uniform vec2 uRes;varying vec2 vC;varying vec3 vK;varying vec2 vRA;' +
+    'void main(){float h=aD.x+32.0;vec2 pos=aP+aC*h;vec2 clip=pos/uRes*2.0-1.0;gl_Position=vec4(clip.x,-clip.y,0.0,1.0);vC=aC*h;vK=aK;vRA=aD.xy;vRA.y=aD.y;}';
+  var FS = 'precision mediump float;varying vec2 vC;varying vec3 vK;varying vec2 vRA;' +
+    'void main(){float d=length(vC);float r=vRA.x;float s=9.5;' +
+    'float cov=1.0-smoothstep(r-0.7,r+0.7,d);' +
+    'float peak=1.0-exp(-r*r/(2.0*s*s));float prof=exp(-d*d/(2.0*(s*s+r*r*0.5)));' +
+    'float ag=0.9*peak*prof;float ac=0.65*cov;float a=(ac+ag*(1.0-ac))*vRA.y;' +
+    'gl_FragColor=vec4(vK*a,a);}';
+
+  function makeGL(canvas) {
+    var gl = origGetContext.call(canvas, 'webgl', { alpha: true, premultipliedAlpha: true, antialias: false, depth: false, stencil: false, powerPreference: 'low-power' });
+    if (!gl) return null;
+    function sh(t, src) { var o = gl.createShader(t); gl.shaderSource(o, src); gl.compileShader(o); return gl.getShaderParameter(o, gl.COMPILE_STATUS) ? o : null; }
+    var v = sh(gl.VERTEX_SHADER, VS), f = sh(gl.FRAGMENT_SHADER, FS);
+    if (!v || !f) return null;
+    var pr = gl.createProgram(); gl.attachShader(pr, v); gl.attachShader(pr, f); gl.linkProgram(pr);
+    if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return null;
+    gl.useProgram(pr);
+    var buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    var STRIDE = 11 * 4;
+    function attr(n, size, off) { var l = gl.getAttribLocation(pr, n); gl.enableVertexAttribArray(l); gl.vertexAttribPointer(l, size, gl.FLOAT, false, STRIDE, off * 4); }
+    attr('aC', 2, 0); attr('aP', 2, 2); attr('aD', 4, 4); attr('aK', 3, 8);
+    var uRes = gl.getUniformLocation(pr, 'uRes');
+    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.clearColor(0, 0, 0, 0);
+    var data = new Float32Array(0), n = 0, queued = false;
+    var corners = [-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1];
+    var cache = {};
+    function rgb(c) { return cache[c] || (cache[c] = c.split(',').map(function (x) { return parseFloat(x) / 255; })); }
+    var ctx = {
+      __gl: true,
+      canvas: canvas,
+      setTransform: function () {}, save: function () {}, restore: function () {},
+      clearRect: function () { n = 0; gl.viewport(0, 0, canvas.width, canvas.height); gl.clear(gl.COLOR_BUFFER_BIT); },
+      push: function (p) {
+        var need = (n + 1) * 6 * 11;
+        if (data.length < need) { var nd = new Float32Array(Math.max(need, data.length * 2 || 66 * 64)); nd.set(data); data = nd; }
+        var k = rgb(p.color), o = n * 66;
+        for (var i = 0; i < 6; i++, o += 11) {
+          data[o] = corners[i * 2]; data[o + 1] = corners[i * 2 + 1];
+          data[o + 2] = p.x; data[o + 3] = p.y;
+          data[o + 4] = p.r; data[o + 5] = p.alpha; data[o + 6] = 0; data[o + 7] = 0;
+          data[o + 8] = k[0]; data[o + 9] = k[1]; data[o + 10] = k[2];
+        }
+        n++;
+        if (!queued) { queued = true; Promise.resolve().then(flush); }
+      }
+    };
+    function flush() {
+      queued = false;
+      if (!n) return;
+      var dpr = canvas.width / (window.innerWidth || canvas.width);
+      gl.uniform2f(uRes, canvas.width / dpr, canvas.height / dpr);
+      gl.bufferData(gl.ARRAY_BUFFER, data.subarray(0, n * 66), gl.DYNAMIC_DRAW);
+      gl.drawArrays(gl.TRIANGLES, 0, n * 6);
+    }
+    return ctx;
+  }
+
+  HTMLCanvasElement.prototype.getContext = function (type) {
+    if (type === '2d' && this.id === 'particles') {
+      if (this.__nxctx) return this.__nxctx;
+      if (this.__nxfail) return origGetContext.apply(this, arguments);
+      var g = null;
+      try { g = makeGL(this); } catch (e) {}
+      if (g) return (this.__nxctx = g);
+      this.__nxfail = true;
+    }
+    return origGetContext.apply(this, arguments);
+  };
+
+  window.nxGlow = function (ctx, p) {
+    if (ctx.__gl) { ctx.push(p); return; }
+    var s = sprite(p.color, p.r);
+    ctx.globalAlpha = p.alpha;
+    ctx.drawImage(s.c, p.x - s.half, p.y - s.half, s.half * 2, s.half * 2);
+    ctx.globalAlpha = 1;
+  };
+
+  var st = document.createElement('style'); st.textContent = '#particles{will-change:transform;transform:translateZ(0)}'; document.head.appendChild(st);
+})();</script>
+<script src="../JS/nx-site.js?v=2"></script>
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="../index.html" aria-label="NixelOS home"><img decoding="async" src="https://raw.githubusercontent.com/Dmutrashaa/NixelOS/main/NixelOS%20Site/picture-material/1791559522545.png" alt="NixelOS logo"><span class="brand-name">NixelOS / Verification</span></a>
+<div class="top-actions"><a class="toplink" href="../index.html" aria-label="Back" title="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></a><button class="menu-toggle" id="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button></div>
+</header>
+<div class="menu-scrim" id="menu-scrim" aria-hidden="true"></div>
+<aside class="side-menu" id="site-menu" aria-hidden="true" inert="">
+  <div class="menu-head">
+    <a class="menu-account" id="account-link" href="login.html">
+      <span class="menu-av" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.6"></circle><path d="M5 20c.8-3.6 3.7-5.4 7-5.4s6.2 1.8 7 5.4"></path></svg></span>
+      <span class="menu-acc-text"><span class="menu-acc-name" data-i18n="navAccount">Log in / Sign up</span><span class="menu-acc-sub"></span></span>
+    </a>
+    <button class="menu-close" id="menu-close" type="button" aria-label="Close menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+  </div>
+  <nav class="menu-links" aria-label="Site navigation">
+    <a class="menu-link" href="../index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10v9.5h13V10"></path><path d="M10 19.5v-5h4v5"></path></svg><span data-i18n="navHome">Home</span></a>
+    <a class="menu-link" href="../downloads.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"></path><path d="m7.5 11 4.5 4.5 4.5-4.5"></path><path d="M5 19.5h14"></path></svg><span data-i18n="navDownloads">Downloads</span></a>
+    <a class="menu-link" href="../news.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="M8 9h8M8 12.5h8M8 16h5"></path></svg><span data-i18n="navNews">News</span></a>
+    <a class="menu-link" href="../min-req.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"></rect><rect x="9.5" y="9.5" width="5" height="5" rx=".8"></rect><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"></path></svg><span data-i18n="navMinReq">Min. Requirements</span></a>
+    <a class="menu-link" href="../faq.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9.6 9.4a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2 1-1.2 1.8"></path><path d="M12 17h.01"></path></svg><span data-i18n="navFaq">FAQ</span></a>
+    <a class="menu-link" href="../Users.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2"></circle><path d="M3.5 19.5c.7-3.1 3-4.7 5.5-4.7s4.8 1.6 5.5 4.7"></path><circle cx="17" cy="9.5" r="2.5"></circle><path d="M15.5 19.5c.5-2.3 2.1-3.6 4.2-3.6.7 0 1.3.15 1.8.45"></path></svg><span data-i18n="navUsers">Users</span></a>
+    <a class="menu-link" href="../chat.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"></path></svg><span data-i18n="navChat">OS Chat</span></a>
+  </nav>
+  <div class="menu-theme">
+    <span class="menu-theme-label" data-i18n="themeLabel">Light theme</span>
+    <button class="theme-switch" id="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Light theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"></path></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"></path></svg><span class="theme-knob"></span></button>
+  </div>
+  <div class="menu-languages">
+    <h2 class="lang-title" data-i18n="langTitle">We are on other languages!</h2>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <span class="lang-thumb" aria-hidden="true"></span>
+      <button class="lang-button" type="button" data-lang="en" aria-pressed="true">English</button>
+      <button class="lang-button" type="button" data-lang="ru" aria-pressed="false">Русский</button>
+      <button class="lang-button" type="button" data-lang="uk" aria-pressed="false">Українська</button>
+    </div>
+  </div>
+</aside>
+<main>
+<section class="card center" aria-live="polite">
+<div class="state" id="s-wait">
+<div class="ico info"><div class="spin" role="presentation"></div></div>
+<h1 data-sk="vWaitT">Verifying your email…</h1>
+<p class="sub" data-sk="vWaitX">Just a moment</p>
+</div>
+<div class="state" id="s-ok" hidden>
+<div class="ico ok pop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.4l2.8 2.8L16.2 9.6"></path></svg></div>
+<h1 data-sk="vOkT">Email confirmed</h1>
+<p class="sub" data-sk="vOkX">Your account is active.</p>
+<div class="acts"><a class="btn" href="../profile.html" data-sk="vProfile">Open profile</a><a class="btn ghost" href="login.html" data-sk="logIn">Log in</a></div>
+</div>
+<div class="state" id="s-expired" hidden>
+<div class="ico warn pop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5.2l3.2 1.9"></path></svg></div>
+<h1 data-sk="vExpT">Link expired</h1>
+<p class="sub" data-sk="vExpX">This link is invalid or has expired.</p>
+<div class="acts"><a class="btn" href="login.html" data-sk="logIn">Log in</a><a class="btn ghost" href="register.html" data-sk="signUp">Sign up</a></div>
+</div>
+<div class="state" id="s-error" hidden>
+<div class="ico bad pop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 21.5 20h-19z"></path><path d="M12 10v4.5M12 17.4v.1"></path></svg></div>
+<h1 data-sk="vErrT">Couldn't verify email</h1>
+<p class="sub" data-sk="vErrX">Something went wrong while verifying.</p>
+<div class="acts"><a class="btn" href="login.html" data-sk="logIn">Log in</a><a class="btn ghost" href="register.html" data-sk="signUp">Sign up</a></div>
+</div>
+<div class="state" id="s-none" hidden>
+<div class="ico info pop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M4 7.5l8 6 8-6"></path></svg></div>
+<h1 data-sk="vNoneT">Nothing to verify</h1>
+<p class="sub" data-sk="vNoneX">Open the confirmation link from your email.</p>
+<div class="acts"><a class="btn" href="login.html" data-sk="logIn">Log in</a><a class="btn ghost" href="../index.html" data-sk="back">Back to site</a></div>
+</div>
+</section>
+</main>
+<script>
+(function(){
+  const NAV_I18N = {
+    en: {
+      navHome:"Home", navDownloads:"Downloads", navNews:"News", navMinReq:"Min. Requirements", navFaq:"FAQ",
+      navUsers:"Users", navChat:"OS Chat", navAccount:"Log in / Sign up", themeLabel:"Light theme",
+      langTitle:"We are on other languages!", openMenu:"Open menu", closeMenu:"Close menu",
+      back:"Back to site", loginTitle:"Log in", loginSub:"Welcome back to NixelOS", fEmail:"Email", fPass:"Password",
+      loginBtn:"Log in", bResend:"Resend email", noAcc:"No account yet?", signUp:"Sign up",
+      regTitle:"Create account", regSub:"Join the NixelOS community", fUser:"Username",
+      eUser:"Username: 3–20 characters, letters, digits and _", fPass2:"Repeat password", regBtn:"Sign up",
+      haveAcc:"Already have an account?", logIn:"Log in", ckTitle:"Check your email",
+      ckText:"We sent a confirmation link to the address below.", ckBack:"Back to log in",
+      vWaitT:"Verifying your email…", vWaitX:"Just a moment", vOkT:"Email confirmed", vOkX:"Your account is active.",
+      vProfile:"Open profile", vExpT:"Link expired", vExpX:"This link is invalid or has expired.",
+      vErrT:"Couldn't verify email", vErrX:"Something went wrong while verifying.",
+      vNoneT:"Nothing to verify", vNoneX:"Open the confirmation link from your email."
+    },
+    ru: {
+      navHome:"Главная", navDownloads:"Загрузки", navNews:"Новости", navMinReq:"Мин. требования", navFaq:"FAQ",
+      navUsers:"Пользователи", navChat:"Чат ОС", navAccount:"Войти / Регистрация", themeLabel:"Светлая тема",
+      langTitle:"Мы доступны на других языках!", openMenu:"Открыть меню", closeMenu:"Закрыть меню",
+      back:"Назад на сайт", loginTitle:"Вход", loginSub:"С возвращением в NixelOS", fEmail:"Email", fPass:"Пароль",
+      loginBtn:"Войти", bResend:"Отправить письмо ещё раз", noAcc:"Ещё нет аккаунта?", signUp:"Регистрация",
+      regTitle:"Создать аккаунт", regSub:"Присоединяйся к сообществу NixelOS", fUser:"Имя пользователя",
+      eUser:"Имя: 3–20 символов, буквы, цифры и _", fPass2:"Повторите пароль", regBtn:"Зарегистрироваться",
+      haveAcc:"Уже есть аккаунт?", logIn:"Войти", ckTitle:"Проверьте почту",
+      ckText:"Мы отправили ссылку для подтверждения на адрес ниже.", ckBack:"Назад ко входу",
+      vWaitT:"Проверяем почту…", vWaitX:"Одну секунду", vOkT:"Email подтверждён", vOkX:"Аккаунт активирован.",
+      vProfile:"Открыть профиль", vExpT:"Ссылка устарела", vExpX:"Ссылка недействительна или срок её действия истёк.",
+      vErrT:"Не удалось подтвердить email", vErrX:"Во время проверки что-то пошло не так.",
+      vNoneT:"Нечего проверять", vNoneX:"Откройте ссылку подтверждения из письма."
+    },
+    uk: {
+      navHome:"Головна", navDownloads:"Завантаження", navNews:"Новини", navMinReq:"Мін. вимоги", navFaq:"FAQ",
+      navUsers:"Користувачі", navChat:"Чат ОС", navAccount:"Увійти / Реєстрація", themeLabel:"Світла тема",
+      langTitle:"Ми доступні іншими мовами!", openMenu:"Відкрити меню", closeMenu:"Закрити меню",
+      back:"Назад на сайт", loginTitle:"Вхід", loginSub:"З поверненням у NixelOS", fEmail:"Email", fPass:"Пароль",
+      loginBtn:"Увійти", bResend:"Надіслати лист ще раз", noAcc:"Ще немає акаунта?", signUp:"Реєстрація",
+      regTitle:"Створити акаунт", regSub:"Приєднуйся до спільноти NixelOS", fUser:"Ім'я користувача",
+      eUser:"Ім'я: 3–20 символів, літери, цифри та _", fPass2:"Повторіть пароль", regBtn:"Зареєструватися",
+      haveAcc:"Вже є акаунт?", logIn:"Увійти", ckTitle:"Перевірте пошту",
+      ckText:"Ми надіслали посилання для підтвердження на адресу нижче.", ckBack:"Назад до входу",
+      vWaitT:"Перевіряємо пошту…", vWaitX:"Одну секунду", vOkT:"Email підтверджено", vOkX:"Акаунт активовано.",
+      vProfile:"Відкрити профіль", vExpT:"Посилання застаріло", vExpX:"Посилання недійсне або термін його дії минув.",
+      vErrT:"Не вдалося підтвердити email", vErrX:"Під час перевірки щось пішло не так.",
+      vNoneT:"Нічого перевіряти", vNoneX:"Відкрийте посилання підтвердження з листа."
+    }
+  };
+  let currentLang = "en";
+  try { currentLang = localStorage.getItem("nixelos-lang") || "en"; } catch(e) {}
+  if (!NAV_I18N[currentLang]) currentLang = "en";
+  const menuToggle = document.getElementById("menu-toggle");
+  const siteMenu = document.getElementById("site-menu");
+  const menuScrim = document.getElementById("menu-scrim");
+  const menuClose = document.getElementById("menu-close");
+  function setMenuOpen(open) {
+    if (!menuToggle || !siteMenu || !menuScrim) return;
+    menuToggle.setAttribute("aria-expanded", String(open));
+    siteMenu.classList.toggle("is-open", open);
+    menuScrim.classList.toggle("is-open", open);
+    siteMenu.setAttribute("aria-hidden", String(!open));
+    siteMenu.toggleAttribute("inert", !open);
+    menuScrim.setAttribute("aria-hidden", String(!open));
+    document.body.style.overflow = open ? "hidden" : "";
+  }
+  if (menuToggle) menuToggle.addEventListener("click", () => setMenuOpen(menuToggle.getAttribute("aria-expanded") !== "true"));
+  if (menuClose) menuClose.addEventListener("click", () => setMenuOpen(false));
+  if (menuScrim) menuScrim.addEventListener("click", () => setMenuOpen(false));
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && menuToggle && menuToggle.getAttribute("aria-expanded") === "true") setMenuOpen(false); });
+  function applyBaseLang(lang) {
+    if (!NAV_I18N[lang]) lang = "en";
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-i18n]").forEach(el => { const k = el.dataset.i18n; if (NAV_I18N[lang][k]) el.textContent = NAV_I18N[lang][k]; });
+    document.querySelectorAll("[data-sk]").forEach(el => { const k = el.dataset.sk; if (NAV_I18N[lang][k]) el.textContent = NAV_I18N[lang][k]; });
+    document.querySelectorAll(".lang-button").forEach(btn => btn.setAttribute("aria-pressed", String(btn.dataset.lang === lang)));
+  }
+  const themeSwitch = document.getElementById("theme-switch");
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    if (themeSwitch) themeSwitch.setAttribute("aria-checked", String(theme === "light"));
+  }
+  applyTheme(document.documentElement.dataset.theme === "light" ? "light" : "dark");
+  if (themeSwitch) themeSwitch.addEventListener("click", () => {
+    const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+    applyTheme(next);
+    try { localStorage.setItem("nixelos-theme", next); } catch(e) {}
+  });
+  const langSwitch = document.querySelector(".lang-switch"), langThumb = document.querySelector(".lang-thumb");
+  function moveThumb() {
+    if (!langSwitch || !langThumb) return;
+    const a = langSwitch.querySelector('.lang-button[aria-pressed="true"]');
+    if (!a) return;
+    langThumb.style.width = a.offsetWidth + "px";
+    langThumb.style.transform = "translateX(" + a.offsetLeft + "px)";
+  }
+  if (langSwitch) {
+    new MutationObserver(moveThumb).observe(langSwitch, { subtree: true, attributes: true, attributeFilter: ["aria-pressed"] });
+    window.addEventListener("resize", moveThumb);
+    document.querySelectorAll(".lang-button").forEach(btn => btn.addEventListener("click", () => {
+      try { localStorage.setItem("nixelos-lang", btn.dataset.lang); } catch(e) {}
+      nxLangSwap(btn.dataset.lang, function () { applyBaseLang(btn.dataset.lang); });
+    }));
+    applyBaseLang(currentLang);
+    moveThumb();
+    requestAnimationFrame(() => requestAnimationFrame(() => langSwitch.classList.add("is-ready")));
+  }
+})();
+</script>
+<script type="module">
+let _mod = {}; try { _mod = await import("../JS/supabase.js?v=5"); } catch (e) {}
+const { sb, initLang, getSessionUser } = _mod;
+if (!sb) { console.warn("Supabase offline"); }
+
+if (initLang) initLang();
+
+const names = ["wait", "ok", "expired", "error", "none"];
+function setState(name) {
+  names.forEach(n => { document.getElementById("s-" + n).hidden = n !== name; });
+}
+
+// Read everything the email link gave us, then remove it from the address bar and history.
+const hash = new URLSearchParams(location.hash.replace(/^#/, ""));
+const query = new URLSearchParams(location.search);
+const param = k => hash.get(k) || query.get(k) || "";
+const accessToken = hash.get("access_token");
+const refreshToken = hash.get("refresh_token");
+const tokenHash = query.get("token_hash");
+const code = query.get("code");
+const linkType = param("type");
+const linkError = param("error") || param("error_code");
+const linkErrorText = (param("error_code") + " " + param("error_description")).toLowerCase();
+history.replaceState(null, "", location.pathname);
+
+const isExpired = text => /expired|invalid|otp_expired|not found|already been used/i.test(text || "");
+
+async function run() {
+  if (linkError) return setState(isExpired(linkErrorText) ? "expired" : "error");
+
+  if (linkType && !["signup", "email"].includes(linkType)) return setState("error");
+
+  let err = null;
+  if (accessToken && refreshToken) {
+    ({ error: err } = await sb.auth.setSession({ access_token: accessToken, refresh_token: refreshToken }));
+  } else if (tokenHash) {
+    ({ error: err } = await sb.auth.verifyOtp({ type: linkType || "signup", token_hash: tokenHash }));
+  } else if (code) {
+    ({ error: err } = await sb.auth.exchangeCodeForSession(code));
+  } else if (!(await getSessionUser())) {
+    return setState("none");
+  }
+  if (err) return setState(isExpired((err.code || "") + " " + (err.message || "")) ? "expired" : "error");
+
+  // Ask Supabase itself (not the browser) whether the email is confirmed.
+  const { data, error } = await sb.auth.getUser();
+  if (error || !data || !data.user) return setState("error");
+  setState(data.user.email_confirmed_at ? "ok" : "error");
+}
+
+if (sb) run().catch(() => setState("error")); else setState("none");
+</script>
+
+
+</body></html>
