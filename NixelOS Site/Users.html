@@ -1,0 +1,1339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090a0e">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>NixelOS — Users</title>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("nixelos-theme")==="light"?"light":"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--background:#090a0e;--panel:rgba(17,18,24,.68);--border:rgba(255,255,255,.09);--text:#f5f5f7;--muted:#b9bbc7;--field:rgba(255,255,255,.06);--option-bg:#14162a}
+:root[data-theme="light"]{color-scheme:light;--background:#f4f5fb;--panel:rgba(255,255,255,.72);--border:rgba(20,24,60,.12);--text:#14162a;--muted:#555a73;--field:rgba(20,24,60,.05);--option-bg:#ffffff}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--background);color:var(--text);font-family:"Comfortaa",system-ui,sans-serif;transition:background-color 300ms ease,color 300ms ease}
+body{min-height:100vh;overflow-x:hidden;position:relative;padding-top:62px}
+#particles{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.78}
+:root[data-theme="light"] #particles{opacity:.45}
+.topbar,main{position:relative;z-index:1}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;min-height:62px;padding:10px clamp(14px,3.5vw,38px);background:var(--panel);border-bottom:1px solid var(--border);-webkit-backdrop-filter:blur(10px) brightness(.78);backdrop-filter:blur(7.5px) brightness(.78)}
+:root[data-theme="light"] .topbar{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.brand{display:inline-flex;align-items:center;gap:10px;min-width:0;color:inherit;text-decoration:none}
+.brand img{display:block;width:36px;height:36px;object-fit:contain;transition:transform 420ms cubic-bezier(.3,1.5,.5,1)}
+.brand-name{font-size:17px;line-height:1;font-weight:700;letter-spacing:-.035em;white-space:nowrap}
+
+/* Side menu */
+.menu-toggle,.menu-close{display:grid;place-items:center;width:44px;height:44px;flex:0 0 auto;border:1px solid rgba(255,255,255,.12);border-radius:12px;color:var(--text);background:rgba(255,255,255,.06);-webkit-backdrop-filter:blur(8.5px);backdrop-filter:blur(8.5px);font:700 22px/1 "Comfortaa",sans-serif;cursor:pointer;transition:background 180ms ease,border-color 180ms ease,transform 220ms ease}
+.menu-toggle:hover,.menu-close:hover{background:rgba(128,112,255,.16);border-color:rgba(150,140,255,.38)}
+.menu-toggle:focus-visible,.menu-close:focus-visible{outline:2px solid #a8b4ff;outline-offset:3px}
+.menu-toggle svg,.menu-close svg{width:22px;height:22px}
+.menu-toggle .menu-icon{display:block;transition:transform 260ms cubic-bezier(.2,.7,.2,1)}
+.menu-toggle[aria-expanded="true"] .menu-icon{transform:rotate(180deg)}
+.menu-scrim{position:fixed;inset:0;z-index:40;background:rgba(3,4,10,.68);opacity:0;visibility:hidden;transition:opacity 280ms ease,visibility 280ms ease}
+.menu-scrim.is-open{opacity:1;visibility:visible}
+.side-menu{position:fixed;z-index:41;top:0;right:0;width:78vw;height:100dvh;overflow-y:auto;border-left:1px solid rgba(255,255,255,.14);background:rgba(20,22,35,.32);-webkit-backdrop-filter:blur(11px) saturate(160%) brightness(.72);backdrop-filter:blur(11px) saturate(160%) brightness(.72);box-shadow:-24px 0 68px rgba(0,0,0,.42);opacity:0;visibility:hidden;transform:translateX(105%);transition:transform 380ms cubic-bezier(.2,.75,.2,1),opacity 260ms ease,visibility 380ms;pointer-events:none;padding:22px}
+.side-menu.is-open{opacity:1;visibility:visible;transform:translateX(0);pointer-events:auto}
+@media(min-width:769px){.side-menu{width:33.333vw}}
+.menu-head{display:flex;align-items:center;gap:12px}
+.menu-head .menu-close{flex:none;margin-left:0}
+.menu-account{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:8px 14px 8px 8px;border:1px solid rgba(255,255,255,.15);border-radius:16px;color:var(--text,#f5f5f7);background:rgba(255,255,255,.08);text-decoration:none;transition:border-color 180ms ease,background 180ms ease,transform 180ms ease}
+.menu-account:hover{border-color:rgba(151,166,255,.6);background:rgba(128,112,255,.16);transform:translateX(2px)}
+.menu-av{flex:none;width:44px;height:44px;border-radius:50%;object-fit:cover;display:grid;place-items:center;font-size:18px;font-weight:700;color:#fff;background:linear-gradient(135deg,#8f9bff,#a46bff);border:1px solid rgba(255,255,255,.18)}
+.menu-av svg{width:22px;height:22px}
+.menu-acc-text{min-width:0;display:grid;gap:2px}
+.menu-acc-name{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:16px;font-weight:700;line-height:1.3}
+.menu-acc-name>span{margin-left:6px;vertical-align:-3px}
+.menu-acc-sub{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:12px;color:var(--muted,#b9bbc7)}
+.menu-acc-sub:empty{display:none}
+.menu-links{display:grid;gap:2px;margin-top:30px}
+.menu-link{display:flex;align-items:center;gap:14px;width:100%;padding:12px 6px;border-radius:10px;color:var(--text);text-decoration:none;font-size:18px;font-weight:700;transition:color 180ms ease,transform 180ms ease}
+.menu-link svg{width:24px;height:24px;flex:0 0 auto;transition:transform 280ms cubic-bezier(.3,1.5,.5,1)}
+.menu-link:hover,.menu-link[aria-current="page"]{color:#a8b4ff}
+.menu-link:hover{transform:translateX(4px)}
+.menu-theme{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:26px;padding:0 6px}
+.menu-theme-label{font-size:16px;font-weight:700}
+.theme-switch{position:relative;display:flex;align-items:center;justify-content:space-between;flex:0 0 auto;width:62px;height:34px;padding:0 8px;border:1px solid rgba(255,255,255,.18);border-radius:999px;color:var(--muted);background:rgba(255,255,255,.08);cursor:pointer}
+.theme-switch svg{width:16px;height:16px}
+.theme-knob{position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#8f9bff,#a46bff);box-shadow:0 2px 8px rgba(0,0,0,.35);transition:transform 280ms cubic-bezier(.2,.7,.2,1)}
+.theme-switch[aria-checked="true"] .theme-knob{transform:translateX(28px)}
+.menu-languages{margin-top:34px}
+.lang-title{margin:0 0 16px;font-size:18px;line-height:1.45}
+.lang-switch{position:relative;display:flex;align-items:center;width:100%;padding:3px;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.06);container-type:inline-size}
+.lang-thumb{position:absolute;top:3px;bottom:3px;left:0;width:0;border-radius:999px;background:linear-gradient(135deg,#8f9bff,#a46bff);box-shadow:0 2px 12px rgba(120,110,255,.45)}
+.lang-button{position:relative;z-index:1;flex:1 1 auto;min-width:0;min-height:36px;padding:0 6px;border:0;border-radius:999px;color:var(--muted);background:none;font:700 12px "Comfortaa",sans-serif;cursor:pointer}
+.lang-button[aria-pressed="true"]{color:#fff}
+:root[data-theme="light"] .menu-toggle,:root[data-theme="light"] .menu-close,:root[data-theme="light"] .menu-account,:root[data-theme="light"] .lang-switch{border-color:rgba(20,24,60,.16);background:rgba(20,24,60,.06)}
+:root[data-theme="light"] .side-menu{border-left-color:rgba(20,24,60,.14);background:rgba(250,251,255,.8);box-shadow:-24px 0 68px rgba(20,24,60,.2)}
+:root[data-theme="light"] .menu-link:hover,:root[data-theme="light"] .menu-link[aria-current="page"]{color:#4a5bd8}
+:root[data-theme="light"] .theme-switch{border-color:rgba(20,24,60,.2);background:rgba(20,24,60,.08)}
+
+main{width:min(980px,calc(100% - 32px));margin:0 auto;padding:clamp(32px,6vh,68px) 0 60px;text-align:center}
+.page-heading{margin:0;font-size:clamp(30px,5.8vw,50px);line-height:1.2;letter-spacing:-.05em;animation:rise-in 700ms cubic-bezier(.2,.7,.2,1) both}
+.intro{max-width:660px;margin:14px auto 28px;color:var(--muted);font-size:clamp(14px,2.2vw,17px);line-height:1.75;animation:rise-in 700ms cubic-bezier(.2,.7,.2,1) 120ms both}
+@keyframes rise-in{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;max-width:860px;margin:0 auto 26px;padding:14px;border:1px solid rgba(133,151,255,.26);border-radius:20px;background:linear-gradient(135deg,rgba(91,111,255,.12),rgba(142,78,255,.07));-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);animation:rise-in 700ms cubic-bezier(.2,.7,.2,1) 200ms both}
+:root[data-theme="light"] .toolbar{border-color:rgba(91,111,255,.32);background:linear-gradient(135deg,rgba(255,255,255,.8),rgba(236,240,255,.72))}
+.search-wrap{position:relative;flex:1 1 260px;display:flex;align-items:center}
+.search-wrap svg{position:absolute;left:14px;width:18px;height:18px;color:var(--muted);pointer-events:none}
+.search-input{width:100%;min-height:44px;padding:0 14px 0 42px;border:1px solid var(--border);border-radius:14px;color:var(--text);background:var(--field);font:400 14px "Comfortaa",sans-serif;transition:border-color 180ms ease,box-shadow 180ms ease}
+.search-input:focus{outline:none;border-color:rgba(151,166,255,.8);box-shadow:0 0 0 3px rgba(133,151,255,.2)}
+
+.u-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.u-tab{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border:1px solid var(--border);border-radius:12px;color:var(--muted);background:var(--field);font:700 13px "Comfortaa",sans-serif;cursor:pointer;transition:color 180ms ease,border-color 180ms ease,background 180ms ease}
+.u-tab:hover{color:var(--text);border-color:rgba(151,166,255,.5)}
+.u-tab[aria-selected="true"]{color:#fff;border-color:#a8b4ff;background:linear-gradient(135deg,#8f9bff,#a46bff)}
+.u-badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;font-size:11px;background:rgba(255,95,115,.9);color:#fff}
+.u-badge[hidden]{display:none}
+
+.users-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(275px,1fr));gap:18px;text-align:left;animation:rise-in 700ms cubic-bezier(.2,.7,.2,1) 280ms both}
+.user-card{display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(133,151,255,.26);border-radius:20px;background:linear-gradient(135deg,rgba(91,111,255,.13),rgba(142,78,255,.07));box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 14px 40px rgba(0,0,0,.22);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);transition:transform 280ms cubic-bezier(.2,.7,.2,1),border-color 240ms ease,box-shadow 280ms ease}
+.user-card:hover{transform:translateY(-4px);border-color:rgba(151,166,255,.62);box-shadow:0 20px 52px rgba(44,56,130,.28)}
+:root[data-theme="light"] .user-card{border-color:rgba(91,111,255,.3);background:linear-gradient(135deg,rgba(255,255,255,.82),rgba(236,240,255,.74));box-shadow:0 14px 40px rgba(20,24,60,.1)}
+
+.uc-banner{position:relative;display:block;width:100%;height:96px;background:linear-gradient(135deg,#2a3578 0%,#52328c 55%,#1c254a 100%);border-bottom:1px solid var(--border);text-decoration:none}
+.uc-banner::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 25% 35%,rgba(143,155,255,.32),transparent 58%);pointer-events:none}
+.uc-banner.has-banner::after{display:none}
+
+.uc-body{display:flex;flex-direction:column;flex:1;padding:0 18px 18px}
+.uc-top{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-top:-32px;margin-bottom:10px;position:relative;z-index:2}
+.uc-av-link{text-decoration:none}
+.uc-av{width:64px;height:64px;border-radius:50%;object-fit:cover;display:grid;place-items:center;font-size:24px;font-weight:700;color:#fff;background:linear-gradient(135deg,#8f9bff,#a46bff);border:3px solid var(--background);box-shadow:0 6px 18px rgba(0,0,0,.38);transition:transform 220ms ease}
+.uc-av-link:hover .uc-av{transform:scale(1.06)}
+
+.uc-name-link{display:inline-flex;align-items:center;gap:6px;color:var(--text);text-decoration:none;font-size:17px;font-weight:700;line-height:1.3}
+.uc-name-link:hover{color:#a8b4ff}
+:root[data-theme="light"] .uc-name-link:hover{color:#4a5bd8}
+.uc-handle{margin:2px 0 0;color:var(--muted);font-size:13px}
+.uc-bio{margin:10px 0 14px;color:var(--muted);font-size:13px;line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:40px}
+.uc-actions{display:flex;gap:8px;margin-top:auto;flex-wrap:wrap}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;flex:1 1 auto;min-height:38px;padding:0 12px;border:1px solid rgba(133,151,255,.34);border-radius:10px;color:#f7f7ff;text-decoration:none;font:700 12.5px "Comfortaa",sans-serif;background:linear-gradient(135deg,rgba(91,111,255,.22),rgba(142,78,255,.15));cursor:pointer;transition:transform 180ms ease,border-color 180ms ease,background 180ms ease}
+:root[data-theme="light"] .btn{color:var(--text);border-color:rgba(91,111,255,.4);background:linear-gradient(135deg,rgba(91,111,255,.14),rgba(142,78,255,.08))}
+.btn:hover{transform:translateY(-2px);border-color:rgba(151,166,255,.72);background:linear-gradient(135deg,rgba(91,111,255,.38),rgba(142,78,255,.28))}
+.btn.ghost{background:var(--field);border-color:var(--border)}
+.btn.ok{border-color:rgba(90,220,150,.48);background:linear-gradient(135deg,rgba(60,200,120,.24),rgba(40,160,100,.14))}
+.btn.danger:hover{border-color:rgba(255,120,120,.7);background:linear-gradient(135deg,rgba(255,90,90,.25),rgba(255,90,140,.18))}
+.btn svg{width:15px;height:15px;flex:none}
+.empty-msg{grid-column:1/-1;padding:42px 16px;text-align:center;color:var(--muted);font-size:15px}
+
+@media(max-width:480px){body{padding-top:54px}.topbar{min-height:54px;padding:8px 14px}.brand img{width:31px;height:31px}.brand-name{font-size:16px}main{padding:28px 0 50px}}
+
+.nx-rules-btn{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 13px;border:1px solid rgba(151,166,255,.38);border-radius:999px;color:var(--text,#f5f5f7);background:rgba(133,151,255,.12);font:700 12px "Comfortaa",sans-serif;cursor:pointer;transition:transform 180ms ease,border-color 180ms ease,background 180ms ease}
+.nx-rules-btn:hover{transform:translateY(-2px);border-color:rgba(151,166,255,.75);background:rgba(133,151,255,.22)}
+.nx-rules-btn svg{width:15px;height:15px;color:#a8b4ff;flex:none}
+:root[data-theme="light"] .nx-rules-btn{border-color:rgba(91,111,255,.4);background:rgba(91,111,255,.1)}
+:root[data-theme="light"] .nx-rules-btn svg{color:#4a5bd8}
+.nx-rules-overlay{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:rgba(5,6,12,.68);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);opacity:0;visibility:hidden;transition:opacity 220ms ease,visibility 220ms ease}
+.nx-rules-overlay.on{opacity:1;visibility:visible}
+.nx-rules-box{width:min(520px,100%);max-height:88vh;overflow-y:auto;padding:clamp(20px,4vw,28px);text-align:left;border:1px solid rgba(151,166,255,.36);border-radius:22px;background:linear-gradient(135deg,rgba(28,31,56,.97),rgba(16,18,30,.98));box-shadow:0 24px 70px rgba(0,0,0,.5);transform:translateY(16px) scale(.97);transition:transform 260ms cubic-bezier(.2,.7,.2,1)}
+.nx-rules-overlay.on .nx-rules-box{transform:none}
+:root[data-theme="light"] .nx-rules-box{background:linear-gradient(135deg,rgba(255,255,255,.98),rgba(238,242,255,.98));box-shadow:0 24px 70px rgba(20,24,60,.24)}
+.nx-rules-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.nx-rules-top h3{margin:0;font-size:clamp(19px,3.2vw,23px);line-height:1.3;letter-spacing:-.03em}
+.nx-rules-sub{margin:0 0 16px;color:var(--muted,#b9bbc7);font-size:13.5px;line-height:1.65}
+.nx-rules-list{display:grid;gap:10px;margin:0 0 16px;padding:0;list-style:none}
+.nx-rules-item{padding:12px 14px;border:1px solid rgba(151,166,255,.22);border-left:3px solid #8f9bff;border-radius:6px 14px 14px 6px;background:rgba(255,255,255,.04)}
+.nx-rules-item:nth-child(4){border-left-color:#ff7a8a;background:rgba(255,100,120,.07)}
+:root[data-theme="light"] .nx-rules-item{background:rgba(91,111,255,.06);border-color:rgba(91,111,255,.22)}
+:root[data-theme="light"] .nx-rules-item:nth-child(4){background:rgba(255,90,110,.09)}
+.nx-rules-item strong{display:block;margin-bottom:4px;font-size:14.5px;color:var(--text,#f5f5f7)}
+.nx-rules-item p{margin:0;font-size:13px;line-height:1.6;color:var(--muted,#b9bbc7)}
+.nx-rules-foot{margin:0 0 16px;padding:10px 12px;border-radius:12px;background:rgba(133,151,255,.1);font-size:13px;font-weight:700;line-height:1.55;text-align:center;color:var(--text,#f5f5f7)}
+.nx-rules-ok{width:100%}
+
+</style>
+  <style>
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: none; }
+}
+
+.reveal.is-visible,
+.hero-logo.is-visible,
+h1.is-visible,
+.tagline.is-visible {
+  animation: rise-in 800ms cubic-bezier(.2,.7,.2,1) forwards;
+}
+
+h1.is-visible { animation-delay: 160ms; }
+.tagline.is-visible { animation-delay: 320ms; }
+
+.os-card:nth-child(1).is-visible { animation-delay: 80ms; }
+.os-card:nth-child(2).is-visible { animation-delay: 220ms; }
+.os-card:nth-child(3).is-visible { animation-delay: 360ms; }
+.social-section .social-intro.is-visible { animation-delay: 120ms; }
+.social-section .social-actions.is-visible { animation-delay: 240ms; }
+
+.reveal.reveal-auto { opacity: 0; transform: translateY(22px); animation: none; }
+.reveal.reveal-auto.is-visible { animation: rise-in 800ms cubic-bezier(.2,.7,.2,1) forwards; animation-delay: var(--reveal-delay, 0ms); }
+
+.os-card,.status-card,.download-card,.news-card,.card,.req-card,.faq-panel{transition:translate 360ms cubic-bezier(.2,.7,.2,1),border-color 300ms ease,box-shadow 360ms ease}
+.os-card:hover,.status-card:hover,.download-card:hover,.news-card:hover,.card:hover,.req-card:hover,.faq-panel:hover{translate:0 -5px;border-color:rgba(151,166,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 24px 60px rgba(44,56,130,.3)}
+:root[data-theme="light"] .os-card:hover,:root[data-theme="light"] .status-card:hover,:root[data-theme="light"] .download-card:hover,:root[data-theme="light"] .news-card:hover,:root[data-theme="light"] .card:hover,:root[data-theme="light"] .req-card:hover,:root[data-theme="light"] .faq-panel:hover{border-color:rgba(91,111,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 24px 60px rgba(44,56,130,.2)}
+.btn,.social-button{position:relative;overflow:hidden;isolation:isolate}
+.btn::after,.social-button::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.2) 50%,transparent 70%);transform:translateX(-130%);transition:transform 650ms cubic-bezier(.2,.7,.2,1)}
+.btn:hover::after,.social-button:hover::after{transform:translateX(130%)}
+.btn:active,.social-button:active{transform:translateY(-1px) scale(.97)}
+.telegram-note a,.news-note a{padding-bottom:2px;background:linear-gradient(currentColor,currentColor) 0 100%/0 2px no-repeat;transition:background-size 320ms cubic-bezier(.2,.7,.2,1),color 200ms ease}
+.telegram-note a:hover,.news-note a:hover{background-size:100% 2px;text-decoration:none}
+.build-image,.news-image{transition:filter 500ms ease}
+.download-card:hover .build-image,.news-card:hover .news-image{filter:saturate(1.15) brightness(1.06)}
+.brand img{transition:transform 420ms cubic-bezier(.3,1.5,.5,1)}
+.brand:hover img{transform:rotate(-8deg) scale(1.08)}
+.menu-link svg{transition:transform 280ms cubic-bezier(.3,1.5,.5,1)}
+.menu-link:hover svg{transform:scale(1.14) rotate(-4deg)}
+.theme-switch{transition:border-color 200ms ease,background 200ms ease}
+.theme-switch:hover{border-color:rgba(151,166,255,.6);background:rgba(133,151,255,.14)}
+:root[data-theme="light"] .theme-switch:hover{border-color:rgba(91,111,255,.6);background:rgba(91,111,255,.14)}
+.lang-switch.is-ready .lang-thumb{transition:transform 440ms cubic-bezier(.2,.8,.2,1.1),width 440ms cubic-bezier(.2,.8,.2,1.1)}
+@media(prefers-reduced-motion:reduce){.os-card:hover,.status-card:hover,.download-card:hover,.news-card:hover,.card:hover,.req-card:hover,.faq-panel:hover{translate:none}.btn::after,.social-button::after{display:none}.lang-switch.is-ready .lang-thumb{transition:none}}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-logo, h1, .tagline, .reveal, .os-card, .status-card {
+    opacity: 1;
+    transform: none;
+    animation: none !important;
+  }
+}
+
+.menu-toggle:active,.menu-close:active,.lang-button:active{transform:scale(.94)}
+.fr-item,.friend-mini,.req-item,.faq-post,.chat-msg,.nx-c,.u-tab,.faq-tab{transition:translate 300ms cubic-bezier(.2,.7,.2,1),border-color 240ms ease,box-shadow 300ms ease,background 240ms ease,color 200ms ease}
+.fr-item:hover,.friend-mini:hover,.req-item:hover,.faq-post:hover,.nx-c:hover{translate:0 -3px;border-color:rgba(151,166,255,.55);box-shadow:0 14px 34px rgba(44,56,130,.22)}
+.chat-msg:hover{translate:3px 0;border-color:rgba(151,166,255,.5)}
+.uc-av,.chat-av,.av-lg,.pv-av,.fr-av,.friend-mini-av,.nx-av,.menu-av{transition:scale 360ms cubic-bezier(.3,1.5,.5,1),box-shadow 300ms ease}
+.user-card:hover .uc-av,.chat-msg:hover .chat-av,.fr-item:hover .fr-av,.friend-mini:hover .friend-mini-av,.nx-c:hover .nx-av,.av-lg:hover,.pv-av:hover,.menu-account:hover .menu-av{scale:1.1;box-shadow:0 0 0 3px rgba(151,166,255,.4),0 8px 22px rgba(44,56,130,.35)}
+.nx-rules-btn,.nx-chip,.faq-open,.news-button,.req-cta,.download-action{position:relative;overflow:hidden;isolation:isolate}
+.nx-rules-btn::after,.nx-chip::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.2) 50%,transparent 70%);transform:translateX(-130%);transition:transform 650ms cubic-bezier(.2,.7,.2,1)}
+.nx-rules-btn:hover::after,.nx-chip:hover::after{transform:translateX(130%)}
+.nx-rules-btn:active,.nx-chip:active,.u-tab:active,.faq-tab:active,.faq-open:active,.news-button:active,.req-cta:active,.download-action:active{scale:.96}
+.users-grid>*,.friends-grid>*,.fr-grid>*,.req-grid>*,.faq-list>*{animation:rise-in 560ms cubic-bezier(.2,.7,.2,1) both}
+.users-grid>*:nth-child(2),.friends-grid>*:nth-child(2),.fr-grid>*:nth-child(2),.req-grid>*:nth-child(2),.faq-list>*:nth-child(2){animation-delay:70ms}
+.users-grid>*:nth-child(3),.friends-grid>*:nth-child(3),.fr-grid>*:nth-child(3),.req-grid>*:nth-child(3),.faq-list>*:nth-child(3){animation-delay:140ms}
+.users-grid>*:nth-child(4),.friends-grid>*:nth-child(4),.fr-grid>*:nth-child(4),.req-grid>*:nth-child(4),.faq-list>*:nth-child(4){animation-delay:210ms}
+.users-grid>*:nth-child(n+5),.friends-grid>*:nth-child(n+5),.fr-grid>*:nth-child(n+5),.req-grid>*:nth-child(n+5),.faq-list>*:nth-child(n+5){animation-delay:280ms}
+.faq-hero,.back-bar{animation:rise-in 700ms cubic-bezier(.2,.7,.2,1) both}
+.live-dot{animation:nx-pulse 1.8s ease-in-out infinite}
+@keyframes nx-pulse{0%,100%{box-shadow:0 0 0 0 rgba(120,255,170,.5)}50%{box-shadow:0 0 0 7px rgba(120,255,170,0)}}
+@media(prefers-reduced-motion:reduce){.users-grid>*,.friends-grid>*,.fr-grid>*,.req-grid>*,.faq-list>*,.faq-hero,.back-bar,.live-dot{animation:none}.nx-rules-btn::after,.nx-chip::after{display:none}.fr-item:hover,.friend-mini:hover,.req-item:hover,.faq-post:hover,.nx-c:hover,.chat-msg:hover{translate:none}}
+.menu-toggle:focus-visible,.menu-close:focus-visible,.menu-link:focus-visible,.lang-button:focus-visible,.theme-switch:focus-visible,.btn:focus-visible,.toplink:focus-visible{outline:2px solid rgba(151,166,255,.85);outline-offset:2px}
+</style>
+  <script>
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function ready(fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+
+  function initReveal() {
+    if (document.querySelector('.reveal') || reduce) return;
+    var main = document.querySelector('main');
+    if (!main) return;
+    var items = [];
+    Array.prototype.forEach.call(main.children, function (el) {
+      var cs = getComputedStyle(el);
+      if (cs.animationName !== 'none' || cs.position === 'fixed' || cs.display === 'none' || el.hidden || /^(SCRIPT|STYLE|TEMPLATE)$/.test(el.tagName)) return;
+      items.push(el);
+    });
+    items.forEach(function (el, i) {
+      el.classList.add('reveal', 'reveal-auto');
+      el.style.setProperty('--reveal-delay', Math.min(i, 4) * 140 + 'ms');
+    });
+    if ('IntersectionObserver' in window) {
+      var revealObserver = new IntersectionObserver(function (entries, observer) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      items.forEach(function (item) { revealObserver.observe(item); });
+    } else {
+      items.forEach(function (item) { item.classList.add('is-visible'); });
+    }
+  }
+
+  function initParticles() {
+    if (document.getElementById('particles')) return;
+    var canvas = document.createElement('canvas');
+    canvas.id = 'particles';
+    canvas.setAttribute('aria-hidden', 'true');
+    canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.78';
+    document.body.insertBefore(canvas, document.body.firstChild);
+    ['.topbar', 'main'].forEach(function (sel) {
+      var n = document.querySelector(sel);
+      if (n && getComputedStyle(n).position === 'static') { n.style.position = 'relative'; n.style.zIndex = '1'; }
+    });
+    var ctx = canvas.getContext('2d');
+    var particles = [], width = 0, height = 0, animationFrame;
+    var colors = ['79, 111, 255', '147, 91, 255', '73, 177, 255'];
+    function resizeParticles() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth; height = window.innerHeight;
+      canvas.width = Math.floor(width * dpr); canvas.height = Math.floor(height * dpr);
+      canvas.style.width = width + 'px'; canvas.style.height = height + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var count = Math.min(42, Math.max(18, Math.floor(width / 27)));
+      particles = Array.from({ length: count }, function () {
+        return {
+          x: Math.random() * width, y: Math.random() * height, r: 2 + Math.random() * 5,
+          vy: 0.12 + Math.random() * 0.38, vx: (Math.random() - 0.5) * 0.22,
+          color: colors[Math.floor(Math.random() * colors.length)], alpha: 0.12 + Math.random() * 0.28
+        };
+      });
+    }
+    function drawParticles() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(function (p) {
+        p.y -= p.vy; p.x += p.vx;
+        if (p.y < -15) { p.y = height + 15; p.x = Math.random() * width; }
+        if (p.x < -15) p.x = width + 15;
+        if (p.x > width + 15) p.x = -15;
+        window.nxGlow(ctx,p);
+      });
+      animationFrame = requestAnimationFrame(drawParticles);
+    }
+    resizeParticles(); drawParticles();
+    window.addEventListener('resize', resizeParticles, { passive: true });
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) cancelAnimationFrame(animationFrame);
+      else drawParticles();
+    });
+  }
+
+  ready(function () { initReveal(); initParticles(); });
+})();
+(function () {
+  var busy = false, pending = null;
+  function setPressed(lang) {
+    document.querySelectorAll('.lang-button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.lang === lang)); });
+  }
+  function visible(el) {
+    var r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < window.innerHeight;
+  }
+  window.nxLangSwap = async function (lang, apply) {
+    if (lang === document.documentElement.lang) { apply(); return; }
+    if (busy) { pending = [lang, apply]; setPressed(lang); return; }
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var items = Array.prototype.filter.call(document.querySelectorAll('[data-i18n],[data-sk]'), visible);
+    if (reduce || !items.length || typeof items[0].animate !== 'function') { apply(); return; }
+    busy = true;
+    setPressed(lang);
+    var shown = { opacity: 1, transform: 'translateY(0)', filter: 'blur(0px)' };
+    var hidden = { opacity: 0, transform: 'translateY(-8px)', filter: 'blur(5px)' };
+    var outs = [], applied = false;
+    try {
+      outs = items.map(function (el) { return el.animate([shown, hidden], { duration: 220, easing: 'ease-in', fill: 'forwards' }); });
+      await Promise.race([Promise.all(outs.map(function (a) { return a.finished; })), new Promise(function (r) { setTimeout(r, 600); })]);
+      apply();
+      applied = true;
+      var ins = items.map(function (el, i) {
+        return el.animate([{ opacity: 0, transform: 'translateY(10px)', filter: 'blur(5px)' }, shown], { duration: 460, delay: Math.min(i * 28, 340), easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' });
+      });
+      outs.forEach(function (a) { a.cancel(); });
+      await Promise.race([Promise.all(ins.map(function (a) { return a.finished; })), new Promise(function (r) { setTimeout(r, 1400); })]);
+    } catch (e) {
+      outs.forEach(function (a) { a.cancel(); });
+      if (!applied) apply();
+    } finally {
+      busy = false;
+      var next = pending;
+      pending = null;
+      if (next) window.nxLangSwap(next[0], next[1]);
+    }
+  };
+})();
+</script>
+  <script>
+(function(){
+if(window.__nxChrome)return;window.__nxChrome=1;
+var page=(location.pathname.split('/').pop()||'index.html').replace(/\.html$/i,'').toLowerCase()||'index';
+var UI={
+en:{home:'NixelOS home',logo:'NixelOS logo',open:'Open menu',close:'Close menu',nav:'Site navigation',lang:'Language',theme:'Light theme'},
+ru:{home:'NixelOS — на главную',logo:'Логотип NixelOS',open:'Открыть меню',close:'Закрыть меню',nav:'Навигация по сайту',lang:'Язык',theme:'Светлая тема'},
+uk:{home:'NixelOS — на головну',logo:'Логотип NixelOS',open:'Відкрити меню',close:'Закрити меню',nav:'Навігація сайтом',lang:'Мова',theme:'Світла тема'}
+};
+var PG={
+index:{en:['NixelOS',''],ru:['NixelOS',''],uk:['NixelOS','']},
+downloads:{en:['NixelOS Downloads','Downloads'],ru:['NixelOS — Загрузки','Загрузки'],uk:['NixelOS — Завантаження','Завантаження']},
+news:{en:['NixelOS News','News'],ru:['NixelOS — Новости','Новости'],uk:['NixelOS — Новини','Новини']},
+'min-req':{en:['NixelOS Minimal Requirements','Requirements'],ru:['NixelOS — Минимальные требования','Требования'],uk:['NixelOS — Мінімальні вимоги','Вимоги']},
+faq:{en:['NixelOS FAQ','FAQ'],ru:['NixelOS — FAQ','FAQ'],uk:['NixelOS — FAQ','FAQ']},
+users:{en:['NixelOS — Users','Users'],ru:['NixelOS — Пользователи','Пользователи'],uk:['NixelOS — Користувачі','Користувачі']},
+chat:{en:['NixelOS — Community Chat','Chat'],ru:['NixelOS — Чат сообщества','Чат'],uk:['NixelOS — Чат спільноти','Чат']},
+profile:{en:['NixelOS — Profile','Profile'],ru:['NixelOS — Профиль','Профиль'],uk:['NixelOS — Профіль','Профіль']},
+'profile-view':{en:['NixelOS — User Profile','Profile View'],ru:['NixelOS — Профиль пользователя','Профиль'],uk:['NixelOS — Профіль користувача','Профіль']},
+login:{en:['NixelOS — Log in','Login'],ru:['NixelOS — Вход','Вход'],uk:['NixelOS — Вхід','Вхід']},
+register:{en:['NixelOS — Sign up','Sign up'],ru:['NixelOS — Регистрация','Регистрация'],uk:['NixelOS — Реєстрація','Реєстрація']},
+verification:{en:['NixelOS — Email verification','Verification'],ru:['NixelOS — Подтверждение почты','Подтверждение'],uk:['NixelOS — Підтвердження пошти','Підтвердження']}
+};
+function lang(){var l=document.documentElement.lang;if(!UI[l]){try{l=localStorage.getItem('nixelos-lang')}catch(e){}}return UI[l]?l:'en'}
+function set(el,a,v){if(el&&el.getAttribute(a)!==v)el.setAttribute(a,v)}
+function chrome(){
+var l=lang(),u=UI[l],p=PG[page];
+set(document.querySelector('.brand'),'aria-label',u.home);
+document.querySelectorAll('.brand img,.menu-head img,.hero-logo').forEach(function(i){set(i,'alt',u.logo)});
+var tg=document.getElementById('menu-toggle');
+if(tg)set(tg,'aria-label',tg.getAttribute('aria-expanded')==='true'?u.close:u.open);
+set(document.getElementById('menu-close'),'aria-label',u.close);
+set(document.querySelector('.menu-links'),'aria-label',u.nav);
+set(document.querySelector('.lang-switch'),'aria-label',u.lang);
+set(document.getElementById('theme-switch'),'aria-label',u.theme);
+if(p){
+var known=[p.en[0],p.ru[0],p.uk[0]];
+if(known.indexOf(document.title)>-1&&document.title!==p[l][0])document.title=p[l][0];
+var bn=document.querySelector('.brand-name');
+if(bn&&p.en[1]&&/^NixelOS\s*\/\s*/.test(bn.textContent)){var want='NixelOS / '+p[l][1];if(bn.textContent!==want)bn.textContent=want}
+}
+}
+var last=lang();
+function onLang(){last=lang();chrome()}
+new MutationObserver(onLang).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+new MutationObserver(function(){chrome()}).observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['aria-expanded']});
+document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.lang-button'))setTimeout(onLang,0)});
+function init(){
+chrome();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+window.addEventListener('load',chrome);
+})();
+</script>
+<script id="nx-gpu">(function () {
+  'use strict';
+  /* ---------- 1. Fast glow for particles (same look, no shadowBlur per frame) ---------- */
+  var sprites = {};
+  function sprite(color, r) {
+    var rr = Math.max(1, Math.round(r));
+    var key = color + '|' + rr;
+    if (sprites[key]) return sprites[key];
+    var S = 2, half = rr + 32, size = half * 2 * S;
+    var c = document.createElement('canvas');
+    c.width = c.height = size;
+    var g = c.getContext('2d');
+    g.scale(S, S);
+    g.shadowBlur = 19;
+    g.shadowColor = 'rgba(' + color + ', 0.9)';
+    g.fillStyle = 'rgba(' + color + ', 0.65)';
+    g.beginPath(); g.arc(half, half, rr, 0, Math.PI * 2); g.fill();
+    return (sprites[key] = { c: c, half: half });
+  }
+
+  /* ---------- 1b. GPU (WebGL) rendering for #particles ---------- */
+  var origGetContext = HTMLCanvasElement.prototype.getContext;
+  var VS = 'attribute vec2 aC;attribute vec2 aP;attribute vec4 aD;attribute vec3 aK;uniform vec2 uRes;varying vec2 vC;varying vec3 vK;varying vec2 vRA;' +
+    'void main(){float h=aD.x+32.0;vec2 pos=aP+aC*h;vec2 clip=pos/uRes*2.0-1.0;gl_Position=vec4(clip.x,-clip.y,0.0,1.0);vC=aC*h;vK=aK;vRA=aD.xy;vRA.y=aD.y;}';
+  var FS = 'precision mediump float;varying vec2 vC;varying vec3 vK;varying vec2 vRA;' +
+    'void main(){float d=length(vC);float r=vRA.x;float s=9.5;' +
+    'float cov=1.0-smoothstep(r-0.7,r+0.7,d);' +
+    'float peak=1.0-exp(-r*r/(2.0*s*s));float prof=exp(-d*d/(2.0*(s*s+r*r*0.5)));' +
+    'float ag=0.9*peak*prof;float ac=0.65*cov;float a=(ac+ag*(1.0-ac))*vRA.y;' +
+    'gl_FragColor=vec4(vK*a,a);}';
+
+  function makeGL(canvas) {
+    var gl = origGetContext.call(canvas, 'webgl', { alpha: true, premultipliedAlpha: true, antialias: false, depth: false, stencil: false, powerPreference: 'low-power' });
+    if (!gl) return null;
+    function sh(t, src) { var o = gl.createShader(t); gl.shaderSource(o, src); gl.compileShader(o); return gl.getShaderParameter(o, gl.COMPILE_STATUS) ? o : null; }
+    var v = sh(gl.VERTEX_SHADER, VS), f = sh(gl.FRAGMENT_SHADER, FS);
+    if (!v || !f) return null;
+    var pr = gl.createProgram(); gl.attachShader(pr, v); gl.attachShader(pr, f); gl.linkProgram(pr);
+    if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return null;
+    gl.useProgram(pr);
+    var buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    var STRIDE = 11 * 4;
+    function attr(n, size, off) { var l = gl.getAttribLocation(pr, n); gl.enableVertexAttribArray(l); gl.vertexAttribPointer(l, size, gl.FLOAT, false, STRIDE, off * 4); }
+    attr('aC', 2, 0); attr('aP', 2, 2); attr('aD', 4, 4); attr('aK', 3, 8);
+    var uRes = gl.getUniformLocation(pr, 'uRes');
+    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.clearColor(0, 0, 0, 0);
+    var data = new Float32Array(0), n = 0, queued = false;
+    var corners = [-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1];
+    var cache = {};
+    function rgb(c) { return cache[c] || (cache[c] = c.split(',').map(function (x) { return parseFloat(x) / 255; })); }
+    var ctx = {
+      __gl: true,
+      canvas: canvas,
+      setTransform: function () {}, save: function () {}, restore: function () {},
+      clearRect: function () { n = 0; gl.viewport(0, 0, canvas.width, canvas.height); gl.clear(gl.COLOR_BUFFER_BIT); },
+      push: function (p) {
+        var need = (n + 1) * 6 * 11;
+        if (data.length < need) { var nd = new Float32Array(Math.max(need, data.length * 2 || 66 * 64)); nd.set(data); data = nd; }
+        var k = rgb(p.color), o = n * 66;
+        for (var i = 0; i < 6; i++, o += 11) {
+          data[o] = corners[i * 2]; data[o + 1] = corners[i * 2 + 1];
+          data[o + 2] = p.x; data[o + 3] = p.y;
+          data[o + 4] = p.r; data[o + 5] = p.alpha; data[o + 6] = 0; data[o + 7] = 0;
+          data[o + 8] = k[0]; data[o + 9] = k[1]; data[o + 10] = k[2];
+        }
+        n++;
+        if (!queued) { queued = true; Promise.resolve().then(flush); }
+      }
+    };
+    function flush() {
+      queued = false;
+      if (!n) return;
+      var dpr = canvas.width / (window.innerWidth || canvas.width);
+      gl.uniform2f(uRes, canvas.width / dpr, canvas.height / dpr);
+      gl.bufferData(gl.ARRAY_BUFFER, data.subarray(0, n * 66), gl.DYNAMIC_DRAW);
+      gl.drawArrays(gl.TRIANGLES, 0, n * 6);
+    }
+    return ctx;
+  }
+
+  HTMLCanvasElement.prototype.getContext = function (type) {
+    if (type === '2d' && this.id === 'particles') {
+      if (this.__nxctx) return this.__nxctx;
+      if (this.__nxfail) return origGetContext.apply(this, arguments);
+      var g = null;
+      try { g = makeGL(this); } catch (e) {}
+      if (g) return (this.__nxctx = g);
+      this.__nxfail = true;
+    }
+    return origGetContext.apply(this, arguments);
+  };
+
+  window.nxGlow = function (ctx, p) {
+    if (ctx.__gl) { ctx.push(p); return; }
+    var s = sprite(p.color, p.r);
+    ctx.globalAlpha = p.alpha;
+    ctx.drawImage(s.c, p.x - s.half, p.y - s.half, s.half * 2, s.half * 2);
+    ctx.globalAlpha = 1;
+  };
+
+  var st = document.createElement('style'); st.textContent = '#particles{will-change:transform;transform:translateZ(0)}'; document.head.appendChild(st);
+})();</script>
+<script src="JS/nx-site.js?v=2"></script>
+</head>
+<body>
+<canvas id="particles" aria-hidden="true"></canvas>
+<header class="topbar">
+  <a class="brand" href="index.html" aria-label="NixelOS home">
+    <img decoding="async" src="https://raw.githubusercontent.com/Dmutrashaa/NixelOS/main/NixelOS%20Site/picture-material/1791559522545.png" alt="NixelOS logo">
+    <span class="brand-name">NixelOS / Users</span>
+  </a>
+  <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu">
+    <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+  </button>
+</header>
+<div class="menu-scrim" id="menu-scrim" aria-hidden="true"></div>
+<aside class="side-menu" id="site-menu" aria-hidden="true" inert="">
+  <div class="menu-head">
+    <a class="menu-account" id="account-link" href="Auth/login.html">
+      <span class="menu-av" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.6"></circle><path d="M5 20c.8-3.6 3.7-5.4 7-5.4s6.2 1.8 7 5.4"></path></svg></span>
+      <span class="menu-acc-text"><span class="menu-acc-name" data-i18n="navAccount">Log in / Sign up</span><span class="menu-acc-sub"></span></span>
+    </a>
+    <button class="menu-close" id="menu-close" type="button" aria-label="Close menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+  </div>
+  <nav class="menu-links" aria-label="Site navigation">
+    <a class="menu-link" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10v9.5h13V10"></path><path d="M10 19.5v-5h4v5"></path></svg><span data-i18n="navHome">Home</span></a>
+    <a class="menu-link" href="downloads.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"></path><path d="m7.5 11 4.5 4.5 4.5-4.5"></path><path d="M5 19.5h14"></path></svg><span data-i18n="navDownloads">Downloads</span></a>
+    <a class="menu-link" href="news.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="M8 9h8M8 12.5h8M8 16h5"></path></svg><span data-i18n="navNews">News</span></a>
+    <a class="menu-link" href="min-req.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"></rect><rect x="9.5" y="9.5" width="5" height="5" rx=".8"></rect><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"></path></svg><span data-i18n="navMinReq">Min. Requirements</span></a>
+    <a class="menu-link" href="faq.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9.6 9.4a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2 1-1.2 1.8"></path><path d="M12 17h.01"></path></svg><span data-i18n="navFaq">FAQ</span></a>
+    <a class="menu-link" href="Users.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2"></circle><path d="M3.5 19.5c.7-3.1 3-4.7 5.5-4.7s4.8 1.6 5.5 4.7"></path><circle cx="17" cy="9.5" r="2.5"></circle><path d="M15.5 19.5c.5-2.3 2.1-3.6 4.2-3.6.7 0 1.3.15 1.8.45"></path></svg><span data-i18n="navUsers">Users</span></a>
+    <a class="menu-link" href="chat.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"></path></svg><span data-i18n="navChat">OS Chat</span></a>
+  </nav>
+  <div class="menu-theme">
+    <span class="menu-theme-label" data-i18n="themeLabel">Light theme</span>
+    <button class="theme-switch" id="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Light theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"></path></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"></path></svg><span class="theme-knob"></span></button>
+  </div>
+  <div class="menu-languages">
+    <h2 class="lang-title" data-i18n="langTitle">We are on other languages!</h2>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <span class="lang-thumb" aria-hidden="true"></span>
+      <button class="lang-button" type="button" data-lang="en" aria-pressed="true">English</button>
+      <button class="lang-button" type="button" data-lang="ru" aria-pressed="false">Русский</button>
+      <button class="lang-button" type="button" data-lang="uk" aria-pressed="false">Українська</button>
+    </div>
+  </div>
+</aside>
+
+<main>
+  <h1 class="page-heading" data-sk="uTitle">NixelOS Users</h1>
+  <p class="intro" data-sk="uIntro">Meet the NixelOS community, view profiles, and add friends!</p>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      <input class="search-input" id="search" type="search" data-sp="uSearch" placeholder="Search by name or @username…">
+    </div>
+    <div class="u-tabs" role="tablist">
+      <button class="u-tab" type="button" role="tab" data-tab="all" aria-selected="true"><span data-sk="uTabAll">All Users</span></button>
+      <button class="u-tab" type="button" role="tab" data-tab="friends" aria-selected="false"><span data-sk="uTabFriends">My Friends</span></button>
+      <button class="u-tab" type="button" role="tab" data-tab="requests" aria-selected="false"><span data-sk="uTabRequests">Requests</span><span class="u-badge" id="req-badge" hidden>0</span></button>
+    </div>
+  </div>
+
+  <div class="users-grid" id="users-grid"></div>
+</main>
+
+<script>
+(function(){
+  const NAV_I18N = {
+    en: {
+      navHome:"Home", navDownloads:"Downloads", navNews:"News", navMinReq:"Min. Requirements", navFaq:"FAQ",
+      navUsers:"Users", navChat:"OS Chat", navAccount:"Log in / Sign up", themeLabel:"Light theme",
+      langTitle:"We are on other languages!", openMenu:"Open menu", closeMenu:"Close menu", back:"Back to site"
+    },
+    ru: {
+      navHome:"Главная", navDownloads:"Загрузки", navNews:"Новости", navMinReq:"Мин. требования", navFaq:"FAQ",
+      navUsers:"Пользователи", navChat:"Чат ОС", navAccount:"Войти / Регистрация", themeLabel:"Светлая тема",
+      langTitle:"Мы доступны на других языках!", openMenu:"Открыть меню", closeMenu:"Закрыть меню", back:"Назад на сайт"
+    },
+    uk: {
+      navHome:"Головна", navDownloads:"Завантаження", navNews:"Новини", navMinReq:"Мін. вимоги", navFaq:"FAQ",
+      navUsers:"Користувачі", navChat:"Чат ОС", navAccount:"Увійти / Реєстрація", themeLabel:"Світла тема",
+      langTitle:"Ми доступні іншими мовами!", openMenu:"Відкрити меню", closeMenu:"Закрити меню", back:"Назад на сайт"
+    }
+  };
+
+
+  const SK_I18N = {
+    en: {
+      back:"Back to site", pTitle:"Your profile", pChange:"Change avatar", pRemove:"Remove avatar",
+      pBannerChange:"Change banner", pBannerRemove:"Remove banner", pBannerHint:"JPG, PNG or WebP up to 4 MB (recommended 3:1 ratio)",
+      pViewPublic:"View public profile", fUser:"Username", pUserHint:"Username can't be changed", fDisp:"Display name",
+      pBio:"About you", pSave:"Save", pLogout:"Log out", fSectionTitle:"Friends & Requests", fIncoming:"Incoming friend requests",
+      fMyFriends:"Friends", pSecurity:"Security", pNewPass:"New password", fPass2:"Repeat password", pChangePass:"Change password",
+      uTitle:"NixelOS Users", uIntro:"Meet the NixelOS community, view profiles, and add friends!",
+      uSearch:"Search by name or @username…", uTabAll:"All Users", uTabFriends:"My Friends", uTabRequests:"Requests",
+      pvBackUsers:"All Users", pvReadOnlyBadge:"Viewing public profile (read-only)", pvJoined:"Joined:", pvBioLabel:"About user",
+      cTitle:"NixelOS Community Chat", cIntro:"Live discussion about NixelOS builds, bootloader features, ideas, and feedback!",
+      cRefresh:"Refresh", sRules:"Rules"
+    },
+    ru: {
+      back:"Назад на сайт", pTitle:"Ваш профиль", pChange:"Сменить аватарку", pRemove:"Убрать аватарку",
+      pBannerChange:"Сменить баннер", pBannerRemove:"Убрать баннер", pBannerHint:"JPG, PNG или WebP до 4 МБ (рекомендуется формат 3:1)",
+      pViewPublic:"Как видят другие", fUser:"Имя пользователя", pUserHint:"Имя пользователя изменить нельзя", fDisp:"Отображаемое имя",
+      pBio:"О себе", pSave:"Сохранить", pLogout:"Выйти", fSectionTitle:"Друзья и запросы", fIncoming:"Входящие запросы в друзья",
+      fMyFriends:"Друзья", pSecurity:"Безопасность", pNewPass:"Новый пароль", fPass2:"Повторите пароль", pChangePass:"Сменить пароль",
+      uTitle:"Пользователи NixelOS", uIntro:"Знакомьтесь с участниками сообщества NixelOS, смотрите профили и добавляйте друзей!",
+      uSearch:"Поиск по имени или @username…", uTabAll:"Все пользователи", uTabFriends:"Мои друзья", uTabRequests:"Запросы",
+      pvBackUsers:"Все пользователи", pvReadOnlyBadge:"Просмотр чужого профиля (только чтение)", pvJoined:"На сайте с:", pvBioLabel:"О пользователе",
+      cTitle:"Чат сообщества NixelOS", cIntro:"Живое обсуждение NixelOS, новых сборок, загрузчика NXBoot и ваших идей!",
+      cRefresh:"Обновить", sRules:"Правила"
+    },
+    uk: {
+      back:"Назад на сайт", pTitle:"Ваш профіль", pChange:"Змінити аватарку", pRemove:"Прибрати аватарку",
+      pBannerChange:"Змінити банер", pBannerRemove:"Прибрати банер", pBannerHint:"JPG, PNG або WebP до 4 МБ (рекомендовано пропорції 3:1)",
+      pViewPublic:"Як бачать інші", fUser:"Ім'я користувача", pUserHint:"Ім'я користувача змінити не можна", fDisp:"Відображуване ім'я",
+      pBio:"Про себе", pSave:"Зберегти", pLogout:"Вийти", fSectionTitle:"Друзі та запити", fIncoming:"Вхідні запити в друзі",
+      fMyFriends:"Друзі", pSecurity:"Безпека", pNewPass:"Новий пароль", fPass2:"Повторіть пароль", pChangePass:"Змінити пароль",
+      uTitle:"Користувачі NixelOS", uIntro:"Знайомтеся зі спільнотою NixelOS, переглядайте профілі та додавайте друзів!",
+      uSearch:"Пошук за ім'ям або @username…", uTabAll:"Усі користувачі", uTabFriends:"Мої друзі", uTabRequests:"Запити",
+      pvBackUsers:"Усі користувачі", pvReadOnlyBadge:"Перегляд чужого профілю (лише читання)", pvJoined:"На сайті з:", pvBioLabel:"Про користувача",
+      cTitle:"Чат спільноти NixelOS", cIntro:"Живе обговорення NixelOS, нових збірок, завантажувача NXBoot та ваших ідей!",
+      cRefresh:"Оновити", sRules:"Правила"
+    }
+  };
+
+  let currentLang = "en";
+  try { currentLang = localStorage.getItem("nixelos-lang") || "en"; } catch(e) {}
+  if (!NAV_I18N[currentLang]) currentLang = "en";
+
+  function tNav(k) {
+    return (NAV_I18N[currentLang] && NAV_I18N[currentLang][k]) || NAV_I18N.en[k] || k;
+  }
+
+  const menuToggle = document.getElementById("menu-toggle");
+  const siteMenu = document.getElementById("site-menu");
+  const menuScrim = document.getElementById("menu-scrim");
+  const menuClose = document.getElementById("menu-close");
+
+  function setMenuOpen(open) {
+    if (!menuToggle || !siteMenu || !menuScrim) return;
+    menuToggle.setAttribute("aria-expanded", String(open));
+    menuToggle.setAttribute("aria-label", open ? tNav("closeMenu") : tNav("openMenu"));
+    siteMenu.classList.toggle("is-open", open);
+    menuScrim.classList.toggle("is-open", open);
+    siteMenu.setAttribute("aria-hidden", String(!open));
+    siteMenu.toggleAttribute("inert", !open);
+    menuScrim.setAttribute("aria-hidden", String(!open));
+    document.body.style.overflow = open ? "hidden" : "";
+    if (open && menuClose) menuClose.focus();
+    else menuToggle.focus();
+  }
+
+  if (menuToggle) menuToggle.addEventListener("click", () => setMenuOpen(menuToggle.getAttribute("aria-expanded") !== "true"));
+  if (menuClose) menuClose.addEventListener("click", () => setMenuOpen(false));
+  if (menuScrim) menuScrim.addEventListener("click", () => setMenuOpen(false));
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && menuToggle && menuToggle.getAttribute("aria-expanded") === "true") setMenuOpen(false);
+  });
+
+  function applyBaseLang(lang) {
+    if (!NAV_I18N[lang]) lang = "en";
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const k = el.dataset.i18n;
+      if (NAV_I18N[lang][k]) el.textContent = NAV_I18N[lang][k];
+    });
+    document.querySelectorAll("[data-sk]").forEach(el => {
+      const k = el.dataset.sk;
+      if (SK_I18N[lang] && SK_I18N[lang][k]) el.textContent = SK_I18N[lang][k];
+    });
+    document.querySelectorAll("[data-sp]").forEach(el => {
+      const k = el.dataset.sp;
+      if (SK_I18N[lang] && SK_I18N[lang][k]) el.placeholder = SK_I18N[lang][k];
+    });
+    document.querySelectorAll(".lang-button").forEach(btn => {
+      btn.setAttribute("aria-pressed", String(btn.dataset.lang === lang));
+    });
+    if (menuToggle) {
+      menuToggle.setAttribute("aria-label", menuToggle.getAttribute("aria-expanded") === "true" ? tNav("closeMenu") : tNav("openMenu"));
+    }
+    window.dispatchEvent(new CustomEvent("nixelos-langchange", { detail: { lang } }));
+  }
+
+  const themeSwitch = document.getElementById("theme-switch");
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    if (themeSwitch) themeSwitch.setAttribute("aria-checked", String(theme === "light"));
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", theme === "light" ? "#f4f5fb" : "#090a0e");
+  }
+  applyTheme(document.documentElement.dataset.theme === "light" ? "light" : "dark");
+  if (themeSwitch) {
+    themeSwitch.addEventListener("click", () => {
+      const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+      applyTheme(next);
+      try { localStorage.setItem("nixelos-theme", next); } catch(e) {}
+    });
+  }
+
+  const langSwitch = document.querySelector(".lang-switch");
+  const langThumb = document.querySelector(".lang-thumb");
+  function moveThumb() {
+    if (!langSwitch || !langThumb) return;
+    const a = langSwitch.querySelector('.lang-button[aria-pressed="true"]');
+    if (!a) return;
+    langThumb.style.width = a.offsetWidth + "px";
+    langThumb.style.transform = "translateX(" + a.offsetLeft + "px)";
+  }
+  if (langSwitch) {
+    new MutationObserver(moveThumb).observe(langSwitch, { subtree: true, attributes: true, attributeFilter: ["aria-pressed"] });
+    if ("ResizeObserver" in window) new ResizeObserver(moveThumb).observe(langSwitch);
+    window.addEventListener("resize", moveThumb);
+    document.querySelectorAll(".lang-button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        try { localStorage.setItem("nixelos-lang", btn.dataset.lang); } catch(e) {}
+        nxLangSwap(btn.dataset.lang, function () { applyBaseLang(btn.dataset.lang); });
+      });
+    });
+    applyBaseLang(currentLang);
+    moveThumb();
+    requestAnimationFrame(() => requestAnimationFrame(() => langSwitch.classList.add("is-ready")));
+  } else {
+    applyBaseLang(currentLang);
+  }
+
+  const canvas = document.getElementById("particles");
+  if (canvas) {
+    const ctx = canvas.getContext("2d");
+    let particles = [], width = 0, height = 0, animationFrame;
+    const colors = ["79, 111, 255", "147, 91, 255", "73, 177, 255"];
+    function resizeParticles() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth; height = window.innerHeight;
+      canvas.width = Math.floor(width * dpr); canvas.height = Math.floor(height * dpr);
+      canvas.style.width = width + "px"; canvas.style.height = height + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const count = Math.min(42, Math.max(18, Math.floor(width / 27)));
+      particles = Array.from({ length: count }, () => ({
+        x: Math.random() * width, y: Math.random() * height, r: 2 + Math.random() * 5,
+        vy: 0.12 + Math.random() * 0.38, vx: (Math.random() - 0.5) * 0.22,
+        color: colors[Math.floor(Math.random() * colors.length)], alpha: 0.12 + Math.random() * 0.28
+      }));
+    }
+    function drawParticles() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(p => {
+        p.y -= p.vy; p.x += p.vx;
+        if (p.y < -15) { p.y = height + 15; p.x = Math.random() * width; }
+        if (p.x < -15) p.x = width + 15;
+        if (p.x > width + 15) p.x = -15;
+        window.nxGlow(ctx,p);
+      });
+      animationFrame = requestAnimationFrame(drawParticles);
+    }
+    resizeParticles(); drawParticles();
+    window.addEventListener("resize", resizeParticles, { passive: true });
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) cancelAnimationFrame(animationFrame);
+      else drawParticles();
+    });
+  }
+})();
+</script>
+<script type="module">
+let Supa = {};
+try {
+  Supa = await import("./JS/supabase.js?v=4");
+} catch (e) {
+  try {
+    const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+    const SUPABASE_URL = "https://pmxbgdggupaznjnclpad.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_-Vmg7JLeeUA5VYnAtf5Y2Q_HllE6Zac";
+    const sbClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
+    });
+    Supa = {
+      sb: sbClient,
+      getSessionUser: async () => {
+        const { data } = await sbClient.auth.getSession();
+        return data && data.session ? data.session.user : null;
+      },
+      makeAvatar: (profile, className) => {
+        const p = profile || {};
+        const url = p.avatar_path ? sbClient.storage.from("avatars").getPublicUrl(p.avatar_path).data.publicUrl : null;
+        let el;
+        if (url) {
+          el = document.createElement("img");
+          el.src = url; el.alt = ""; el.loading = "lazy"; el.referrerPolicy = "no-referrer";
+        } else {
+          el = document.createElement("div");
+          el.textContent = ((p.display_name || p.username || "?").trim()[0] || "?").toUpperCase();
+        }
+        el.className = className;
+        return el;
+      },
+      badge: () => {
+        const s = document.createElement("span");
+        s.style.cssText = "display:inline-flex;flex:none;width:16px;height:16px;color:#5b8cff;vertical-align:middle";
+        s.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 1.8l2.6 1.9 3.2-.1 1 3 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3-3.2-.1L12 22.2l-2.6-1.9-3.2.1-1-3-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3 3.2.1z"/><path fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M8 12.3l2.8 2.8L16.2 9.6"/></svg>';
+        return s;
+      },
+      initMenuAccount: async (base) => {
+        const a = document.getElementById("account-link");
+        if (!a) return;
+        a.href = base + "Auth/login.html";
+        try {
+          const { data } = await sbClient.auth.getSession();
+          const u = data && data.session ? data.session.user : null;
+          if (!u) return;
+          a.href = base + "profile.html";
+          const { data: p } = await sbClient.from("profiles").select("*").eq("id", u.id).maybeSingle();
+          if (!p) return;
+          const av = a.querySelector(".menu-av");
+          if (av) av.replaceWith(Supa.makeAvatar(p, "menu-av"));
+          const name = a.querySelector(".menu-acc-name");
+          if (name) {
+            name.removeAttribute("data-i18n");
+            name.removeAttribute("data-sk");
+            name.textContent = p.display_name;
+            if (p.is_verified) name.append(Supa.badge());
+          }
+          const sub = a.querySelector(".menu-acc-sub");
+          if (sub) sub.textContent = "@" + p.username;
+        } catch (err) {}
+      }
+    };
+  } catch (e2) {
+    Supa = {
+      sb: null,
+      getSessionUser: async () => null,
+      makeAvatar: (profile, className) => {
+        const p = profile || {};
+        const el = document.createElement("div");
+        el.textContent = ((p.display_name || p.username || "?").trim()[0] || "?").toUpperCase();
+        el.className = className;
+        return el;
+      },
+      badge: () => {
+        const s = document.createElement("span");
+        s.style.cssText = "display:inline-flex;flex:none;width:16px;height:16px;color:#5b8cff;vertical-align:middle";
+        s.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 1.8l2.6 1.9 3.2-.1 1 3 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3-3.2-.1L12 22.2l-2.6-1.9-3.2.1-1-3-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3 3.2.1z"/><path fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M8 12.3l2.8 2.8L16.2 9.6"/></svg>';
+        return s;
+      },
+      initMenuAccount: async () => {}
+    };
+  }
+}
+const { sb, getSessionUser } = Supa;
+const _memStore = {};
+const sGet = k => { try { return localStorage.getItem(k); } catch (e) { return _memStore[k] || null; } };
+const sSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { _memStore[k] = String(v); } };
+const sDel = k => { try { localStorage.removeItem(k); } catch (e) { delete _memStore[k]; } };
+
+
+const EXTRA_I18N = {
+  en: {
+    sComments: "Comments", sWrite: "Write a comment…", sPost: "Post", sLoginC: "Log in to comment", sLoginR: "Log in to react", sDel: "Delete", sNone: "No comments yet. Be the first!", sEmpty: "Comment can't be empty", eLoad: "Failed to load comments", sClose: "Close", sVerified: "Verified", pWait: "Please wait…", eNet: "Something went wrong. Try again later", eRate: "Too many attempts. Wait a little", pBannerLabel: "Profile banner", pBannerChange: "Change banner", pBannerRemove: "Remove banner",
+    pBannerHint: "JPG, PNG or WebP up to 4 MB (recommended 3:1 ratio)", eBanner: "Only JPG, PNG or WebP up to 4 MB",
+    pViewPublic: "View public profile", sMod: "Admin / Mod", navUsers: "Users", navChat: "OS Chat",
+    sRules: "Rules", rulesTitle: "NixelOS Community Rules 🚀",
+    rulesSub: "We're not the police here, but to keep the vibe friendly and fun for everyone, stick to these simple rules:",
+    rule1T: "1. Don't spam or flood 🛑", rule1D: "No need to flood comments or chat with identical messages. One thoughtful message beats ten noisy ones!",
+    rule2T: "2. Be cool — no insults 🤝", rule2D: "Respect other members! We're all here testing the OS of the future together, so keep it chill and toxicity-free.",
+    rule3T: "3. No bad words or swearing 🧼", rule3D: "Keep the chat as clean as fresh NXBoot code. Bad language and profanity are strictly off-limits.",
+    rule4T: "5. Insulting admins = Instant Ban ⚡", rule4D: "Yes, we skipped #4 because rule #5 is serious: our admins & devs code NixelOS late into the night. Insulting the team gets you a one-way ticket to Ban-land!",
+    rulesFoot: "Follow the rules, enjoy smooth booting, and may your FPS always be high! 😎", rulesOk: "Got it, I'll be cool!",
+    fAddFriend: "Add to friends", fReqSent: "Request sent (Cancel)", fAccept: "Accept friend", fDecline: "Decline",
+    fFriends: "In friends ✓", fRemoveFriend: "Remove friend", fLoginFriend: "Log in to add friends",
+    fSectionTitle: "Friends & Requests", fIncoming: "Incoming friend requests", fMyFriends: "Friends",
+    fNoFriends: "No friends added yet. Find cool people in Users!", fNoRequests: "No pending friend requests",
+    uTitle: "NixelOS Users", uIntro: "Meet the NixelOS community, view profiles, and add friends!",
+    uSearch: "Search by name or @username…", uTabAll: "All Users", uTabFriends: "My Friends", uTabRequests: "Requests",
+    uEmpty: "No users found.", uViewProfile: "View profile", pvTitle: "User Profile", pvJoined: "Joined:",
+    pvBioLabel: "About user", pvBioEmpty: "This user hasn't written a bio yet.", pvEditOwn: "Edit my profile",
+    pvNotFound: "User not found", pvNotFoundSub: "This account doesn't exist or the link is incorrect.",
+    pvBackUsers: "All Users", pvReadOnlyBadge: "Viewing public profile (read-only)",
+    cTitle: "NixelOS Community Chat", cIntro: "Live discussion about NixelOS builds, bootloader features, ideas, and feedback!",
+    cWrite: "Write a message about NixelOS…", cSend: "Send", cEmpty: "No messages yet. Start the NixelOS discussion!",
+    cLogin: "Log in to join the NixelOS chat", cRefresh: "Refresh"
+  },
+  ru: {
+    sComments: "Комментарии", sWrite: "Напишите комментарий…", sPost: "Отправить", sLoginC: "Войдите, чтобы комментировать", sLoginR: "Войдите, чтобы ставить реакции", sDel: "Удалить", sNone: "Комментариев пока нет. Будьте первым!", sEmpty: "Комментарий не может быть пустым", eLoad: "Не удалось загрузить комментарии", sClose: "Закрыть", sVerified: "Подтверждён", pWait: "Подождите…", eNet: "Что-то пошло не так. Попробуйте позже", eRate: "Слишком много попыток. Подождите немного", pBannerLabel: "Баннер профиля", pBannerChange: "Сменить баннер", pBannerRemove: "Убрать баннер",
+    pBannerHint: "JPG, PNG или WebP до 4 МБ (рекомендуется формат 3:1)", eBanner: "Только JPG, PNG или WebP до 4 МБ",
+    pViewPublic: "Как видят другие", sMod: "Админ / Мод", navUsers: "Пользователи", navChat: "Чат ОС",
+    sRules: "Правила", rulesTitle: "Правила сообщества NixelOS 🚀",
+    rulesSub: "Мы тут не полиция, но чтобы всем было кайфово общаться, держи несколько простых правил:",
+    rule1T: "1. Не спамить и не флудить 🛑", rule1D: "Не засыпай чат и комменты одинаковыми сообщениями. Лучше написать одну крутую мысль, чем десять пустых!",
+    rule2T: "2. Не оскорблять участников 🤝", rule2D: "Уважай других! Мы тут все свои и тестируем ОС будущего, так что давай без токсичности и ссор.",
+    rule3T: "3. Плохие слова запрещены 🧼", rule3D: "Держим общение чистым, как свежий код загрузчика NXBoot. Мат и ругательства оставь за пределами сайта.",
+    rule4T: "5. Оскорбление админов — Бан ⚡", rule4D: "Да, пункт 4 мы перепрыгнули, потому что правило №5 железное: админы ночами пилят NixelOS, поэтому за наезды на команду — мгновенный билет в бан!",
+    rulesFoot: "Соблюдай правила — и будет тебе счастье, быстрый бут и стабильный FPS! 😎", rulesOk: "Понял, буду котиком!",
+    fAddFriend: "Добавить в друзья", fReqSent: "Запрос отправлен (Отменить)", fAccept: "Принять в друзья", fDecline: "Отклонить",
+    fFriends: "В друзьях ✓", fRemoveFriend: "Удалить из друзей", fLoginFriend: "Войдите, чтобы добавить в друзья",
+    fSectionTitle: "Друзья и запросы", fIncoming: "Входящие запросы в друзья", fMyFriends: "Друзья",
+    fNoFriends: "Пока нет друзей. Найдите единомышленников во вкладке «Пользователи»!", fNoRequests: "Нет новых запросов в друзья",
+    uTitle: "Пользователи NixelOS", uIntro: "Знакомьтесь с участниками сообщества NixelOS, смотрите профили и добавляйте друзей!",
+    uSearch: "Поиск по имени или @username…", uTabAll: "Все пользователи", uTabFriends: "Мои друзья", uTabRequests: "Запросы",
+    uEmpty: "Пользователи не найдены.", uViewProfile: "Профиль", pvTitle: "Профиль пользователя", pvJoined: "На сайте с:",
+    pvBioLabel: "О пользователе", pvBioEmpty: "Пользователь ещё ничего о себе не рассказал.", pvEditOwn: "Редактировать мой профиль",
+    pvNotFound: "Пользователь не найден", pvNotFoundSub: "Такого аккаунта не существует или ссылка неверна.",
+    pvBackUsers: "Все пользователи", pvReadOnlyBadge: "Просмотр чужого профиля (только чтение)",
+    cTitle: "Чат сообщества NixelOS", cIntro: "Живое обсуждение NixelOS, новых сборок, загрузчика NXBoot и ваших идей!",
+    cWrite: "Напишите сообщение об ОС…", cSend: "Отправить", cEmpty: "Сообщений пока нет. Начните обсуждение NixelOS первым!",
+    cLogin: "Войдите в аккаунт, чтобы общаться в чате NixelOS", cRefresh: "Обновить"
+  },
+  uk: {
+    sComments: "Коментарі", sWrite: "Напишіть коментар…", sPost: "Надіслати", sLoginC: "Увійдіть, щоб коментувати", sLoginR: "Увійдіть, щоб ставити реакції", sDel: "Видалити", sNone: "Коментарів поки немає. Будьте першим!", sEmpty: "Коментар не може бути порожнім", eLoad: "Не вдалося завантажити коментарі", sClose: "Закрити", sVerified: "Підтверджений", pWait: "Зачекайте…", eNet: "Щось пішло не так. Спробуйте пізніше", eRate: "Забагато спроб. Зачекайте трохи", pBannerLabel: "Банер профілю", pBannerChange: "Змінити банер", pBannerRemove: "Прибрати банер",
+    pBannerHint: "JPG, PNG або WebP до 4 МБ (рекомендовано пропорції 3:1)", eBanner: "Лише JPG, PNG або WebP до 4 МБ",
+    pViewPublic: "Як бачать інші", sMod: "Адмін / Мод", navUsers: "Користувачі", navChat: "Чат ОС",
+    sRules: "Правила", rulesTitle: "Правила спільноти NixelOS 🚀",
+    rulesSub: "Ми тут не поліція, але щоб усім було кайфово спілкуватися, тримай кілька простих правил:",
+    rule1T: "1. Не спамити та не флудити 🛑", rule1D: "Не засипай коментарі чи чат однаковими повідомленнями. Краще написати одну круту думку, ніж десять порожніх!",
+    rule2T: "2. Не ображати учасників 🤝", rule2D: "Поважай інших! Ми тут усі свої й разом тестуємо ОС майбутнього, тож давай без токсичності та сварок.",
+    rule3T: "3. Погані слова заборонені 🧼", rule3D: "Тримаймо спілкування чистим, як свіженький код завантажувача NXBoot. Матюки та лайку залиш поза сайтом.",
+    rule4T: "5. Образа адмінів — Бан ⚡", rule4D: "Так, пункт 4 ми перестрибнули, бо правило №5 залізне: адміни ночами пиляють NixelOS, тому за наїзди чи образу команди — миттєвий квиток у бан!",
+    rulesFoot: "Дотримуйся правил — і буде тобі щастя, швидкий бут та стабільний FPS! 😎", rulesOk: "Зрозумів, буду котиком!",
+    fAddFriend: "Додати в друзі", fReqSent: "Запит надіслано (Скасувати)", fAccept: "Прийняти в друзі", fDecline: "Відхилити",
+    fFriends: "У друзях ✓", fRemoveFriend: "Видалити з друзів", fLoginFriend: "Увійдіть, щоб додати в друзі",
+    fSectionTitle: "Друзі та запити", fIncoming: "Вхідні запити в друзі", fMyFriends: "Друзі",
+    fNoFriends: "Поки немає друзів. Знайдіть однодумців у вкладці «Користувачі»!", fNoRequests: "Немає нових запитів у друзі",
+    uTitle: "Користувачі NixelOS", uIntro: "Знайомтеся зі спільнотою NixelOS, переглядайте профілі та додавайте друзів!",
+    uSearch: "Пошук за ім'ям або @username…", uTabAll: "Усі користувачі", uTabFriends: "Мої друзі", uTabRequests: "Запити",
+    uEmpty: "Користувачів не знайдено.", uViewProfile: "Профіль", pvTitle: "Профіль користувача", pvJoined: "На сайті з:",
+    pvBioLabel: "Про користувача", pvBioEmpty: "Користувач ще нічого про себе не розповів.", pvEditOwn: "Редагувати мій профіль",
+    pvNotFound: "Користувача не знайдено", pvNotFoundSub: "Такого акаунта не існує або посилання неправильне.",
+    pvBackUsers: "Усі користувачі", pvReadOnlyBadge: "Перегляд чужого профілю (лише читання)",
+    cTitle: "Чат спільноти NixelOS", cIntro: "Живе обговорення NixelOS, нових збірок, завантажувача NXBoot та ваших ідей!",
+    cWrite: "Напишіть повідомлення про ОС…", cSend: "Надіслати", cEmpty: "Повідомлень поки немає. Почніть обговорення NixelOS першим!",
+    cLogin: "Увійдіть в акаунт, щоб спілкуватися в чаті NixelOS", cRefresh: "Оновити"
+  }
+};
+
+const getLang = Supa.getLang || (() => {
+  try { const l = sGet("nixelos-lang") || "en"; return ["en","ru","uk"].includes(l) ? l : "en"; } catch { return "en"; }
+});
+
+const t = key => {
+  const l = getLang();
+  if (EXTRA_I18N[l] && EXTRA_I18N[l][key]) return EXTRA_I18N[l][key];
+  if (Supa.t) {
+    const v = Supa.t(key);
+    if (v && v !== key) return v;
+  }
+  return (EXTRA_I18N.en && EXTRA_I18N.en[key]) || key;
+};
+
+const applyLabels = (root = document) => {
+  root.querySelectorAll("[data-sk]").forEach(el => {
+    const v = t(el.dataset.sk);
+    if (v && v !== el.dataset.sk) el.textContent = v;
+  });
+  root.querySelectorAll("[data-sp]").forEach(el => {
+    const v = t(el.dataset.sp);
+    if (v && v !== el.dataset.sp) el.placeholder = v;
+  });
+};
+
+const initLang = () => {
+  document.documentElement.lang = getLang();
+  applyLabels();
+};
+
+const makeAvatar = Supa.makeAvatar;
+const badge = Supa.badge;
+const initMenuAccount = Supa.initMenuAccount;
+
+const getMyProfile = async (uid) => {
+  const read = () => sb.from("profiles").select("*").eq("id", uid).maybeSingle();
+  let { data } = await read();
+  if (!data) {
+    const r = await sb.rpc("ensure_my_profile");
+    if (!r.error) ({ data } = await read());
+  }
+  return data;
+};
+
+const bannerUrl = Supa.bannerUrl || (path => {
+  if (!path) return null;
+  if (/^https?:\/\//i.test(path)) return path;
+  return sb.storage.from("avatars").getPublicUrl(path).data.publicUrl;
+});
+
+const applyBannerStyle = Supa.applyBannerStyle || ((el, profile) => {
+  if (!el) return;
+  let bPath = profile && profile.banner_path;
+  if (!bPath && profile && profile.id) { try { bPath = sGet("nixelos-banner-" + profile.id) || null; } catch (e) {} }
+  const url = bannerUrl(bPath);
+  if (url) {
+    el.style.backgroundImage = `linear-gradient(180deg, rgba(9,10,14,.15) 0%, rgba(9,10,14,.55) 100%), url("${url.replace(/"/g, "%22")}")`;
+    el.style.backgroundSize = "cover";
+    el.style.backgroundPosition = "center";
+    el.classList.add("has-banner");
+  } else {
+    el.style.backgroundImage = "";
+    el.style.backgroundSize = "";
+    el.style.backgroundPosition = "";
+    el.classList.remove("has-banner");
+  }
+});
+
+const modBadge = Supa.modBadge || (() => {
+  const s = document.createElement("span");
+  s.textContent = "MOD";
+  s.title = t("sMod");
+  s.style.cssText = "display:inline-flex;align-items:center;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.04em;color:#fff;background:linear-gradient(135deg,#ff6b8b,#a46bff);vertical-align:middle";
+  return s;
+});
+
+let _localRulesOv = null;
+const ensureRulesModal = Supa.ensureRulesModal || (() => {
+  if (_localRulesOv) { applyLabels(_localRulesOv); return _localRulesOv; }
+  if (!document.getElementById("nx-rules-style")) {
+    const st = document.createElement("style");
+    st.id = "nx-rules-style";
+    st.textContent = `.nx-rules-btn{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 13px;border:1px solid rgba(151,166,255,.38);border-radius:999px;color:var(--text,#f5f5f7);background:rgba(133,151,255,.12);font:700 12px "Comfortaa",sans-serif;cursor:pointer;transition:transform 180ms ease,border-color 180ms ease,background 180ms ease}.nx-rules-btn:hover{transform:translateY(-2px);border-color:rgba(151,166,255,.75);background:rgba(133,151,255,.22)}.nx-rules-btn svg{width:15px;height:15px;color:#a8b4ff;flex:none}.nx-rules-overlay{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:rgba(5,6,12,.68);backdrop-filter:blur(7px);opacity:0;visibility:hidden;transition:opacity 220ms ease,visibility 220ms ease}.nx-rules-overlay.on{opacity:1;visibility:visible}.nx-rules-box{width:min(520px,100%);max-height:88vh;overflow-y:auto;padding:clamp(20px,4vw,28px);text-align:left;border:1px solid rgba(151,166,255,.36);border-radius:22px;background:linear-gradient(135deg,rgba(28,31,56,.97),rgba(16,18,30,.98));box-shadow:0 24px 70px rgba(0,0,0,.5)}.nx-rules-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}.nx-rules-top h3{margin:0;font-size:21px}.nx-rules-sub{margin:0 0 16px;color:var(--muted,#b9bbc7);font-size:13.5px;line-height:1.65}.nx-rules-list{display:grid;gap:10px;margin:0 0 16px;padding:0;list-style:none}.nx-rules-item{padding:12px 14px;border:1px solid rgba(151,166,255,.22);border-left:3px solid #8f9bff;border-radius:6px 14px 14px 6px;background:rgba(255,255,255,.04)}.nx-rules-item:nth-child(4){border-left-color:#ff7a8a;background:rgba(255,100,120,.07)}.nx-rules-item strong{display:block;margin-bottom:4px;font-size:14.5px}.nx-rules-item p{margin:0;font-size:13px;line-height:1.6;color:var(--muted,#b9bbc7)}.nx-rules-foot{margin:0 0 16px;padding:10px 12px;border-radius:12px;background:rgba(133,151,255,.1);font-size:13px;font-weight:700;text-align:center}.nx-rules-ok{width:100%}`;
+    document.head.append(st);
+  }
+  _localRulesOv = document.createElement("div");
+  _localRulesOv.className = "nx-rules-overlay";
+  _localRulesOv.innerHTML = `<div class="nx-rules-box" role="dialog" aria-modal="true"><div class="nx-rules-top"><h3 data-sk="rulesTitle"></h3><button type="button" class="nx-x nx-rules-close" style="width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:none;color:var(--text);cursor:pointer">✕</button></div><p class="nx-rules-sub" data-sk="rulesSub"></p><ul class="nx-rules-list"><li class="nx-rules-item"><strong data-sk="rule1T"></strong><p data-sk="rule1D"></p></li><li class="nx-rules-item"><strong data-sk="rule2T"></strong><p data-sk="rule2D"></p></li><li class="nx-rules-item"><strong data-sk="rule3T"></strong><p data-sk="rule3D"></p></li><li class="nx-rules-item"><strong data-sk="rule4T"></strong><p data-sk="rule4D"></p></li></ul><p class="nx-rules-foot" data-sk="rulesFoot"></p><button type="button" class="btn nx-rules-ok" data-sk="rulesOk"></button></div>`;
+  document.body.append(_localRulesOv);
+  const close = () => _localRulesOv.classList.remove("on");
+  _localRulesOv.querySelector(".nx-rules-close").addEventListener("click", close);
+  _localRulesOv.querySelector(".nx-rules-ok").addEventListener("click", close);
+  _localRulesOv.addEventListener("mousedown", e => { if (e.target === _localRulesOv) close(); });
+  applyLabels(_localRulesOv);
+  return _localRulesOv;
+});
+
+const openRulesModal = Supa.openRulesModal || (() => {
+  const ov = ensureRulesModal();
+  applyLabels(ov);
+  ov.classList.add("on");
+});
+
+const makeRulesButton = Supa.makeRulesButton || (() => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "nx-rules-btn";
+  b.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4.5 6.5v5.8c0 4.6 3.2 8.4 7.5 10.2 4.3-1.8 7.5-5.6 7.5-10.2V6.5L12 3Z"></path><path d="M12 8v4.5"></path><path d="M12 16h.01"></path></svg><span data-sk="sRules">${t("sRules")}</span>`;
+  b.addEventListener("click", openRulesModal);
+  return b;
+});
+
+
+initMenuAccount("./");
+
+const NAV_I18N = {
+  en: { navHome:"Home", navDownloads:"Downloads", navNews:"News", navMinReq:"Min. Requirements", navFaq:"FAQ", navUsers:"Users", navChat:"OS Chat", navAccount:"Log in / Sign up", themeLabel:"Light theme", langTitle:"We are on other languages!" },
+  ru: { navHome:"Главная", navDownloads:"Загрузки", navNews:"Новости", navMinReq:"Мин. требования", navFaq:"FAQ", navUsers:"Пользователи", navChat:"Чат ОС", navAccount:"Войти / Регистрация", themeLabel:"Светлая тема", langTitle:"Мы доступны на других языках!" },
+  uk: { navHome:"Головна", navDownloads:"Завантаження", navNews:"Новини", navMinReq:"Мін. вимоги", navFaq:"FAQ", navUsers:"Користувачі", navChat:"Чат ОС", navAccount:"Увійти / Реєстрація", themeLabel:"Світла тема", langTitle:"Ми доступні іншими мовами!" }
+};
+
+const $ = id => document.getElementById(id);
+let meUser = null;
+let allUsers = [];
+let friendshipsMap = {}; // otherUserId -> friendship row
+let currentTab = "all";
+
+function applyAllLang(lang) {
+  if (!NAV_I18N[lang]) lang = "en";
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const k = el.dataset.i18n;
+    if (NAV_I18N[lang][k]) el.textContent = NAV_I18N[lang][k];
+  });
+  document.querySelectorAll(".lang-button").forEach(btn => btn.setAttribute("aria-pressed", String(btn.dataset.lang === lang)));
+  applyLabels();
+  renderUsers();
+}
+
+
+
+
+
+applyAllLang(getLang());
+window.addEventListener("nixelos-langchange", e => applyAllLang(e.detail.lang));
+
+/* Users & Friendships */
+const ICON_ADD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M19 8v6M22 11h-6"></path></svg>';
+const ICON_USER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+
+async function loadData() {
+  meUser = await getSessionUser().catch(() => null);
+  let usersData = null;
+  try {
+    const res = await sb.from("profiles").select("*").order("created_at", { ascending: false }).limit(200);
+    usersData = res.data;
+  } catch (e) {}
+  allUsers = (usersData && usersData.length) ? usersData : [
+    {
+      id: "demo-nixel-dev",
+      username: "nixel_dev",
+      display_name: "NixelOS Developer",
+      bio: "Building NixelOS & NXBoot bootloader 🚀",
+      is_verified: true,
+      is_moderator: true,
+      created_at: "2026-10-15T10:00:00Z"
+    }
+  ];
+
+  friendshipsMap = {};
+  if (meUser) {
+    const { data: fRows } = await sb.from("friendships")
+      .select("id,requester_id,addressee_id,status")
+      .or(`requester_id.eq.${meUser.id},addressee_id.eq.${meUser.id}`);
+    (fRows || []).forEach(r => {
+      const other = r.requester_id === meUser.id ? r.addressee_id : r.requester_id;
+      friendshipsMap[other] = r;
+    });
+  }
+
+  updateRequestBadge();
+  renderUsers();
+}
+
+function updateRequestBadge() {
+  const badgeEl = $("req-badge");
+  if (!meUser) {
+    badgeEl.hidden = true;
+    return;
+  }
+  const incomingCount = Object.values(friendshipsMap).filter(r => r.status === "pending" && r.addressee_id === meUser.id).length;
+  badgeEl.textContent = String(incomingCount);
+  badgeEl.hidden = incomingCount === 0;
+}
+
+function buildFriendButton(u) {
+  if (meUser && meUser.id === u.id) {
+    const selfBtn = document.createElement("a");
+    selfBtn.className = "btn ghost";
+    selfBtn.href = "profile.html";
+    selfBtn.textContent = t("pvEditOwn");
+    return selfBtn;
+  }
+
+  if (!meUser) {
+    const localKey = "nixelos-local-friend-" + (u.id || u.username);
+    const isAdded = sGet(localKey) === "1";
+    const fBtn = document.createElement("button");
+    fBtn.type = "button";
+    fBtn.className = isAdded ? "btn ok" : "btn";
+    fBtn.innerHTML = isAdded ? `<span>${t("fFriends")}</span>` : (ICON_ADD + `<span>${t("fAddFriend")}</span>`);
+    fBtn.addEventListener("click", () => {
+      if (sGet(localKey) === "1") sDel(localKey);
+      else sSet(localKey, "1");
+      renderUsers();
+    });
+    return fBtn;
+  }
+
+  const fr = friendshipsMap[u.id];
+  if (!fr) {
+    const addBtn = document.createElement("button");
+    addBtn.type = "button";
+    addBtn.className = "btn";
+    addBtn.innerHTML = ICON_ADD + `<span>${t("fAddFriend")}</span>`;
+    addBtn.addEventListener("click", async () => {
+      addBtn.disabled = true;
+      const { data, error } = await sb.from("friendships")
+        .insert({ requester_id: meUser.id, addressee_id: u.id, status: "pending" })
+        .select("*")
+        .single();
+      if (!error && data) friendshipsMap[u.id] = data;
+      else friendshipsMap[u.id] = { id: "local", requester_id: meUser.id, addressee_id: u.id, status: "pending" };
+      updateRequestBadge();
+      renderUsers();
+    });
+    return addBtn;
+  }
+
+  if (fr.status === "pending" && fr.requester_id === meUser.id) {
+    const cancelBtn = document.createElement("button");
+    cancelBtn.type = "button";
+    cancelBtn.className = "btn ghost";
+    cancelBtn.textContent = t("fReqSent");
+    cancelBtn.addEventListener("click", async () => {
+      cancelBtn.disabled = true;
+      await sb.from("friendships").delete().eq("id", fr.id);
+      delete friendshipsMap[u.id];
+      updateRequestBadge();
+      renderUsers();
+    });
+    return cancelBtn;
+  }
+
+  if (fr.status === "pending" && fr.addressee_id === meUser.id) {
+    const wrap = document.createElement("div");
+    wrap.style.cssText = "display:flex;gap:6px;flex:1 1 auto";
+    const accBtn = document.createElement("button");
+    accBtn.type = "button";
+    accBtn.className = "btn ok";
+    accBtn.textContent = t("fAccept");
+    accBtn.addEventListener("click", async () => {
+      accBtn.disabled = true;
+      const { data } = await sb.from("friendships").update({ status: "accepted" }).eq("id", fr.id).select("*").single();
+      if (data) friendshipsMap[u.id] = data;
+      updateRequestBadge();
+      renderUsers();
+    });
+    const decBtn = document.createElement("button");
+    decBtn.type = "button";
+    decBtn.className = "btn ghost danger";
+    decBtn.textContent = "✕";
+    decBtn.title = t("fDecline");
+    decBtn.style.flex = "0 0 auto";
+    decBtn.addEventListener("click", async () => {
+      decBtn.disabled = true;
+      await sb.from("friendships").delete().eq("id", fr.id);
+      delete friendshipsMap[u.id];
+      updateRequestBadge();
+      renderUsers();
+    });
+    wrap.append(accBtn, decBtn);
+    return wrap;
+  }
+
+  const frBtn = document.createElement("button");
+  frBtn.type = "button";
+  frBtn.className = "btn ok";
+  frBtn.textContent = t("fFriends");
+  frBtn.title = t("fRemoveFriend");
+  frBtn.addEventListener("click", async () => {
+    frBtn.disabled = true;
+    await sb.from("friendships").delete().eq("id", fr.id);
+    delete friendshipsMap[u.id];
+    updateRequestBadge();
+    renderUsers();
+  });
+  return frBtn;
+}
+
+function renderUsers() {
+  const grid = $("users-grid");
+  grid.replaceChildren();
+  const q = ($("search").value || "").trim().toLowerCase();
+
+  const filtered = allUsers.filter(u => {
+    if (q) {
+      const dn = (u.display_name || "").toLowerCase();
+      const un = (u.username || "").toLowerCase();
+      if (!dn.includes(q) && !un.includes(q)) return false;
+    }
+    if (currentTab === "friends") {
+      const fr = friendshipsMap[u.id];
+      return fr && fr.status === "accepted";
+    }
+    if (currentTab === "requests") {
+      const fr = friendshipsMap[u.id];
+      return fr && fr.status === "pending";
+    }
+    return true;
+  });
+
+  if (!filtered.length) {
+    const empty = document.createElement("p");
+    empty.className = "empty-msg";
+    empty.textContent = currentTab === "friends" ? t("fNoFriends") : currentTab === "requests" ? t("fNoRequests") : t("uEmpty");
+    grid.append(empty);
+    return;
+  }
+
+  filtered.forEach(u => {
+    const profileHref = "profile-view.html?u=" + encodeURIComponent(u.username);
+    const card = document.createElement("article");
+    card.className = "user-card";
+
+    const banner = document.createElement("a");
+    banner.className = "uc-banner";
+    banner.href = profileHref;
+    banner.setAttribute("aria-label", u.display_name || u.username);
+    applyBannerStyle(banner, u);
+
+    const body = document.createElement("div");
+    body.className = "uc-body";
+
+    const top = document.createElement("div");
+    top.className = "uc-top";
+    const avLink = document.createElement("a");
+    avLink.className = "uc-av-link";
+    avLink.href = profileHref;
+    avLink.append(makeAvatar(u, "uc-av"));
+    top.append(avLink);
+
+    const nameLink = document.createElement("a");
+    nameLink.className = "uc-name-link";
+    nameLink.href = profileHref;
+    nameLink.textContent = u.display_name || u.username;
+    if (u.is_verified) nameLink.append(badge());
+    if (u.is_moderator) nameLink.append(modBadge());
+
+    const handle = document.createElement("p");
+    handle.className = "uc-handle";
+    handle.textContent = "@" + u.username;
+
+    const bio = document.createElement("p");
+    bio.className = "uc-bio";
+    bio.textContent = (u.bio && u.bio.trim()) ? u.bio : t("pvBioEmpty");
+
+    const actions = document.createElement("div");
+    actions.className = "uc-actions";
+    const viewBtn = document.createElement("a");
+    viewBtn.className = "btn ghost";
+    viewBtn.href = profileHref;
+    viewBtn.innerHTML = ICON_USER + `<span>${t("uViewProfile")}</span>`;
+    actions.append(viewBtn, buildFriendButton(u));
+
+    body.append(top, nameLink, handle, bio, actions);
+    card.append(banner, body);
+    grid.append(card);
+  });
+}
+
+$("search").addEventListener("input", renderUsers);
+document.querySelectorAll(".u-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    currentTab = tab.dataset.tab;
+    document.querySelectorAll(".u-tab").forEach(x => x.setAttribute("aria-selected", String(x === tab)));
+    renderUsers();
+  });
+});
+
+loadData();
+</script>
+
+
+</body>
+</html>

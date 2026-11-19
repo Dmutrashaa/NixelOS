@@ -1,0 +1,980 @@
+<!doctype html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090a0e">
+  <title>NixelOS FAQ</title>
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem("nixelos-theme")==="light"?"light":"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&amp;family=Ubuntu:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --background: #090a0e;
+      --panel: rgba(17, 18, 24, 0.68);
+      --border: rgba(255, 255, 255, 0.09);
+      --text: #f5f5f7;
+      --muted: #b9bbc7;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--background);
+      color: var(--text);
+      font-family: "Comfortaa", system-ui, sans-serif;
+    }
+
+    body { min-height: 100vh; overflow-x: hidden; position: relative; padding-top: 62px; }
+
+    #particles {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: .78;
+    }
+
+    .topbar, main { position: relative; z-index: 1; }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      min-height: 62px;
+      padding: 10px clamp(14px, 3.5vw, 38px);
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      -webkit-backdrop-filter: blur(10px) brightness(0.78);
+      backdrop-filter: blur(7.5px) brightness(0.78);
+      justify-content: space-between;
+    }
+
+    .menu-toggle {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      flex: 0 0 auto;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.06);
+      -webkit-backdrop-filter: blur(8.5px);
+      backdrop-filter: blur(8.5px);
+      font: 700 22px/1 "Comfortaa", sans-serif;
+      cursor: pointer;
+      transition: background 180ms ease, border-color 180ms ease, transform 220ms ease;
+    }
+    .menu-toggle:hover { background: rgba(128,112,255,.16); border-color: rgba(150,140,255,.38); }
+    .menu-toggle:focus-visible { outline: 2px solid #a8b4ff; outline-offset: 3px; }
+    .menu-toggle .menu-icon { display: block; transition: transform 260ms cubic-bezier(.2,.7,.2,1); }
+    .menu-toggle[aria-expanded="true"] .menu-icon { transform: rotate(180deg); }
+
+    .menu-scrim {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: rgba(3, 4, 10, .68);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 280ms ease, visibility 280ms ease;
+    }
+    .menu-scrim.is-open { opacity: 1; visibility: visible; }
+
+    .side-menu {
+      position: fixed;
+      z-index: 41;
+      top: 0;
+      right: 0;
+      width: 78vw;
+      height: 100dvh;
+      border-left: 1px solid rgba(255,255,255,.14);
+      background: rgba(20, 22, 35, .32);
+      -webkit-backdrop-filter: blur(11px) saturate(160%) brightness(.72);
+      backdrop-filter: blur(11px) saturate(160%) brightness(.72);
+      box-shadow: -24px 0 68px rgba(0,0,0,.42);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(105%);
+      transition: transform 380ms cubic-bezier(.2,.75,.2,1), opacity 260ms ease, visibility 380ms;
+      pointer-events: none;
+      padding: 22px;
+      overflow-y: auto;
+    }
+    @media (min-width: 769px) {
+      .side-menu {
+        width: 33.333vw;
+      }
+    }
+    .side-menu.is-open { opacity: 1; visibility: visible; transform: translateX(0); pointer-events: auto; }
+
+    .menu-close {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      margin-left: auto;
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.08);
+      -webkit-backdrop-filter: blur(8.5px);
+      backdrop-filter: blur(8.5px);
+      font: 700 24px/1 "Comfortaa", sans-serif;
+      cursor: pointer;
+      transition: background 180ms ease, transform 180ms ease;
+    }
+    .menu-close:hover { background: rgba(128,112,255,.2); transform: translateX(2px); }
+    .menu-links { display: grid; gap: 12px; margin-top: 30px; }
+    .menu-link { width: 100%; }
+    .menu-languages { margin-top: 34px; }
+    .menu-language-title { margin: 0 0 16px; font-size: 18px; line-height: 1.45; }
+    .menu-close:focus-visible { outline: 2px solid #a8b4ff; outline-offset: 3px; }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand img {
+      display: block;
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
+
+    .brand-name {
+      font-size: 17px;
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      white-space: nowrap;
+    }
+
+
+.brand{color:inherit;text-decoration:none}
+main{width:min(900px,calc(100% - 36px));margin:0 auto;padding:clamp(36px,7vh,76px) 0 60px;text-align:center}
+.news-card{width:min(100%,690px);margin:0 auto;padding:clamp(20px,4vw,32px);text-align:left;overflow:hidden;border:1px solid rgba(133,151,255,.26);border-radius:22px;background:linear-gradient(135deg,rgba(91,111,255,.14),rgba(142,78,255,.08));box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 16px 47px rgba(0,0,0,.22);-webkit-backdrop-filter:blur(15px) saturate(135%);backdrop-filter:blur(15px) saturate(135%);opacity:0;transform:translateY(22px)}
+.news-title{margin:0 0 12px;font-size:clamp(22px,3.8vw,30px);line-height:1.3;letter-spacing:-.04em}
+.news-text{margin:0;color:var(--muted);font-size:clamp(15px,2.2vw,17px);line-height:1.8}
+.news-image{display:block;width:100%;height:auto;margin:22px 0 18px;border:1px solid var(--border);border-radius:14px;background:#111522}
+.news-meta{margin:0;color:var(--muted);font-size:13px}
+.news-card + .news-card{margin-top:22px}
+.news-button{margin-top:18px}
+.news-button + .news-meta{margin-top:18px}
+.news-text + .news-meta{margin-top:18px}
+.news-note{max-width:690px;margin:30px auto 0;color:var(--muted);font-size:14px;line-height:1.8;opacity:0;transform:translateY(22px)}
+.news-note a{color:#b8c2ff;text-decoration:none;font-weight:700}
+.news-note a:hover{text-decoration:underline}
+.reveal.is-visible{animation:rise-in 800ms cubic-bezier(.2,.7,.2,1) forwards}
+.news-note.is-visible{animation-delay:160ms}
+@keyframes rise-in{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:480px){body{padding-top:54px}.topbar{min-height:54px;padding:8px 14px}.brand img{width:31px;height:31px}.brand-name{font-size:16px}main{padding:36px 0 50px}}
+@media(prefers-reduced-motion:reduce){.news-card,.news-note{opacity:1;transform:none;animation:none!important}}
+  
+:root{--option-bg:#14162a}
+html,body{transition:background-color 300ms ease,color 300ms ease}
+.menu-toggle svg,.menu-close svg{width:22px;height:22px}
+.menu-links{gap:2px}
+.menu-link{display:flex;align-items:center;gap:14px;width:100%;padding:12px 6px;border-radius:10px;color:var(--text);text-decoration:none;font-size:18px;font-weight:700;transition:color 180ms ease,transform 180ms ease}
+.menu-link svg{width:24px;height:24px;flex:0 0 auto}
+.menu-link:hover,.menu-link[aria-current="page"]{color:#a8b4ff}
+.menu-link:hover{transform:translateX(4px)}
+.menu-link:focus-visible{outline:2px solid #a8b4ff;outline-offset:2px}
+.menu-theme{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:26px;padding:0 6px}
+.menu-theme-label{font-size:16px;font-weight:700}
+.theme-switch{position:relative;display:flex;align-items:center;justify-content:space-between;flex:0 0 auto;width:62px;height:34px;padding:0 8px;border:1px solid rgba(255,255,255,.18);border-radius:999px;color:var(--muted);background:rgba(255,255,255,.08);cursor:pointer}
+.theme-switch svg{width:16px;height:16px}
+.theme-switch:focus-visible{outline:2px solid #a8b4ff;outline-offset:3px}
+.theme-knob{position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#8f9bff,#a46bff);box-shadow:0 2px 8px rgba(0,0,0,.35);transition:transform 280ms cubic-bezier(.2,.7,.2,1)}
+.theme-switch[aria-checked="true"] .theme-knob{transform:translateX(28px)}
+:root[data-theme="light"]{color-scheme:light;--background:#f4f5fb;--panel:rgba(255,255,255,.72);--border:rgba(20,24,60,.12);--text:#14162a;--muted:#555a73;--option-bg:#ffffff}
+:root[data-theme="light"] #particles{opacity:.45}
+:root[data-theme="light"] .topbar{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+:root[data-theme="light"] .menu-toggle,:root[data-theme="light"] .menu-close{border-color:rgba(20,24,60,.16);background:rgba(20,24,60,.06)}
+:root[data-theme="light"] .menu-toggle:hover,:root[data-theme="light"] .menu-close:hover{border-color:rgba(91,111,255,.45);background:rgba(91,111,255,.14)}
+:root[data-theme="light"] .menu-scrim{background:rgba(20,24,60,.38)}
+:root[data-theme="light"] .side-menu{border-left-color:rgba(20,24,60,.14);background:rgba(250,251,255,.8);box-shadow:-24px 0 68px rgba(20,24,60,.2);-webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%)}
+:root[data-theme="light"] .menu-link:hover,:root[data-theme="light"] .menu-link[aria-current="page"]{color:#4a5bd8}
+:root[data-theme="light"] .theme-switch{border-color:rgba(20,24,60,.2);background:rgba(20,24,60,.08)}
+:root[data-theme="light"] .social-button,:root[data-theme="light"] .btn{color:var(--text);border-color:rgba(91,111,255,.4);background:linear-gradient(135deg,rgba(91,111,255,.12),rgba(142,78,255,.08));box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 8px 24px rgba(44,56,130,.1)}
+:root[data-theme="light"] .social-button:hover,:root[data-theme="light"] .btn:hover{border-color:rgba(91,111,255,.75);background:linear-gradient(135deg,rgba(91,111,255,.26),rgba(142,78,255,.2))}
+:root[data-theme="light"] .os-card{border-color:rgba(20,24,60,.12);background:rgba(255,255,255,.72);box-shadow:0 16px 47px rgba(20,24,60,.1)}
+:root[data-theme="light"] .status-card,:root[data-theme="light"] .download-card,:root[data-theme="light"] .news-card{border-color:rgba(91,111,255,.32);background:linear-gradient(135deg,rgba(255,255,255,.78),rgba(236,240,255,.7));box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 16px 47px rgba(20,24,60,.12)}
+:root[data-theme="light"] .telegram-note a,:root[data-theme="light"] .news-note a{color:#4a5bd8}
+:root[data-theme="light"] .build-select{border-color:rgba(91,111,255,.4);background:rgba(255,255,255,.75)}
+
+::selection{background:rgba(143,155,255,.38);color:inherit}
+html{scrollbar-width:thin;scrollbar-color:rgba(143,155,255,.5) transparent}
+.lang-switch{position:relative;display:flex;align-items:center;width:100%;padding:3px;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.06);-webkit-backdrop-filter:blur(8.5px);backdrop-filter:blur(8.5px);container-type:inline-size}
+.lang-thumb{position:absolute;top:3px;bottom:3px;left:0;width:0;border-radius:999px;background:linear-gradient(135deg,#8f9bff,#a46bff);box-shadow:0 2px 12px rgba(120,110,255,.45)}
+.lang-button{position:relative;z-index:1;flex:1 1 auto;min-width:0;min-height:36px;padding:0 6px;border:0;border-radius:999px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);background:none;font:700 12px "Comfortaa",sans-serif;font-size:clamp(10px,calc(5.6cqw - 1.5px),13px);cursor:pointer;transition:color 260ms ease}
+.lang-button:hover{color:var(--text)}
+.lang-button[aria-pressed="true"]{color:#fff}
+.lang-button:focus-visible{outline:2px solid #a8b4ff;outline-offset:-3px}
+:root[data-theme="light"] .lang-switch{border-color:rgba(20,24,60,.16);background:rgba(20,24,60,.06)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:44px;padding:0 22px;border:1px solid rgba(133,151,255,.32);border-radius:9px;color:#f7f7ff;text-decoration:none;font:700 14px "Comfortaa",sans-serif;background:linear-gradient(135deg,rgba(91,111,255,.17),rgba(142,78,255,.11));box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 8px 24px rgba(44,56,130,.12);-webkit-backdrop-filter:blur(15px) saturate(135%);backdrop-filter:blur(15px) saturate(135%);cursor:pointer;transition:transform 180ms ease,border-color 180ms ease,background 180ms ease}
+.btn:hover{transform:translateY(-3px);border-color:rgba(151,166,255,.68);background:linear-gradient(135deg,rgba(91,111,255,.34),rgba(142,78,255,.27))}
+.btn:focus-visible{outline:2px solid #a8b4ff;outline-offset:4px}
+.faq-hero{margin-bottom:30px}
+.faq-title,.faq-subtitle,.faq-panel,.faq-footer{opacity:0;transform:translateY(22px)}
+.faq-title{margin:0;font-size:clamp(30px,6vw,48px);line-height:1.2;letter-spacing:-.05em;font-weight:700}
+.faq-subtitle{margin:14px auto 0;max-width:560px;color:var(--muted);font-size:clamp(14px,2.2vw,17px);line-height:1.8}
+.faq-panel{width:min(100%,690px);margin:0 auto;padding:clamp(14px,3.4vw,24px);text-align:left;border:1px solid rgba(133,151,255,.26);border-radius:22px;background:linear-gradient(135deg,rgba(91,111,255,.14),rgba(142,78,255,.08));box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 16px 47px rgba(0,0,0,.22);-webkit-backdrop-filter:blur(15px) saturate(135%);backdrop-filter:blur(15px) saturate(135%)}
+.faq-tabs{position:relative;display:flex;padding:3px;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.06)}
+.faq-thumb{position:absolute;top:3px;bottom:3px;left:0;width:0;border-radius:999px;background:linear-gradient(135deg,#8f9bff,#a46bff);box-shadow:0 2px 12px rgba(120,110,255,.45)}
+.faq-tabs.is-ready .faq-thumb{transition:transform 440ms cubic-bezier(.2,.8,.2,1.1),width 440ms cubic-bezier(.2,.8,.2,1.1)}
+.faq-tab{position:relative;z-index:1;flex:1 1 0;display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;min-height:42px;padding:0 10px;border:0;border-radius:999px;color:var(--muted);background:none;font:700 14px "Comfortaa",sans-serif;cursor:pointer;transition:color 260ms ease}
+.faq-tab svg{width:18px;height:18px;flex:0 0 auto;transition:transform 320ms cubic-bezier(.3,1.5,.5,1)}
+.faq-tab:hover{color:var(--text)}
+.faq-tab:hover svg{transform:scale(1.15) rotate(-6deg)}
+.faq-tab[aria-selected="true"]{color:#fff}
+.faq-tab:focus-visible{outline:2px solid #a8b4ff;outline-offset:-3px}
+.faq-sections{margin-top:18px}
+.faq-section.is-in{animation:faq-in 460ms cubic-bezier(.2,.7,.2,1)}
+@keyframes faq-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.faq-list{display:grid;gap:12px}
+.faq-post{overflow:hidden;border:1px solid rgba(255,255,255,.1);border-radius:16px;background:rgba(14,16,28,.38);transition:border-color 300ms ease,background 300ms ease,box-shadow 360ms ease;animation:faq-in 520ms cubic-bezier(.2,.7,.2,1) backwards;animation-delay:calc(var(--i,0) * 70ms)}
+.faq-post:hover,.faq-post.is-open{border-color:rgba(151,166,255,.55)}
+.faq-post.is-open{box-shadow:0 14px 36px rgba(44,56,130,.25)}
+.faq-head{display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;padding:16px 18px;border:0;color:var(--text);background:none;font:inherit;text-align:left;cursor:pointer}
+.faq-head:focus-visible{outline:2px solid #a8b4ff;outline-offset:-3px}
+.faq-head-text{display:grid;gap:4px;min-width:0}
+.faq-post-title{font-size:clamp(16px,2.6vw,19px);font-weight:700;line-height:1.35;letter-spacing:-.02em}
+.faq-post-sub{color:var(--muted);font-size:13px;line-height:1.6}
+.faq-chevron{flex:0 0 auto;width:22px;height:22px;color:#a8b4ff;transition:transform 380ms cubic-bezier(.3,1.4,.5,1)}
+.faq-post.is-open .faq-chevron{transform:rotate(180deg)}
+.faq-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows 420ms cubic-bezier(.2,.7,.2,1)}
+.faq-post.is-open .faq-body{grid-template-rows:1fr}
+.faq-body-inner{min-height:0;overflow:hidden;padding:0 18px;opacity:0;transition:opacity 300ms ease,padding 420ms cubic-bezier(.2,.7,.2,1)}
+.faq-post.is-open .faq-body-inner{padding:0 18px 18px;opacity:1}
+.faq-image{display:block;width:100%;height:auto;margin:2px 0 14px;border:1px solid var(--border);border-radius:12px;background:#111522}
+.faq-block{padding:12px 14px;border-left:3px solid rgba(143,155,255,.6);border-radius:4px 12px 12px 4px;background:rgba(255,255,255,.04)}
+.faq-block+.faq-block{margin-top:10px}
+.faq-block-problem{border-left-color:#ff7a8a}
+.faq-block-cause{border-left-color:#ffc56b}
+.faq-block-solution{border-left-color:#5fd39a}
+.faq-block-title{margin:0 0 6px;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.faq-block-text{margin:0;color:var(--text);font-size:14.5px;line-height:1.75;overflow-wrap:anywhere}
+.faq-block-text a{color:#b8c2ff}
+.faq-empty{display:flex;flex-direction:column;align-items:center;padding:clamp(16px,4vw,32px) 8px;text-align:center}
+.faq-empty[hidden]{display:none}
+.faq-radar{width:132px;height:132px;margin-bottom:10px}
+.faq-radar svg{width:100%;height:100%;overflow:visible}
+.faq-ring{fill:none;stroke:#8f9bff;stroke-width:1.4;transform-origin:60px 60px;opacity:0;animation:faq-ping 3s ease-out infinite}
+.faq-ring:nth-of-type(2){animation-delay:1s}
+.faq-ring:nth-of-type(3){animation-delay:2s}
+@keyframes faq-ping{0%{transform:scale(.25);opacity:.85}100%{transform:scale(1.12);opacity:0}}
+.faq-bug{fill:#ff7a8a;opacity:.15;animation:faq-blink 2.4s ease-in-out infinite}
+.faq-bug:nth-of-type(5){animation-delay:.5s}
+.faq-bug:nth-of-type(6){animation-delay:1.1s}
+.faq-bug:nth-of-type(7){animation-delay:1.7s}
+@keyframes faq-blink{0%,100%{opacity:.12;transform:scale(1)}50%{opacity:1;transform:scale(1.5)}}
+.faq-bug{transform-box:fill-box;transform-origin:center}
+.faq-glass{transform-origin:60px 60px;animation:faq-scan 5.6s ease-in-out infinite}
+@keyframes faq-scan{0%{transform:translate(-22px,-12px) rotate(-6deg)}25%{transform:translate(16px,-22px) rotate(4deg)}50%{transform:translate(24px,12px) rotate(8deg)}75%{transform:translate(-14px,22px) rotate(-4deg)}100%{transform:translate(-22px,-12px) rotate(-6deg)}}
+.faq-empty-title{margin:0;font-size:clamp(20px,3.4vw,26px);font-weight:700;letter-spacing:-.035em;line-height:1.3}
+.faq-empty-sub{max-width:440px;margin:10px 0 0;font-size:clamp(14px,2vw,16px);line-height:1.75;color:transparent;background:linear-gradient(100deg,var(--muted) 0%,var(--muted) 38%,#a8b4ff 50%,var(--muted) 62%,var(--muted) 100%);background-size:260% 100%;-webkit-background-clip:text;background-clip:text;animation:faq-shimmer 3.2s linear infinite}
+@keyframes faq-shimmer{from{background-position:130% 0}to{background-position:-130% 0}}
+.faq-footer{display:flex;flex-direction:column;align-items:center;gap:16px;width:min(100%,690px);margin:34px auto 0}
+.faq-note{margin:0;color:var(--muted);font-size:15px;line-height:1.7}
+.faq-open{min-width:150px}
+.faq-open svg{transition:transform 260ms cubic-bezier(.3,1.5,.5,1)}
+.faq-open:hover svg{transform:translate(3px,-3px)}
+:root[data-theme="light"] .faq-panel{border-color:rgba(91,111,255,.32);background:linear-gradient(135deg,rgba(255,255,255,.78),rgba(236,240,255,.7));box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 16px 47px rgba(20,24,60,.12)}
+:root[data-theme="light"] .faq-tabs{border-color:rgba(20,24,60,.16);background:rgba(20,24,60,.06)}
+:root[data-theme="light"] .faq-post{border-color:rgba(20,24,60,.12);background:rgba(255,255,255,.7)}
+:root[data-theme="light"] .faq-post:hover,:root[data-theme="light"] .faq-post.is-open{border-color:rgba(91,111,255,.6)}
+:root[data-theme="light"] .faq-post.is-open{box-shadow:0 14px 36px rgba(44,56,130,.14)}
+:root[data-theme="light"] .faq-block{background:rgba(20,24,60,.05)}
+:root[data-theme="light"] .faq-block-text a,:root[data-theme="light"] .faq-chevron{color:#4a5bd8}
+:root[data-theme="light"] .faq-ring{stroke:#4a5bd8}
+:root[data-theme="light"] .faq-empty-sub{background-image:linear-gradient(100deg,var(--muted) 0%,var(--muted) 38%,#4a5bd8 50%,var(--muted) 62%,var(--muted) 100%)}
+@media(max-width:480px){.faq-hero{margin-bottom:22px}.faq-head{padding:14px}.faq-body-inner{padding:0 14px}.faq-post.is-open .faq-body-inner{padding:0 14px 14px}.faq-tab{font-size:13px;gap:6px}}
+@media(prefers-reduced-motion:reduce){.faq-title,.faq-subtitle,.faq-panel,.faq-footer{opacity:1;transform:none;animation:none!important}.faq-ring,.faq-bug,.faq-glass,.faq-empty-sub,.faq-post,.faq-section.is-in{animation:none!important}.faq-empty-sub{color:var(--muted);background:none}.faq-body,.faq-body-inner,.faq-chevron,.faq-tabs.is-ready .faq-thumb{transition:none}}
+
+
+.menu-head{display:flex;align-items:center;gap:12px}
+.menu-head .menu-close{flex:none;margin-left:0}
+.menu-account{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:8px 14px 8px 8px;border:1px solid rgba(255,255,255,.15);border-radius:16px;color:var(--text,#f5f5f7);background:rgba(255,255,255,.08);text-decoration:none;transition:border-color 180ms ease,background 180ms ease,transform 180ms ease}
+.menu-account:hover{border-color:rgba(151,166,255,.6);background:rgba(128,112,255,.16);transform:translateX(2px)}
+.menu-account:focus-visible{outline:2px solid #a8b4ff;outline-offset:3px}
+.menu-av{flex:none;width:44px;height:44px;border-radius:50%;object-fit:cover;display:grid;place-items:center;font-size:18px;font-weight:700;color:#fff;background:linear-gradient(135deg,#8f9bff,#a46bff);border:1px solid rgba(255,255,255,.18)}
+.menu-av svg{width:22px;height:22px}
+.menu-acc-text{min-width:0;display:grid;gap:2px}
+.menu-acc-name{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:16px;font-weight:700;line-height:1.3}
+.menu-acc-name>span{margin-left:6px;vertical-align:-3px}
+.menu-acc-sub{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:12px;color:var(--muted,#b9bbc7)}
+.menu-acc-sub:empty{display:none}
+:root[data-theme="light"] .menu-account{border-color:rgba(20,24,60,.16);background:rgba(20,24,60,.06)}
+:root[data-theme="light"] .menu-account:hover{border-color:rgba(91,111,255,.45);background:rgba(91,111,255,.14)}
+</style>
+  <style>
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: none; }
+}
+
+.reveal.is-visible,
+.hero-logo.is-visible,
+h1.is-visible,
+.tagline.is-visible {
+  animation: rise-in 800ms cubic-bezier(.2,.7,.2,1) forwards;
+}
+
+h1.is-visible { animation-delay: 160ms; }
+.tagline.is-visible { animation-delay: 320ms; }
+
+.os-card:nth-child(1).is-visible { animation-delay: 80ms; }
+.os-card:nth-child(2).is-visible { animation-delay: 220ms; }
+.os-card:nth-child(3).is-visible { animation-delay: 360ms; }
+.social-section .social-intro.is-visible { animation-delay: 120ms; }
+.social-section .social-actions.is-visible { animation-delay: 240ms; }
+
+.reveal.reveal-auto { opacity: 0; transform: translateY(22px); animation: none; }
+.reveal.reveal-auto.is-visible { animation: rise-in 800ms cubic-bezier(.2,.7,.2,1) forwards; animation-delay: var(--reveal-delay, 0ms); }
+
+.os-card,.status-card,.download-card,.news-card,.card,.req-card,.faq-panel{transition:translate 360ms cubic-bezier(.2,.7,.2,1),border-color 300ms ease,box-shadow 360ms ease}
+.os-card:hover,.status-card:hover,.download-card:hover,.news-card:hover,.card:hover,.req-card:hover,.faq-panel:hover{translate:0 -5px;border-color:rgba(151,166,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 24px 60px rgba(44,56,130,.3)}
+:root[data-theme="light"] .os-card:hover,:root[data-theme="light"] .status-card:hover,:root[data-theme="light"] .download-card:hover,:root[data-theme="light"] .news-card:hover,:root[data-theme="light"] .card:hover,:root[data-theme="light"] .req-card:hover,:root[data-theme="light"] .faq-panel:hover{border-color:rgba(91,111,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 24px 60px rgba(44,56,130,.2)}
+.btn,.social-button{position:relative;overflow:hidden;isolation:isolate}
+.btn::after,.social-button::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.2) 50%,transparent 70%);transform:translateX(-130%);transition:transform 650ms cubic-bezier(.2,.7,.2,1)}
+.btn:hover::after,.social-button:hover::after{transform:translateX(130%)}
+.btn:active,.social-button:active{transform:translateY(-1px) scale(.97)}
+.telegram-note a,.news-note a{padding-bottom:2px;background:linear-gradient(currentColor,currentColor) 0 100%/0 2px no-repeat;transition:background-size 320ms cubic-bezier(.2,.7,.2,1),color 200ms ease}
+.telegram-note a:hover,.news-note a:hover{background-size:100% 2px;text-decoration:none}
+.build-image,.news-image{transition:filter 500ms ease}
+.download-card:hover .build-image,.news-card:hover .news-image{filter:saturate(1.15) brightness(1.06)}
+.brand img{transition:transform 420ms cubic-bezier(.3,1.5,.5,1)}
+.brand:hover img{transform:rotate(-8deg) scale(1.08)}
+.menu-link svg{transition:transform 280ms cubic-bezier(.3,1.5,.5,1)}
+.menu-link:hover svg{transform:scale(1.14) rotate(-4deg)}
+.theme-switch{transition:border-color 200ms ease,background 200ms ease}
+.theme-switch:hover{border-color:rgba(151,166,255,.6);background:rgba(133,151,255,.14)}
+:root[data-theme="light"] .theme-switch:hover{border-color:rgba(91,111,255,.6);background:rgba(91,111,255,.14)}
+.lang-switch.is-ready .lang-thumb{transition:transform 440ms cubic-bezier(.2,.8,.2,1.1),width 440ms cubic-bezier(.2,.8,.2,1.1)}
+@media(prefers-reduced-motion:reduce){.os-card:hover,.status-card:hover,.download-card:hover,.news-card:hover,.card:hover,.req-card:hover,.faq-panel:hover{translate:none}.btn::after,.social-button::after{display:none}.lang-switch.is-ready .lang-thumb{transition:none}}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-logo, h1, .tagline, .reveal, .os-card, .status-card {
+    opacity: 1;
+    transform: none;
+    animation: none !important;
+  }
+}
+
+.menu-toggle:active,.menu-close:active,.lang-button:active{transform:scale(.94)}
+.fr-item,.friend-mini,.req-item,.faq-post,.chat-msg,.nx-c,.u-tab,.faq-tab{transition:translate 300ms cubic-bezier(.2,.7,.2,1),border-color 240ms ease,box-shadow 300ms ease,background 240ms ease,color 200ms ease}
+.fr-item:hover,.friend-mini:hover,.req-item:hover,.faq-post:hover,.nx-c:hover{translate:0 -3px;border-color:rgba(151,166,255,.55);box-shadow:0 14px 34px rgba(44,56,130,.22)}
+.chat-msg:hover{translate:3px 0;border-color:rgba(151,166,255,.5)}
+.uc-av,.chat-av,.av-lg,.pv-av,.fr-av,.friend-mini-av,.nx-av,.menu-av{transition:scale 360ms cubic-bezier(.3,1.5,.5,1),box-shadow 300ms ease}
+.user-card:hover .uc-av,.chat-msg:hover .chat-av,.fr-item:hover .fr-av,.friend-mini:hover .friend-mini-av,.nx-c:hover .nx-av,.av-lg:hover,.pv-av:hover,.menu-account:hover .menu-av{scale:1.1;box-shadow:0 0 0 3px rgba(151,166,255,.4),0 8px 22px rgba(44,56,130,.35)}
+.nx-rules-btn,.nx-chip,.faq-open,.news-button,.req-cta,.download-action{position:relative;overflow:hidden;isolation:isolate}
+.nx-rules-btn::after,.nx-chip::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.2) 50%,transparent 70%);transform:translateX(-130%);transition:transform 650ms cubic-bezier(.2,.7,.2,1)}
+.nx-rules-btn:hover::after,.nx-chip:hover::after{transform:translateX(130%)}
+.nx-rules-btn:active,.nx-chip:active,.u-tab:active,.faq-tab:active,.faq-open:active,.news-button:active,.req-cta:active,.download-action:active{scale:.96}
+.users-grid>*,.friends-grid>*,.fr-grid>*,.req-grid>*,.faq-list>*{animation:rise-in 560ms cubic-bezier(.2,.7,.2,1) both}
+.users-grid>*:nth-child(2),.friends-grid>*:nth-child(2),.fr-grid>*:nth-child(2),.req-grid>*:nth-child(2),.faq-list>*:nth-child(2){animation-delay:70ms}
+.users-grid>*:nth-child(3),.friends-grid>*:nth-child(3),.fr-grid>*:nth-child(3),.req-grid>*:nth-child(3),.faq-list>*:nth-child(3){animation-delay:140ms}
+.users-grid>*:nth-child(4),.friends-grid>*:nth-child(4),.fr-grid>*:nth-child(4),.req-grid>*:nth-child(4),.faq-list>*:nth-child(4){animation-delay:210ms}
+.users-grid>*:nth-child(n+5),.friends-grid>*:nth-child(n+5),.fr-grid>*:nth-child(n+5),.req-grid>*:nth-child(n+5),.faq-list>*:nth-child(n+5){animation-delay:280ms}
+.faq-hero,.back-bar{animation:rise-in 700ms cubic-bezier(.2,.7,.2,1) both}
+.live-dot{animation:nx-pulse 1.8s ease-in-out infinite}
+@keyframes nx-pulse{0%,100%{box-shadow:0 0 0 0 rgba(120,255,170,.5)}50%{box-shadow:0 0 0 7px rgba(120,255,170,0)}}
+@media(prefers-reduced-motion:reduce){.users-grid>*,.friends-grid>*,.fr-grid>*,.req-grid>*,.faq-list>*,.faq-hero,.back-bar,.live-dot{animation:none}.nx-rules-btn::after,.nx-chip::after{display:none}.fr-item:hover,.friend-mini:hover,.req-item:hover,.faq-post:hover,.nx-c:hover,.chat-msg:hover{translate:none}}
+.menu-toggle:focus-visible,.menu-close:focus-visible,.menu-link:focus-visible,.lang-button:focus-visible,.theme-switch:focus-visible,.btn:focus-visible,.toplink:focus-visible{outline:2px solid rgba(151,166,255,.85);outline-offset:2px}
+</style>
+  <script>
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function ready(fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+
+  function initReveal() {
+    if (document.querySelector('.reveal') || reduce) return;
+    var main = document.querySelector('main');
+    if (!main) return;
+    var items = [];
+    Array.prototype.forEach.call(main.children, function (el) {
+      var cs = getComputedStyle(el);
+      if (cs.animationName !== 'none' || cs.position === 'fixed' || cs.display === 'none' || el.hidden || /^(SCRIPT|STYLE|TEMPLATE)$/.test(el.tagName)) return;
+      items.push(el);
+    });
+    items.forEach(function (el, i) {
+      el.classList.add('reveal', 'reveal-auto');
+      el.style.setProperty('--reveal-delay', Math.min(i, 4) * 140 + 'ms');
+    });
+    if ('IntersectionObserver' in window) {
+      var revealObserver = new IntersectionObserver(function (entries, observer) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      items.forEach(function (item) { revealObserver.observe(item); });
+    } else {
+      items.forEach(function (item) { item.classList.add('is-visible'); });
+    }
+  }
+
+  function initParticles() {
+    if (document.getElementById('particles')) return;
+    var canvas = document.createElement('canvas');
+    canvas.id = 'particles';
+    canvas.setAttribute('aria-hidden', 'true');
+    canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.78';
+    document.body.insertBefore(canvas, document.body.firstChild);
+    ['.topbar', 'main'].forEach(function (sel) {
+      var n = document.querySelector(sel);
+      if (n && getComputedStyle(n).position === 'static') { n.style.position = 'relative'; n.style.zIndex = '1'; }
+    });
+    var ctx = canvas.getContext('2d');
+    var particles = [], width = 0, height = 0, animationFrame;
+    var colors = ['79, 111, 255', '147, 91, 255', '73, 177, 255'];
+    function resizeParticles() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth; height = window.innerHeight;
+      canvas.width = Math.floor(width * dpr); canvas.height = Math.floor(height * dpr);
+      canvas.style.width = width + 'px'; canvas.style.height = height + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var count = Math.min(42, Math.max(18, Math.floor(width / 27)));
+      particles = Array.from({ length: count }, function () {
+        return {
+          x: Math.random() * width, y: Math.random() * height, r: 2 + Math.random() * 5,
+          vy: 0.12 + Math.random() * 0.38, vx: (Math.random() - 0.5) * 0.22,
+          color: colors[Math.floor(Math.random() * colors.length)], alpha: 0.12 + Math.random() * 0.28
+        };
+      });
+    }
+    function drawParticles() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(function (p) {
+        p.y -= p.vy; p.x += p.vx;
+        if (p.y < -15) { p.y = height + 15; p.x = Math.random() * width; }
+        if (p.x < -15) p.x = width + 15;
+        if (p.x > width + 15) p.x = -15;
+        window.nxGlow(ctx,p);
+      });
+      animationFrame = requestAnimationFrame(drawParticles);
+    }
+    resizeParticles(); drawParticles();
+    window.addEventListener('resize', resizeParticles, { passive: true });
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) cancelAnimationFrame(animationFrame);
+      else drawParticles();
+    });
+  }
+
+  ready(function () { initReveal(); initParticles(); });
+})();
+(function () {
+  var busy = false, pending = null;
+  function setPressed(lang) {
+    document.querySelectorAll('.lang-button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.lang === lang)); });
+  }
+  function visible(el) {
+    var r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < window.innerHeight;
+  }
+  window.nxLangSwap = async function (lang, apply) {
+    if (lang === document.documentElement.lang) { apply(); return; }
+    if (busy) { pending = [lang, apply]; setPressed(lang); return; }
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var items = Array.prototype.filter.call(document.querySelectorAll('[data-i18n],[data-sk]'), visible);
+    if (reduce || !items.length || typeof items[0].animate !== 'function') { apply(); return; }
+    busy = true;
+    setPressed(lang);
+    var shown = { opacity: 1, transform: 'translateY(0)', filter: 'blur(0px)' };
+    var hidden = { opacity: 0, transform: 'translateY(-8px)', filter: 'blur(5px)' };
+    var outs = [], applied = false;
+    try {
+      outs = items.map(function (el) { return el.animate([shown, hidden], { duration: 220, easing: 'ease-in', fill: 'forwards' }); });
+      await Promise.race([Promise.all(outs.map(function (a) { return a.finished; })), new Promise(function (r) { setTimeout(r, 600); })]);
+      apply();
+      applied = true;
+      var ins = items.map(function (el, i) {
+        return el.animate([{ opacity: 0, transform: 'translateY(10px)', filter: 'blur(5px)' }, shown], { duration: 460, delay: Math.min(i * 28, 340), easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' });
+      });
+      outs.forEach(function (a) { a.cancel(); });
+      await Promise.race([Promise.all(ins.map(function (a) { return a.finished; })), new Promise(function (r) { setTimeout(r, 1400); })]);
+    } catch (e) {
+      outs.forEach(function (a) { a.cancel(); });
+      if (!applied) apply();
+    } finally {
+      busy = false;
+      var next = pending;
+      pending = null;
+      if (next) window.nxLangSwap(next[0], next[1]);
+    }
+  };
+})();
+</script>
+  <script>
+(function(){
+if(window.__nxChrome)return;window.__nxChrome=1;
+var page=(location.pathname.split('/').pop()||'index.html').replace(/\.html$/i,'').toLowerCase()||'index';
+var UI={
+en:{home:'NixelOS home',logo:'NixelOS logo',open:'Open menu',close:'Close menu',nav:'Site navigation',lang:'Language',theme:'Light theme'},
+ru:{home:'NixelOS — на главную',logo:'Логотип NixelOS',open:'Открыть меню',close:'Закрыть меню',nav:'Навигация по сайту',lang:'Язык',theme:'Светлая тема'},
+uk:{home:'NixelOS — на головну',logo:'Логотип NixelOS',open:'Відкрити меню',close:'Закрити меню',nav:'Навігація сайтом',lang:'Мова',theme:'Світла тема'}
+};
+var PG={
+index:{en:['NixelOS',''],ru:['NixelOS',''],uk:['NixelOS','']},
+downloads:{en:['NixelOS Downloads','Downloads'],ru:['NixelOS — Загрузки','Загрузки'],uk:['NixelOS — Завантаження','Завантаження']},
+news:{en:['NixelOS News','News'],ru:['NixelOS — Новости','Новости'],uk:['NixelOS — Новини','Новини']},
+'min-req':{en:['NixelOS Minimal Requirements','Requirements'],ru:['NixelOS — Минимальные требования','Требования'],uk:['NixelOS — Мінімальні вимоги','Вимоги']},
+faq:{en:['NixelOS FAQ','FAQ'],ru:['NixelOS — FAQ','FAQ'],uk:['NixelOS — FAQ','FAQ']},
+users:{en:['NixelOS — Users','Users'],ru:['NixelOS — Пользователи','Пользователи'],uk:['NixelOS — Користувачі','Користувачі']},
+chat:{en:['NixelOS — Community Chat','Chat'],ru:['NixelOS — Чат сообщества','Чат'],uk:['NixelOS — Чат спільноти','Чат']},
+profile:{en:['NixelOS — Profile','Profile'],ru:['NixelOS — Профиль','Профиль'],uk:['NixelOS — Профіль','Профіль']},
+'profile-view':{en:['NixelOS — User Profile','Profile View'],ru:['NixelOS — Профиль пользователя','Профиль'],uk:['NixelOS — Профіль користувача','Профіль']},
+login:{en:['NixelOS — Log in','Login'],ru:['NixelOS — Вход','Вход'],uk:['NixelOS — Вхід','Вхід']},
+register:{en:['NixelOS — Sign up','Sign up'],ru:['NixelOS — Регистрация','Регистрация'],uk:['NixelOS — Реєстрація','Реєстрація']},
+verification:{en:['NixelOS — Email verification','Verification'],ru:['NixelOS — Подтверждение почты','Подтверждение'],uk:['NixelOS — Підтвердження пошти','Підтвердження']}
+};
+function lang(){var l=document.documentElement.lang;if(!UI[l]){try{l=localStorage.getItem('nixelos-lang')}catch(e){}}return UI[l]?l:'en'}
+function set(el,a,v){if(el&&el.getAttribute(a)!==v)el.setAttribute(a,v)}
+function chrome(){
+var l=lang(),u=UI[l],p=PG[page];
+set(document.querySelector('.brand'),'aria-label',u.home);
+document.querySelectorAll('.brand img,.menu-head img,.hero-logo').forEach(function(i){set(i,'alt',u.logo)});
+var tg=document.getElementById('menu-toggle');
+if(tg)set(tg,'aria-label',tg.getAttribute('aria-expanded')==='true'?u.close:u.open);
+set(document.getElementById('menu-close'),'aria-label',u.close);
+set(document.querySelector('.menu-links'),'aria-label',u.nav);
+set(document.querySelector('.lang-switch'),'aria-label',u.lang);
+set(document.getElementById('theme-switch'),'aria-label',u.theme);
+if(p){
+var known=[p.en[0],p.ru[0],p.uk[0]];
+if(known.indexOf(document.title)>-1&&document.title!==p[l][0])document.title=p[l][0];
+var bn=document.querySelector('.brand-name');
+if(bn&&p.en[1]&&/^NixelOS\s*\/\s*/.test(bn.textContent)){var want='NixelOS / '+p[l][1];if(bn.textContent!==want)bn.textContent=want}
+}
+}
+var last=lang();
+function onLang(){last=lang();chrome()}
+new MutationObserver(onLang).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+new MutationObserver(function(){chrome()}).observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['aria-expanded']});
+document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.lang-button'))setTimeout(onLang,0)});
+function init(){
+chrome();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+window.addEventListener('load',chrome);
+})();
+</script>
+<script id="nx-gpu">(function () {
+  'use strict';
+  /* ---------- 1. Fast glow for particles (same look, no shadowBlur per frame) ---------- */
+  var sprites = {};
+  function sprite(color, r) {
+    var rr = Math.max(1, Math.round(r));
+    var key = color + '|' + rr;
+    if (sprites[key]) return sprites[key];
+    var S = 2, half = rr + 32, size = half * 2 * S;
+    var c = document.createElement('canvas');
+    c.width = c.height = size;
+    var g = c.getContext('2d');
+    g.scale(S, S);
+    g.shadowBlur = 19;
+    g.shadowColor = 'rgba(' + color + ', 0.9)';
+    g.fillStyle = 'rgba(' + color + ', 0.65)';
+    g.beginPath(); g.arc(half, half, rr, 0, Math.PI * 2); g.fill();
+    return (sprites[key] = { c: c, half: half });
+  }
+
+  /* ---------- 1b. GPU (WebGL) rendering for #particles ---------- */
+  var origGetContext = HTMLCanvasElement.prototype.getContext;
+  var VS = 'attribute vec2 aC;attribute vec2 aP;attribute vec4 aD;attribute vec3 aK;uniform vec2 uRes;varying vec2 vC;varying vec3 vK;varying vec2 vRA;' +
+    'void main(){float h=aD.x+32.0;vec2 pos=aP+aC*h;vec2 clip=pos/uRes*2.0-1.0;gl_Position=vec4(clip.x,-clip.y,0.0,1.0);vC=aC*h;vK=aK;vRA=aD.xy;vRA.y=aD.y;}';
+  var FS = 'precision mediump float;varying vec2 vC;varying vec3 vK;varying vec2 vRA;' +
+    'void main(){float d=length(vC);float r=vRA.x;float s=9.5;' +
+    'float cov=1.0-smoothstep(r-0.7,r+0.7,d);' +
+    'float peak=1.0-exp(-r*r/(2.0*s*s));float prof=exp(-d*d/(2.0*(s*s+r*r*0.5)));' +
+    'float ag=0.9*peak*prof;float ac=0.65*cov;float a=(ac+ag*(1.0-ac))*vRA.y;' +
+    'gl_FragColor=vec4(vK*a,a);}';
+
+  function makeGL(canvas) {
+    var gl = origGetContext.call(canvas, 'webgl', { alpha: true, premultipliedAlpha: true, antialias: false, depth: false, stencil: false, powerPreference: 'low-power' });
+    if (!gl) return null;
+    function sh(t, src) { var o = gl.createShader(t); gl.shaderSource(o, src); gl.compileShader(o); return gl.getShaderParameter(o, gl.COMPILE_STATUS) ? o : null; }
+    var v = sh(gl.VERTEX_SHADER, VS), f = sh(gl.FRAGMENT_SHADER, FS);
+    if (!v || !f) return null;
+    var pr = gl.createProgram(); gl.attachShader(pr, v); gl.attachShader(pr, f); gl.linkProgram(pr);
+    if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return null;
+    gl.useProgram(pr);
+    var buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    var STRIDE = 11 * 4;
+    function attr(n, size, off) { var l = gl.getAttribLocation(pr, n); gl.enableVertexAttribArray(l); gl.vertexAttribPointer(l, size, gl.FLOAT, false, STRIDE, off * 4); }
+    attr('aC', 2, 0); attr('aP', 2, 2); attr('aD', 4, 4); attr('aK', 3, 8);
+    var uRes = gl.getUniformLocation(pr, 'uRes');
+    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.clearColor(0, 0, 0, 0);
+    var data = new Float32Array(0), n = 0, queued = false;
+    var corners = [-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1];
+    var cache = {};
+    function rgb(c) { return cache[c] || (cache[c] = c.split(',').map(function (x) { return parseFloat(x) / 255; })); }
+    var ctx = {
+      __gl: true,
+      canvas: canvas,
+      setTransform: function () {}, save: function () {}, restore: function () {},
+      clearRect: function () { n = 0; gl.viewport(0, 0, canvas.width, canvas.height); gl.clear(gl.COLOR_BUFFER_BIT); },
+      push: function (p) {
+        var need = (n + 1) * 6 * 11;
+        if (data.length < need) { var nd = new Float32Array(Math.max(need, data.length * 2 || 66 * 64)); nd.set(data); data = nd; }
+        var k = rgb(p.color), o = n * 66;
+        for (var i = 0; i < 6; i++, o += 11) {
+          data[o] = corners[i * 2]; data[o + 1] = corners[i * 2 + 1];
+          data[o + 2] = p.x; data[o + 3] = p.y;
+          data[o + 4] = p.r; data[o + 5] = p.alpha; data[o + 6] = 0; data[o + 7] = 0;
+          data[o + 8] = k[0]; data[o + 9] = k[1]; data[o + 10] = k[2];
+        }
+        n++;
+        if (!queued) { queued = true; Promise.resolve().then(flush); }
+      }
+    };
+    function flush() {
+      queued = false;
+      if (!n) return;
+      var dpr = canvas.width / (window.innerWidth || canvas.width);
+      gl.uniform2f(uRes, canvas.width / dpr, canvas.height / dpr);
+      gl.bufferData(gl.ARRAY_BUFFER, data.subarray(0, n * 66), gl.DYNAMIC_DRAW);
+      gl.drawArrays(gl.TRIANGLES, 0, n * 6);
+    }
+    return ctx;
+  }
+
+  HTMLCanvasElement.prototype.getContext = function (type) {
+    if (type === '2d' && this.id === 'particles') {
+      if (this.__nxctx) return this.__nxctx;
+      if (this.__nxfail) return origGetContext.apply(this, arguments);
+      var g = null;
+      try { g = makeGL(this); } catch (e) {}
+      if (g) return (this.__nxctx = g);
+      this.__nxfail = true;
+    }
+    return origGetContext.apply(this, arguments);
+  };
+
+  window.nxGlow = function (ctx, p) {
+    if (ctx.__gl) { ctx.push(p); return; }
+    var s = sprite(p.color, p.r);
+    ctx.globalAlpha = p.alpha;
+    ctx.drawImage(s.c, p.x - s.half, p.y - s.half, s.half * 2, s.half * 2);
+    ctx.globalAlpha = 1;
+  };
+
+  var st = document.createElement('style'); st.textContent = '#particles{will-change:transform;transform:translateZ(0)}'; document.head.appendChild(st);
+})();</script>
+<script src="JS/nx-site.js?v=2"></script>
+</head>
+<body>
+  <canvas id="particles" aria-hidden="true"></canvas>
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="NixelOS home">
+      <img decoding="async" src="https://raw.githubusercontent.com/Dmutrashaa/NixelOS/main/NixelOS%20Site/picture-material/1791559522545.png" alt="NixelOS logo" data-i18n-alt="logoAlt">
+      <span class="brand-name">NixelOS / FAQ</span>
+    </a>
+    <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+  </header>
+  <div class="menu-scrim" id="menu-scrim" aria-hidden="true"></div>
+  <aside class="side-menu" id="site-menu" aria-hidden="true" inert="">
+    <div class="menu-head">
+    <a class="menu-account" id="account-link" href="Auth/login.html"><span class="menu-av" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.6"></circle><path d="M5 20c.8-3.6 3.7-5.4 7-5.4s6.2 1.8 7 5.4"></path></svg></span><span class="menu-acc-text"><span class="menu-acc-name" data-i18n="navAccount">Log in / Sign up</span><span class="menu-acc-sub"></span></span></a>
+    <button class="menu-close" id="menu-close" type="button" aria-label="Close menu" data-i18n-aria="closeMenu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+    </div>
+    <nav class="menu-links" aria-label="Site navigation">
+      <a class="menu-link" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10v9.5h13V10"></path><path d="M10 19.5v-5h4v5"></path></svg><span data-i18n="navHome">Home</span></a>
+      <a class="menu-link" href="downloads.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"></path><path d="m7.5 11 4.5 4.5 4.5-4.5"></path><path d="M5 19.5h14"></path></svg><span data-i18n="navDownloads">Downloads</span></a>
+      <a class="menu-link" href="news.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="M8 9h8M8 12.5h8M8 16h5"></path></svg><span data-i18n="navNews">News</span></a>
+      <a class="menu-link" href="min-req.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"></rect><rect x="9.5" y="9.5" width="5" height="5" rx=".8"></rect><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"></path></svg><span data-i18n="navMinReq">Min. Requirements</span></a>
+      <a class="menu-link" href="faq.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9.6 9.4a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2 1-1.2 1.8"></path><path d="M12 17h.01"></path></svg><span data-i18n="navFaq">FAQ</span></a>
+      <a class="menu-link" href="Users.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2"></circle><path d="M3.5 19.5c.7-3.1 3-4.7 5.5-4.7s4.8 1.6 5.5 4.7"></path><circle cx="17" cy="9.5" r="2.5"></circle><path d="M15.5 19.5c.5-2.3 2.1-3.6 4.2-3.6.7 0 1.3.15 1.8.45"></path></svg><span data-i18n="navUsers">Users</span></a>
+      <a class="menu-link" href="chat.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"></path></svg><span data-i18n="navChat">OS Chat</span></a>
+      </nav>
+    <div class="menu-theme">
+      <span class="menu-theme-label" data-i18n="themeLabel">Light theme</span>
+      <button class="theme-switch" id="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Light theme" data-i18n-aria="themeLabel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"></path></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"></path></svg><span class="theme-knob"></span></button>
+    </div>
+    <div class="menu-languages">
+      <h2 class="lang-title menu-language-title" data-i18n="langTitle">We are on other languages!</h2>
+      <div class="lang-switch" role="group" aria-label="Language" data-i18n-aria="langGroup">
+        <span class="lang-thumb" aria-hidden="true"></span>
+        <button class="lang-button" type="button" data-lang="en" aria-pressed="true">English</button>
+        <button class="lang-button" type="button" data-lang="ru" aria-pressed="false">Русский</button>
+        <button class="lang-button" type="button" data-lang="uk" aria-pressed="false">Українська</button>
+      </div>
+    </div>
+  </aside>
+  <main>
+    <section class="faq-hero">
+      <h1 class="faq-title reveal" data-i18n="faqTitle">FAQ</h1>
+      <p class="faq-subtitle reveal" data-i18n="faqSubtitle">Answers and fixes for the most common problems</p>
+    </section>
+    <section class="faq-panel reveal">
+      <div class="faq-tabs" role="tablist" aria-label="FAQ sections" data-i18n-aria="faqSections">
+        <span class="faq-thumb" aria-hidden="true"></span>
+        <button class="faq-tab" type="button" role="tab" id="tab-help" data-tab="help" aria-selected="true" aria-controls="faq-help"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9.6 9.4a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2 1-1.2 1.8"></path><path d="M12 17h.01"></path></svg><span data-i18n="faqHelp">Help</span></button>
+        <button class="faq-tab" type="button" role="tab" id="tab-errors" data-tab="errors" aria-selected="false" aria-controls="faq-errors" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 21.5 20h-19L12 3.5Z"></path><path d="M12 10v4.5"></path><path d="M12 17.4h.01"></path></svg><span data-i18n="faqErrors">Errors</span></button>
+      </div>
+      <div class="faq-sections">
+        <div class="faq-section" id="faq-help" role="tabpanel" aria-labelledby="tab-help" data-section="help"><div class="faq-list"></div><div class="faq-empty"><div class="faq-radar"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="faq-ring" cx="60" cy="60" r="50"></circle><circle class="faq-ring" cx="60" cy="60" r="50"></circle><circle class="faq-ring" cx="60" cy="60" r="50"></circle><circle class="faq-bug" cx="32" cy="42" r="3"></circle><circle class="faq-bug" cx="90" cy="50" r="3"></circle><circle class="faq-bug" cx="72" cy="92" r="3"></circle><circle class="faq-bug" cx="40" cy="84" r="2.4"></circle><g class="faq-glass"><circle cx="54" cy="54" r="15" fill="rgba(143,155,255,.14)" stroke="#a8b4ff" stroke-width="3.2"></circle><path d="m65.5 65.5 16 16" stroke="#a8b4ff" stroke-width="5.5" stroke-linecap="round"></path></g></svg></div><h3 class="faq-empty-title" data-i18n="faqEmptyTitle">No posts here yet!</h3><p class="faq-empty-sub" data-i18n="faqEmptySub">Hmm! We are finding errors, and how to help you!...</p></div></div>
+        <div class="faq-section" id="faq-errors" role="tabpanel" aria-labelledby="tab-errors" data-section="errors" hidden=""><div class="faq-list"><article class="faq-post"><button class="faq-head" type="button" aria-expanded="false"><span class="faq-head-text"><span class="faq-post-title" data-i18n="faq1Title">Error code - BAD_CPU_CONFIG, What to do?</span><span class="faq-post-sub" data-i18n="faq1Sub">What to do when you see this error.</span></span><svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button><div class="faq-body"><div class="faq-body-inner"><section class="faq-block faq-block-problem"><h4 class="faq-block-title" data-i18n="faqProblem">Problem</h4><p class="faq-block-text" data-i18n="faq1Problem">The problem is that your CPU is unsupported on NixelOS! It's can't run, because maybe it's not x86-64.</p></section><section class="faq-block faq-block-solution"><h4 class="faq-block-title" data-i18n="faqSolution">Solution</h4><p class="faq-block-text" data-i18n="faq1Solution">You need to get a better CPU, only 64-bit. It's cannot be fixed, without better processor.</p></section></div></div></article></div><div class="faq-empty"><div class="faq-radar"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="faq-ring" cx="60" cy="60" r="50"></circle><circle class="faq-ring" cx="60" cy="60" r="50"></circle><circle class="faq-ring" cx="60" cy="60" r="50"></circle><circle class="faq-bug" cx="32" cy="42" r="3"></circle><circle class="faq-bug" cx="90" cy="50" r="3"></circle><circle class="faq-bug" cx="72" cy="92" r="3"></circle><circle class="faq-bug" cx="40" cy="84" r="2.4"></circle><g class="faq-glass"><circle cx="54" cy="54" r="15" fill="rgba(143,155,255,.14)" stroke="#a8b4ff" stroke-width="3.2"></circle><path d="m65.5 65.5 16 16" stroke="#a8b4ff" stroke-width="5.5" stroke-linecap="round"></path></g></svg></div><h3 class="faq-empty-title" data-i18n="faqEmptyTitle">No posts here yet!</h3><p class="faq-empty-sub" data-i18n="faqEmptySub">Hmm! We are finding errors, and how to help you!...</p></div></div>
+      </div>
+    </section>
+    <div class="faq-footer reveal">
+      <p class="faq-note" data-i18n="faqNotHelpful">Not helpful? Check out our Socials!</p>
+      <a class="btn faq-open" href="index.html#socials"><span data-i18n="faqOpen">Open</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18"><path d="M7 17 17 7"></path><path d="M8 7h9v9"></path></svg></a>
+    </div>
+  </main>
+  <script>function fmtMd(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/gs,'<b>$1</b>').replace(/__(.+?)__/gs,'<u>$1</u>').replace(/~~(.+?)~~/gs,'<s>$1</s>').replace(/\*(.+?)\*/gs,'<i>$1</i>').replace(/\{c:(#[0-9a-fA-F]{3,8})\|(.+?)\}/gs,'<span style="color:$1">$2</span>').replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>').replace(/\n/g,'<br>')}
+
+    const translations = {
+      en: {navHome:"Home",navDownloads:"Downloads",navNews:"News",navMinReq:"Min. Requirements",navFaq:"FAQ",navUsers:"Users",navChat:"OS Chat",navAccount:"Log in / Sign up",themeLabel:"Light theme",langTitle:"We are on other languages!",langGroup:"Language",openMenu:"Open menu",closeMenu:"Close menu",logoAlt:"NixelOS logo",faqTitle:"FAQ",faqSubtitle:"Answers and fixes for the most common problems",faqHelp:"Help",faqErrors:"Errors",faqSections:"FAQ sections",faqEmptyTitle:"No posts here yet!",faqEmptySub:"Hmm! We are finding errors, and how to help you!...",faqNotHelpful:"Not helpful? Check out our Socials!",faqOpen:"Open",faqProblem:"Problem",faqCause:"Possible cause",faqSolution:"Solution",faq1Title:"Error code - BAD_CPU_CONFIG, What to do?",faq1Sub:"What to do when you see this error.",faq1Problem:"The problem is that your CPU is unsupported on NixelOS! It's can't run, because maybe it's not x86-64.",faq1Solution:"You need to get a better CPU, only 64-bit. It's cannot be fixed, without better processor."},
+      ru: {navHome:"Главная",navDownloads:"Загрузки",navNews:"Новости",navMinReq:"Мин. требования",navFaq:"FAQ",navUsers:"Пользователи",navChat:"Чат ОС",navAccount:"Войти / Регистрация",themeLabel:"Светлая тема",langTitle:"Мы доступны на других языках!",langGroup:"Язык",openMenu:"Открыть меню",closeMenu:"Закрыть меню",logoAlt:"Логотип NixelOS",faqTitle:"FAQ",faqSubtitle:"Ответы и решения для самых частых проблем",faqHelp:"Помощь",faqErrors:"Ошибки",faqSections:"Разделы FAQ",faqEmptyTitle:"Здесь пока нет постов!",faqEmptySub:"Хм! Мы ищем ошибки и способы, как вам помочь!...",faqNotHelpful:"Не помогло? Загляните в наши соцсети!",faqOpen:"Открыть",faqProblem:"Проблема",faqCause:"Возможная причина",faqSolution:"Решение",faq1Title:"Код ошибки - BAD_CPU_CONFIG, Что делать?",faq1Sub:"Что делать, если вы видите эту ошибку.",faq1Problem:"Проблема в том, что ваш процессор не поддерживается NixelOS! Он не запускается, потому что, возможно, это не x86-64.",faq1Solution:"Вам нужен процессор получше, только 64-битный. Это невозможно исправить без лучшего процессора."},
+      uk: {navHome:"Головна",navDownloads:"Завантаження",navNews:"Новини",navMinReq:"Мін. вимоги",navFaq:"FAQ",navUsers:"Користувачі",navChat:"Чат ОС",navAccount:"Увійти / Реєстрація",themeLabel:"Світла тема",langTitle:"Ми доступні іншими мовами!",langGroup:"Мова",openMenu:"Відкрити меню",closeMenu:"Закрити меню",logoAlt:"Логотип NixelOS",faqTitle:"FAQ",faqSubtitle:"Відповіді та рішення для найпоширеніших проблем",faqHelp:"Допомога",faqErrors:"Помилки",faqSections:"Розділи FAQ",faqEmptyTitle:"Тут ще немає дописів!",faqEmptySub:"Хм! Ми шукаємо помилки та способи, як вам допомогти!...",faqNotHelpful:"Не допомогло? Завітайте до наших соцмереж!",faqOpen:"Відкрити",faqProblem:"Проблема",faqCause:"Можлива причина",faqSolution:"Рішення",faq1Title:"Код помилки - BAD_CPU_CONFIG, що робити?",faq1Sub:"Що робити, коли ви бачите цю помилку.",faq1Problem:"Проблема в тому, що ваш ЦП не підтримується в NixelOS! Він не може працювати, тому що, можливо, це не x86-64.",faq1Solution:"Вам потрібно отримати кращий процесор, лише 64-розрядний. Це неможливо виправити без кращого процесора."}
+    };
+    let currentLang = 'en';
+    function t(key) {
+      return (translations[currentLang] && translations[currentLang][key]) || translations.en[key];
+    }
+    function applyLang(lang) {
+      if (!translations[lang]) lang = 'en';
+      currentLang = lang;
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-i18n]').forEach(el => { el.innerHTML=fmtMd(t(el.dataset.i18n)); });
+      document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+      document.querySelectorAll('[data-i18n-alt]').forEach(el => { el.setAttribute('alt', t(el.dataset.i18nAlt)); });
+      menuToggle.setAttribute('aria-label', menuToggle.getAttribute('aria-expanded') === 'true' ? t('closeMenu') : t('openMenu'));
+      document.querySelectorAll('.lang-button').forEach(btn => { btn.setAttribute('aria-pressed', String(btn.dataset.lang === lang)); });
+    }
+    let langBusy = false;
+    let pendingLang = null;
+    function setPressed(lang) {
+      document.querySelectorAll('.lang-button').forEach(btn => { btn.setAttribute('aria-pressed', String(btn.dataset.lang === lang)); });
+    }
+    function isRevealed(el) {
+      const holder = el.closest('.reveal');
+      return !holder || holder.classList.contains('is-visible');
+    }
+    async function switchLang(lang) {
+      if (!translations[lang]) lang = 'en';
+      if (lang === currentLang) return;
+      if (langBusy) {
+        pendingLang = lang;
+        setPressed(lang);
+        return;
+      }
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const items = Array.from(document.querySelectorAll('[data-i18n]')).filter(isRevealed);
+      if (reduceMotion || !items.length || typeof items[0].animate !== 'function') {
+        applyLang(lang);
+        return;
+      }
+      langBusy = true;
+      setPressed(lang);
+      const hidden = { opacity: 0, transform: 'translateY(-8px)', filter: 'blur(5px)' };
+      const shown = { opacity: 1, transform: 'translateY(0)', filter: 'blur(0px)' };
+      let outs = [];
+      try {
+        outs = items.map(el => el.animate([shown, hidden], { duration: 220, easing: 'ease-in', fill: 'forwards' }));
+        await Promise.all(outs.map(a => a.finished));
+        applyLang(lang);
+        const ins = items.map((el, i) => el.animate(
+          [{ opacity: 0, transform: 'translateY(10px)', filter: 'blur(5px)' }, shown],
+          { duration: 460, delay: Math.min(i * 28, 340), easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' }
+        ));
+        outs.forEach(a => a.cancel());
+        await Promise.all(ins.map(a => a.finished));
+      } catch (e) {
+        outs.forEach(a => a.cancel());
+        applyLang(lang);
+      } finally {
+        langBusy = false;
+        const next = pendingLang;
+        pendingLang = null;
+        if (next && next !== currentLang) switchLang(next);
+      }
+    }
+    const menuToggle = document.getElementById('menu-toggle');
+    const siteMenu = document.getElementById('site-menu');
+    const menuScrim = document.getElementById('menu-scrim');
+    const menuClose = document.getElementById('menu-close');
+    function setMenuOpen(open) {
+      menuToggle.setAttribute('aria-expanded', String(open));
+      menuToggle.setAttribute('aria-label', open ? t('closeMenu') : t('openMenu'));
+      siteMenu.classList.toggle('is-open', open);
+      menuScrim.classList.toggle('is-open', open);
+      siteMenu.setAttribute('aria-hidden', String(!open));
+      siteMenu.toggleAttribute('inert', !open);
+      menuScrim.setAttribute('aria-hidden', String(!open));
+      document.body.style.overflow = open ? 'hidden' : '';
+      if (open) menuClose.focus();
+      else menuToggle.focus();
+    }
+    menuToggle.addEventListener('click', () => setMenuOpen(menuToggle.getAttribute('aria-expanded') !== 'true'));
+    menuClose.addEventListener('click', () => setMenuOpen(false));
+    menuScrim.addEventListener('click', () => setMenuOpen(false));
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && menuToggle.getAttribute('aria-expanded') === 'true') setMenuOpen(false);
+    });
+
+    const revealItems = document.querySelectorAll('.reveal');
+    if ('IntersectionObserver' in window) {
+      const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      revealItems.forEach(item => revealObserver.observe(item));
+    } else {
+      revealItems.forEach(item => item.classList.add('is-visible'));
+    }
+
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let width = 0;
+    let height = 0;
+    const colors = ['79, 111, 255', '147, 91, 255', '73, 177, 255'];
+    function resizeParticles() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const count = Math.min(42, Math.max(18, Math.floor(width / 27)));
+      particles = Array.from({ length: count }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        r: 2 + Math.random() * 5,
+        vy: 0.12 + Math.random() * 0.38,
+        vx: (Math.random() - 0.5) * 0.22,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        alpha: 0.12 + Math.random() * 0.28
+      }));
+    }
+    let animationFrame;
+    function drawParticles() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(p => {
+        p.y -= p.vy;
+        p.x += p.vx;
+        if (p.y < -15) { p.y = height + 15; p.x = Math.random() * width; }
+        if (p.x < -15) p.x = width + 15;
+        if (p.x > width + 15) p.x = -15;
+        window.nxGlow(ctx,p);
+      });
+      animationFrame = requestAnimationFrame(drawParticles);
+    }
+    resizeParticles();
+    drawParticles();
+    window.addEventListener('resize', resizeParticles, { passive: true });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) cancelAnimationFrame(animationFrame);
+      else drawParticles();
+    });
+    document.querySelectorAll('.lang-button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        switchLang(btn.dataset.lang);
+        try { localStorage.setItem('nixelos-lang', btn.dataset.lang); } catch (e) {}
+      });
+    });
+    let savedLang = 'en';
+    try { savedLang = localStorage.getItem('nixelos-lang') || 'en'; } catch (e) {}
+    applyLang(savedLang);
+  
+const themeSwitch=document.getElementById('theme-switch');
+function applyTheme(theme){document.documentElement.dataset.theme=theme;themeSwitch.setAttribute('aria-checked',String(theme==='light'));const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.setAttribute('content',theme==='light'?'#f4f5fb':'#090a0e')}
+applyTheme(document.documentElement.dataset.theme==='light'?'light':'dark');
+themeSwitch.addEventListener('click',()=>{const next=document.documentElement.dataset.theme==='light'?'dark':'light';applyTheme(next);try{localStorage.setItem('nixelos-theme',next)}catch(e){}});
+
+const langSwitch=document.querySelector('.lang-switch'),langThumb=document.querySelector('.lang-thumb');
+function moveThumb(){const a=langSwitch.querySelector('.lang-button[aria-pressed="true"]');if(!a)return;langThumb.style.width=a.offsetWidth+'px';langThumb.style.transform='translateX('+a.offsetLeft+'px)'}
+new MutationObserver(moveThumb).observe(langSwitch,{subtree:true,attributes:true,attributeFilter:['aria-pressed']});
+if('ResizeObserver'in window)new ResizeObserver(moveThumb).observe(langSwitch);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(moveThumb);
+window.addEventListener('resize',moveThumb);
+moveThumb();
+requestAnimationFrame(()=>requestAnimationFrame(()=>langSwitch.classList.add('is-ready')));
+const faqBar=document.querySelector('.faq-tabs'),faqThumb=document.querySelector('.faq-thumb'),faqTabs=[...document.querySelectorAll('.faq-tab')],faqPanel=document.querySelector('.faq-panel');
+function moveFaqThumb(){const a=faqBar.querySelector('.faq-tab[aria-selected="true"]');if(!a)return;faqThumb.style.width=a.offsetWidth+'px';faqThumb.style.transform='translateX('+a.offsetLeft+'px)'}
+function refreshFaq(){
+  document.querySelectorAll('.faq-section').forEach(sec=>{
+    const posts=sec.querySelectorAll('.faq-post');
+    sec.querySelector('.faq-empty').hidden=posts.length>0;
+    posts.forEach((p,i)=>p.style.setProperty('--i',i));
+  });
+}
+function selectFaq(name,instant){
+  faqTabs.forEach(b=>{const on=b.dataset.tab===name;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+  document.querySelectorAll('.faq-section').forEach(sec=>{
+    const on=sec.dataset.section===name;
+    sec.hidden=!on;
+    sec.classList.remove('is-in');
+    if(on&&!instant){void sec.offsetWidth;sec.classList.add('is-in')}
+  });
+  moveFaqThumb();
+  try{history.replaceState(null,'','#'+name)}catch(e){}
+}
+faqTabs.forEach((b,i)=>{
+  b.addEventListener('click',()=>selectFaq(b.dataset.tab));
+  b.addEventListener('keydown',e=>{
+    if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight')return;
+    e.preventDefault();
+    const n=faqTabs[(i+(e.key==='ArrowRight'?1:faqTabs.length-1))%faqTabs.length];
+    selectFaq(n.dataset.tab);n.focus();
+  });
+});
+faqPanel.addEventListener('click',e=>{
+  const h=e.target.closest('.faq-head');
+  if(!h)return;
+  const p=h.closest('.faq-post'),open=!p.classList.contains('is-open');
+  p.classList.toggle('is-open',open);
+  h.setAttribute('aria-expanded',String(open));
+});
+new MutationObserver(moveFaqThumb).observe(faqBar,{subtree:true,attributes:true,attributeFilter:['aria-selected']});
+if('ResizeObserver'in window)new ResizeObserver(moveFaqThumb).observe(faqBar);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(moveFaqThumb);
+window.addEventListener('resize',moveFaqThumb);
+refreshFaq();
+selectFaq(location.hash==='#errors'?'errors':'help',true);
+requestAnimationFrame(()=>requestAnimationFrame(()=>faqBar.classList.add('is-ready')));
+
+</script>
+
+
+<script type="module">
+try {
+  const m = await import("./JS/supabase.js?v=4");
+  if (m && m.initMenuAccount) m.initMenuAccount("./");
+} catch (e) {}
+</script>
+
+
+</body></html>
