@@ -285,11 +285,7 @@ h1.is-visible { animation-delay: 160ms; }
         if (p.y < -15) { p.y = height + 15; p.x = Math.random() * width; }
         if (p.x < -15) p.x = width + 15;
         if (p.x > width + 15) p.x = -15;
-        ctx.save();
-        ctx.globalAlpha = p.alpha; ctx.shadowBlur = 19;
-        ctx.shadowColor = 'rgba(' + p.color + ', 0.9)'; ctx.fillStyle = 'rgba(' + p.color + ', 0.65)';
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
-        ctx.restore();
+        window.nxGlow(ctx,p);
       });
       animationFrame = requestAnimationFrame(drawParticles);
     }
@@ -399,11 +395,115 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 window.addEventListener('load',chrome);
 })();
 </script>
+<script id="nx-gpu">(function () {
+  'use strict';
+  /* ---------- 1. Fast glow for particles (same look, no shadowBlur per frame) ---------- */
+  var sprites = {};
+  function sprite(color, r) {
+    var rr = Math.max(1, Math.round(r));
+    var key = color + '|' + rr;
+    if (sprites[key]) return sprites[key];
+    var S = 2, half = rr + 32, size = half * 2 * S;
+    var c = document.createElement('canvas');
+    c.width = c.height = size;
+    var g = c.getContext('2d');
+    g.scale(S, S);
+    g.shadowBlur = 19;
+    g.shadowColor = 'rgba(' + color + ', 0.9)';
+    g.fillStyle = 'rgba(' + color + ', 0.65)';
+    g.beginPath(); g.arc(half, half, rr, 0, Math.PI * 2); g.fill();
+    return (sprites[key] = { c: c, half: half });
+  }
+
+  /* ---------- 1b. GPU (WebGL) rendering for #particles ---------- */
+  var origGetContext = HTMLCanvasElement.prototype.getContext;
+  var VS = 'attribute vec2 aC;attribute vec2 aP;attribute vec4 aD;attribute vec3 aK;uniform vec2 uRes;varying vec2 vC;varying vec3 vK;varying vec2 vRA;' +
+    'void main(){float h=aD.x+32.0;vec2 pos=aP+aC*h;vec2 clip=pos/uRes*2.0-1.0;gl_Position=vec4(clip.x,-clip.y,0.0,1.0);vC=aC*h;vK=aK;vRA=aD.xy;vRA.y=aD.y;}';
+  var FS = 'precision mediump float;varying vec2 vC;varying vec3 vK;varying vec2 vRA;' +
+    'void main(){float d=length(vC);float r=vRA.x;float s=9.5;' +
+    'float cov=1.0-smoothstep(r-0.7,r+0.7,d);' +
+    'float peak=1.0-exp(-r*r/(2.0*s*s));float prof=exp(-d*d/(2.0*(s*s+r*r*0.5)));' +
+    'float ag=0.9*peak*prof;float ac=0.65*cov;float a=(ac+ag*(1.0-ac))*vRA.y;' +
+    'gl_FragColor=vec4(vK*a,a);}';
+
+  function makeGL(canvas) {
+    var gl = origGetContext.call(canvas, 'webgl', { alpha: true, premultipliedAlpha: true, antialias: false, depth: false, stencil: false, powerPreference: 'low-power' });
+    if (!gl) return null;
+    function sh(t, src) { var o = gl.createShader(t); gl.shaderSource(o, src); gl.compileShader(o); return gl.getShaderParameter(o, gl.COMPILE_STATUS) ? o : null; }
+    var v = sh(gl.VERTEX_SHADER, VS), f = sh(gl.FRAGMENT_SHADER, FS);
+    if (!v || !f) return null;
+    var pr = gl.createProgram(); gl.attachShader(pr, v); gl.attachShader(pr, f); gl.linkProgram(pr);
+    if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return null;
+    gl.useProgram(pr);
+    var buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    var STRIDE = 11 * 4;
+    function attr(n, size, off) { var l = gl.getAttribLocation(pr, n); gl.enableVertexAttribArray(l); gl.vertexAttribPointer(l, size, gl.FLOAT, false, STRIDE, off * 4); }
+    attr('aC', 2, 0); attr('aP', 2, 2); attr('aD', 4, 4); attr('aK', 3, 8);
+    var uRes = gl.getUniformLocation(pr, 'uRes');
+    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.clearColor(0, 0, 0, 0);
+    var data = new Float32Array(0), n = 0, queued = false;
+    var corners = [-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1];
+    var cache = {};
+    function rgb(c) { return cache[c] || (cache[c] = c.split(',').map(function (x) { return parseFloat(x) / 255; })); }
+    var ctx = {
+      __gl: true,
+      canvas: canvas,
+      setTransform: function () {}, save: function () {}, restore: function () {},
+      clearRect: function () { n = 0; gl.viewport(0, 0, canvas.width, canvas.height); gl.clear(gl.COLOR_BUFFER_BIT); },
+      push: function (p) {
+        var need = (n + 1) * 6 * 11;
+        if (data.length < need) { var nd = new Float32Array(Math.max(need, data.length * 2 || 66 * 64)); nd.set(data); data = nd; }
+        var k = rgb(p.color), o = n * 66;
+        for (var i = 0; i < 6; i++, o += 11) {
+          data[o] = corners[i * 2]; data[o + 1] = corners[i * 2 + 1];
+          data[o + 2] = p.x; data[o + 3] = p.y;
+          data[o + 4] = p.r; data[o + 5] = p.alpha; data[o + 6] = 0; data[o + 7] = 0;
+          data[o + 8] = k[0]; data[o + 9] = k[1]; data[o + 10] = k[2];
+        }
+        n++;
+        if (!queued) { queued = true; Promise.resolve().then(flush); }
+      }
+    };
+    function flush() {
+      queued = false;
+      if (!n) return;
+      var dpr = canvas.width / (window.innerWidth || canvas.width);
+      gl.uniform2f(uRes, canvas.width / dpr, canvas.height / dpr);
+      gl.bufferData(gl.ARRAY_BUFFER, data.subarray(0, n * 66), gl.DYNAMIC_DRAW);
+      gl.drawArrays(gl.TRIANGLES, 0, n * 6);
+    }
+    return ctx;
+  }
+
+  HTMLCanvasElement.prototype.getContext = function (type) {
+    if (type === '2d' && this.id === 'particles') {
+      if (this.__nxctx) return this.__nxctx;
+      if (this.__nxfail) return origGetContext.apply(this, arguments);
+      var g = null;
+      try { g = makeGL(this); } catch (e) {}
+      if (g) return (this.__nxctx = g);
+      this.__nxfail = true;
+    }
+    return origGetContext.apply(this, arguments);
+  };
+
+  window.nxGlow = function (ctx, p) {
+    if (ctx.__gl) { ctx.push(p); return; }
+    var s = sprite(p.color, p.r);
+    ctx.globalAlpha = p.alpha;
+    ctx.drawImage(s.c, p.x - s.half, p.y - s.half, s.half * 2, s.half * 2);
+    ctx.globalAlpha = 1;
+  };
+
+  var st = document.createElement('style'); st.textContent = '#particles{will-change:transform;transform:translateZ(0)}'; document.head.appendChild(st);
+})();</script>
+<script src="../JS/nx-site.js?v=2"></script>
 </head>
 <body>
 <header class="topbar">
-<a class="brand" href="../index.html" aria-label="NixelOS home"><img src="https://raw.githubusercontent.com/Dmutrashaa/NixelOS/main/NixelOS%20Site/picture-material/1791559522545.png" alt="NixelOS logo"><span class="brand-name">NixelOS / Verification</span></a>
-<div class="top-actions"><a class="toplink" href="../index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg><span data-sk="back">Back to site</span></a><button class="menu-toggle" id="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button></div>
+<a class="brand" href="../index.html" aria-label="NixelOS home"><img decoding="async" src="https://raw.githubusercontent.com/Dmutrashaa/NixelOS/main/NixelOS%20Site/picture-material/1791559522545.png" alt="NixelOS logo"><span class="brand-name">NixelOS / Verification</span></a>
+<div class="top-actions"><a class="toplink" href="../index.html" aria-label="Back" title="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></a><button class="menu-toggle" id="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button></div>
 </header>
 <div class="menu-scrim" id="menu-scrim" aria-hidden="true"></div>
 <aside class="side-menu" id="site-menu" aria-hidden="true" inert="">
@@ -581,7 +681,7 @@ window.addEventListener('load',chrome);
 })();
 </script>
 <script type="module">
-let _mod = {}; try { _mod = await import("./supabase.js?v=4"); } catch (e) {}
+let _mod = {}; try { _mod = await import("../JS/supabase.js?v=4"); } catch (e) {}
 const { sb, initLang, getSessionUser } = _mod;
 if (!sb) { console.warn("Supabase offline"); }
 
